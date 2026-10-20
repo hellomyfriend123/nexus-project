@@ -1,0 +1,22 @@
+# Không đưa vào Docker build context: output build, git, secret, log
+**/target/
+.git/
+.gitignore
+.m2repo/
+.m2/
+*.log
+logs/
+
+# Secret & cấu hình cục bộ — TUYỆT ĐỐI không bake vào image
+.env
+.env.*
+!.env.example
+application-local.yml
+application-secret.yml
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+Thumbs.db
+.DS_Store
