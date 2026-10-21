@@ -1,0 +1,1079 @@
+﻿Project Nexus 
+Software Requirement Specification
+Version: 1.0
+HCM, Apr 2026
+Approval Page
+Prepared by: 
+Business Analyst
+Signature:
+____________________
+Date:
+____ /____  / ____
+Reviewed by: 
+Business Analyst
+Signature:
+____________________
+Date:
+____ /____  / ____
+Supported by:
+Signature:
+____________________
+Date:
+____ /____  / ____
+Approved by: 
+Signature:
+____________________
+Date:
+____ /____  / ____
+Revision History
+Date
+Version
+Author
+Change Description
+04/06/2026
+1.0
+HauNK
+Create new
+Table of Contents
+1.Introduction5
+1.1Purpose5
+1.2Scope of Project5
+2.Overall Description5
+2.1Business Context5
+2.2System Context Diagram6
+2.3System Actors6
+2.4High-Level Logical Architecture7
+2.5Component Diagram7
+2.6Configurations List7
+2.7Privileges List10
+2.8Event Message Table12
+3.Software Requirements Specification14
+3.1User Service14
+3.1.1Identity and Access Management14
+3.1.2Reputation17
+3.2Notification Service18
+3.2.1Event Logs Management18
+3.2.2Health Check19
+3.2.3Notification19
+3.3Catalog Service20
+3.3.1Product Management20
+3.3.2Category Management20
+3.3.3Search & Discovery21
+3.4Commerce Services21
+3.4.1Shopping Cart21
+3.4.2Checkout & Payment22
+3.4.3Order Management23
+3.5Auction Services24
+3.5.1Auction Management24
+3.5.2Bidding25
+3.5.3Auction Settlement26
+3.6Fulfillment Service27
+3.6.1Inventory/Warehouse27
+3.6.2Shipping & Logistics29
+4.Other Requirements31
+4.1General implementation principles31
+4.2API & Contract Management31
+4.3Configuration & Secrects Management31
+5.Non-functional Requirements32
+5.1Performance & Scalability32
+5.2Availability & Reliability32
+5.3Data Consistency & Integrity33
+5.4Security & Compliance33
+5.5Observability & Monitoring33
+5.6Maintainability & Extensibility33
+5.7Deployment & Operations34
+5.8Data Retention & Auditing34
+Introduction
+Purpose
+This document defines the functional and non-functional requirements for the "Project Nexus" e-commerce marketplace platform. It serves as the primary source of truth for the development, quality assurance, and stakeholder teams to ensure the final product aligns with the business vision and strategic objectives.
+Scope of Project
+The "Project Nexus" system is an online platform designed to connect Sellers with Buyers, facilitating the transaction of a diverse range of goods.
+In-Scope Features:
+Account management for Buyers, Sellers, and Administrators.
+Comprehensive product, category, and inventory management.
+End-to-end shopping workflow: product search, shopping cart, checkout, and payment processing.
+Order management and fulfillment tracking.
+Rating and review systems for products and sellers.
+Management of promotional campaigns and discount codes.
+Out-of-Scope Features for Version 1.0:
+In-house logistics and supply chain management system (the platform will integrate with third-party logistics providers).
+Internal corporate systems (e.g., Human Resources, Accounting).
+A dedicated mobile application for Sellers (Phase 1 will focus on a web-based portal).
+Overall Description
+Business Context
+While the e-commerce market is experiencing robust growth, users still face challenges in finding high-quality products at competitive prices within a seamless shopping experience. "Project Nexus" is conceived to address this gap by providing a reliable, user-friendly platform that integrates multiple value-added services for both buyers and sellers 
+System Context Diagram
+System Actors
+Actor
+Description
+Buyer
+The end-user who performs actions such as searching for products, viewing details, placing orders, making payments and submitting reviews.
+Seller
+A business partner who lists products for sale, manages inventory, processes orders, and interacts with Buyers.
+Administrator (Admin)
+A system manager responsible for overall platform governance, content moderation, user management, system configuration, and viewing aggregate reports.
+Support Staff
+A user who handles inquiries, complaints, and disputes from both Buyers and Sellers.
+External System
+Third-party partner systems, such as payment gateways and shipping carriers.
+High-Level Logical Architecture
+Component Diagram
+Configurations List
+This table defines the configurations that can be used in the system. It can be updated or added more configuration in the future.
+Configuration name
+Description
+Default value
+SYSTEM_ENV
+System environment (DEV / STAGING / PROD)
+DEV
+SYSTEM_TIMEZONE
+System default time zone
+UTC
+SESSION_TIMEOUT_MINUTES
+User session timeout
+30
+MAX_LOGIN_ATTEMPTS
+Maximum failed login attempts
+5
+PASSWORD_POLICY
+Password validation rules
+STANDARD
+ACCESS_TOKEN_EXPIRY_MINUTES
+Access token expiration time
+60
+ALLOW_SELF_REGISTRATION
+Allow users to selfregister
+true
+DEFAULT_USER_ROLE
+Default role assigned to new users
+USER
+USER_SOFT_DELETE
+Use soft delete for user accounts
+true
+DEFAULT_ROLE_PRIVILEGES
+Default privileges for new roles
+READ_ONLY
+PRODUCT_STATUSES
+Supported product statuses
+DRAFT, ACTIVE, INACTIVE
+MAX_PRODUCT_IMAGES
+Maximum images per product
+5
+ALLOW_PRODUCT_DELETE_WITH_ORDER
+Allow deleting product with orders
+false
+PRODUCT_AUCTION_ENABLED
+Allow products to be listed in auctions
+true
+CATEGORY_MAX_LEVEL
+Maximum category hierarchy depth
+3
+ALLOW_CATEGORY_DELETE_WITH_PRODUCT
+Allow deleting category with products
+false
+CATEGORY_DEFAULT_SORT
+Default category sort order
+NAME_ASC
+MAX_ACTIVE_CART_PER_USER
+Maximum active cart per user
+1
+CART_EXPIRATION_DAYS
+Cart expiration time
+7
+ALLOW_GUEST_CART
+Allow guest users to have carts
+true
+CART_MERGE_ON_LOGIN
+Merge guest cart on login
+true
+CHECKOUT_PRICE_REVALIDATION
+Recalculate price during checkout
+true
+CHECKOUT_TIMEOUT_MINUTES
+Checkout timeout
+15
+ORDER_IDEMPOTENCY_ENABLED
+Enable idempotent order creation
+true
+PAYMENT_PROVIDER
+Payment gateway provider
+STRIPE
+PAYMENT_RETRY_LIMIT
+Maximum payment retries attempts
+3
+PAYMENT_CALLBACK_TIMEOUT_MINUTES
+Payment callback timeout
+10
+PAYMENT_IDEMPOTENCY_WINDOW_MINUTES
+Idempotency window for callbacks
+60
+AUCTION_MIN_DURATION_MINUTES
+Minimum auction duration
+60
+AUCTION_MAX_DURATION_HOURS
+Maximum auction duration
+168
+DEFAULT_BID_INCREMENT
+Default bid increment value
+10
+MAX_ACTIVE_AUCTIONS_PER_SELLER
+Max active auctions per seller
+5
+ANTI_SNIPING_ENABLED
+Enable antisniping
+true
+ANTI_SNIPING_EXTENSION_MINUTES
+Extend auction if bid placed near end
+5
+AUCTION_PAYMENT_DEADLINE_HOURS
+Payment deadline for auction winner
+24
+DEFAULT_WAREHOUSE_ID
+Default warehouse identifier
+WH_001
+INVENTORY_RESERVATION_TIMEOUT_MINUTES
+Inventory reservation timeout
+30
+ALLOW_OVERSELL
+Allow overselling inventory
+false
+MAX_WAREHOUSES_PER_ORDER
+Max warehouses per order
+2
+SUPPORTED_CARRIERS
+Supported shipping carriers
+GHN, GHTK
+DEFAULT_CARRIER
+Default shipping carrier
+GHN
+SHIPPING_API_TIMEOUT_MS
+Carrier API timeout
+3000
+SHIPPING_RETRY_LIMIT
+Shipping requests retry limit
+3
+FREE_SHIPPING_THRESHOLD
+Order amount for free shipping
+100
+EMAIL_NOTIFICATION_ENABLED
+Enable email notifications
+true
+PUSH_NOTIFICATION_ENABLED
+Enable push notifications
+true
+SMS_NOTIFICATION_ENABLED
+Enable SMS notifications
+false
+NOTIFICATION_RETRY_LIMIT
+Notification retries attempts
+3
+TRANSACTIONAL_NOTIFICATION_MANDATORY
+Transactional notifications mandatory
+true
+MIN_REPUTATION_TO_BID
+Minimum reputation score to bid
+40
+MIN_REPUTATION_TO_SELL
+Minimum reputation score to create auction
+50
+TRUST_LEVEL_THRESHOLDS
+Trust level score thresholds
+CONFIGURED
+PAYMENT_TIMEOUT_PENALTY_SCORE
+Penalty score for payment timeout
+10
+FEATURE_AUCTION_ENABLED
+Enable auction feature
+true
+FEATURE_MULTI_WAREHOUSE_ENABLED
+Enable multiwarehouse support
+false
+FEATURE_SMS_NOTIFICATION_ENABLED
+Enable SMS notifications
+false
+FEATURE_REPUTATION_ENFORCEMENT
+Enable reputation enforcement
+true
+Privileges List
+Privilege
+Description
+Admin
+Seller
+Buyer
+Support Staff
+AUTH.LOGIN
+Login to the system
+X
+X
+X
+X
+AUTH.LOGOUT
+Logout from the system
+X
+X
+X
+X
+PROFILE.VIEW
+View own profile
+X
+X
+X
+X
+PROFILE.UPDATE
+Update own profile
+X
+X
+X
+X
+PROFILE.CHANGE_PASSWORD
+Change own password
+X
+X
+X
+X
+PROFILE.RESET_PASSWORD
+Reset forgotten password
+X
+X
+X
+X
+USER.CREATE
+Create user account
+X
+USER.UPDATE
+Update user information
+X
+X
+USER.DELETE
+Delete user account
+X
+USER.VIEW
+View user details
+X
+X
+USER.LIST
+View user list
+X
+X
+USER.CHANGE_PASSWORD
+Change user password
+X
+USER.REPUTATION.VIEW
+View user reputation
+X
+X
+USER.REPUTATION.ADJUST
+Adjust user reputation
+X
+ROLE.CREATE
+Create role
+X
+ROLE.UPDATE
+Update role
+X
+ROLE.DELETE
+Delete role
+X
+ROLE.VIEW
+View role details
+X
+X
+ROLE.LIST
+View role list
+X
+X
+PRODUCT.CREATE
+Create product
+X
+X
+PRODUCT.UPDATE
+Update product
+X
+X
+PRODUCT.DELETE
+Delete product
+X
+X
+PRODUCT.VIEW
+View product details
+X
+X
+X
+X
+PRODUCT.LIST
+View product list
+X
+X
+X
+X
+PRODUCT.SEARCH
+Search products
+X
+X
+X
+X
+CATEGORY.CREATE
+Create category
+X
+CATEGORY.UPDATE
+Update category
+X
+CATEGORY.DELETE
+Delete category
+X
+CATEGORY.VIEW
+View category details
+X
+X
+X
+X
+CATEGORY.LIST
+View category list
+X
+X
+X
+X
+CART.CREATE
+Create shopping cart
+X
+CART.UPDATE
+Update cart items
+X
+CART.REMOVE_ITEM
+Remove cart item
+X
+CART.VIEW
+View shopping cart
+X
+CHECKOUT.START
+Start checkout process
+X
+ORDER.CREATE
+Create order
+X
+ORDER.CANCEL
+Cancel order
+X
+X
+X
+ORDER.VIEW
+View order details
+X
+X
+X
+X
+ORDER.LIST
+View order list/history
+X
+X
+X
+X
+ORDER.REFUND
+Request or process refund
+X
+X
+AUCTION.CREATE
+Create auction
+X
+X
+AUCTION.UPDATE
+Update auction configuration
+X
+X
+AUCTION.CANCEL
+Cancel auction
+X
+X
+AUCTION.ADMIN_CANCEL
+Admin force cancel auction
+X
+AUCTION.VIEW
+View auction details
+X
+X
+X
+X
+AUCTION.LIST
+View auction list
+X
+X
+X
+X
+AUCTION.BID
+Place bid
+X
+AUCTION.VIEW_BID_HISTORY
+View bid history
+X
+X
+X
+X
+SHIPPING.QUOTE
+Get shipping fee quote
+X
+X
+X
+X
+SHIPPING.CREATE_SHIPMENT
+Create shipment
+X
+X
+SHIPPING.VIEW_SHIPMENT
+View shipment details
+X
+X
+X
+X
+SHIPPING.UPDATE_STATUS
+Update shipment status
+X
+X
+SHIPPING.MANUAL_OVERRIDE
+Manual shipment override
+X
+X
+REPUTATION.VIEW
+View reputation summary
+X
+X
+X
+X
+REPUTATION.RATE
+Rate transaction partner
+X
+X
+REPUTATION.PENALTY.VIEW
+View penalty history
+X
+X
+REPUTATION.PENALTY.APPLY
+Apply reputation penalty
+X
+NOTIFICATION.VIEW
+View notification history
+X
+X
+X
+X
+NOTIFICATION.MANAGE_PREFERENCE
+Manage notification preferences
+X
+X
+EVENT_LOG.VIEW
+View event log list
+X
+X
+EVENT_LOG.VIEW_DETAIL
+View event log details
+X
+X
+AUDIT_LOG.VIEW
+View audit logs
+X
+SYSTEM.CONFIG.VIEW
+View system configuration
+X
+SYSTEM.CONFIG.UPDATE
+Update system configuration
+X
+SYSTEM.HEALTH.VIEW
+View system health status
+X
+X
+Event Message Table
+Event Id
+Description
+UserRegistered
+A new user account has been successfully created
+UserUpdated
+User information has been updated
+UserDeleted
+A user account has been deleted
+UserPasswordChanged
+A user password has been changed
+UserPasswordReset
+A user password has been reset via forgotpassword process
+UserLoggedIn
+A user has successfully logged into the system
+UserLoggedOut
+A user has logged out of the system
+UserRoleAssigned
+A role has been assigned or updated for a user
+ProductCreated
+A new product has been created
+ProductUpdated
+Product information has been updated
+ProductDeleted
+A product has been deleted
+ProductStatusChanged
+Product status has been changed
+CategoryCreated
+A new category has been created
+CategoryUpdated
+Category information has been updated
+CategoryDeleted
+A category has been deleted
+CartCreated
+A shopping cart has been created
+CartItemAdded
+An item has been added to the cart
+CartItemUpdated
+A cart item has been updated
+CartItemRemoved
+An item has been removed from the cart
+CartExpired
+A shopping cart has expired
+CheckoutStarted
+Checkout process has been initiated
+OrderCreated
+An order has been created
+OrderCancelled
+An order has been cancelled
+OrderPaid
+An order payment has been completed successfully
+OrderPaymentFailed
+An order payment has failed
+OrderCompleted
+An order has been completed
+OrderRefundRequested
+A refund has been requested
+OrderRefundCompleted
+A refund has been completed
+AuctionCreated
+A new auction has been created
+AuctionScheduled
+An auction has been scheduled
+AuctionStarted
+An auction has started
+BidPlaced
+A bid has been placed on an auction
+Outbid
+A bidder has been outbid
+AuctionCancelled
+An auction has been cancelled
+AuctionEnded
+An auction has ended
+AuctionWon
+An auction has been won by a bidder
+AuctionFailed
+An auction has ended without a winner
+AuctionPaymentTimeout
+Auction winner failed to pay within the allowed time
+AuctionSettled
+Auction settlement has been finalized
+InventoryChecked
+Inventory availability has been checked
+InventoryReserved
+Inventory has been reserved
+InventoryReleased
+Reserved inventory has been released
+InventoryCommitted
+Inventory has been committed (OUT)
+InventoryAdjusted
+Inventory quantity has been adjusted
+InventoryReservationExpired
+Inventory reservation has expired
+ShippingQuoteRequested
+Shipping fee quotation has been requested
+ShipmentCreated
+A shipment has been created
+ShipmentPickedUp
+A shipment has been picked up
+ShipmentInTransit
+A shipment is in transit
+ShipmentDelivered
+A shipment has been delivered
+ShipmentFailed
+Shipment delivery has failed
+ShipmentReturned
+Shipment has been returned
+NotificationCreated
+A notification has been created
+NotificationSent
+A notification has been sent
+NotificationFailed
+A notification delivery has failed
+UserRated
+A user has been rated
+ReputationScoreUpdated
+User reputation score has been updated
+ReputationPenaltyApplied
+A reputation penalty has been applied
+TrustLevelChanged
+User trust level has changed
+SystemConfigUpdated
+System configuration has been updated
+SystemHealthCheckFailed
+A system health check has failed
+SystemHealthCheckRecovered
+A system health check has recovered
+MessageBrokerUnavailable
+Message broker is unavailable
+MessageBrokerRecovered
+Message broker has recovered
+Software Requirements Specification
+User Service
+Identity and Access Management
+Users Management
+Create User
+The application needs to provide a function that allows users to create new user accounts. When selecting the “Create New User” option, users must enter required information including email, phone number, full name, identify number, gender, address, date of birth, and password. The system must validate the input data before creating the account. If the data is missing or invalid, the system should notify the user. If all data is valid, the system will create the new user account and record the action
+Update User
+The application needs to provide a function that allows users to update existing user information. By selecting the “Update User Information” option, users are required to enter updated information including full name, date of birth, gender, address, and email. The system must validate the input data before processing the update request. If any required information is missing or invalid, the system should notify the user and prevent the update. If all information is valid, the system will update the user’s information in the database and record the action for audit and tracking purposes.
+Get list of Users
+The application needs to provide a function that allows users to view a list of users in the system. Users should be able to search for user information, apply filters based on selected criteria, and sort the list using the available columns. The system shall display the user list based on the applied search, filter, and sorting options. By default, the list should be sorted by full name. Each user record displayed in the list should include full name, email, phone number, identify number, gender, address, and date of birth. If there is no user data available, the system shall display a “No Data” message instead of an empty list.
+Delete User
+The application needs to provide a function that allows an administrator or manager to delete a selected user account from the system. When a user account is selected for deletion, the system shall process the delete request. If the account exists and has not been deleted previously, the system shall remove the user account and provide a confirmation of the action. The system shall record the deletion event for audit and tracking purposes, including information about who performed the action. If the user account does not exist or has already been deleted, the system shall notify the administrator or manager and prevent the deletion.
+View User Information
+The application needs to provide a function that allows an administrator or manager to view detailed information of a specific user account. When a user account is selected for viewing, the system shall retrieve and display the corresponding user information. The system shall only allow the information to be displayed if the user account exists and has not been deleted. If the requested user account cannot be found or is not available, the system shall notify the user accordingly.
+Change password
+The application needs to provide a function that allows a user to change the password of a user account. When the password change function is initiated, the user is required to enter a new password. The system shall validate the password change request before processing it. If the new password is the same as the current password or does not meet the required password rules, the system shall notify the user and prevent the change. If the password change is valid, the system shall update the password in the database and record the action for audit and tracking purposes, including information about who performed the change and when it occurred.
+Roles Management
+Create Role
+The application needs to provide a function that allows users to create a new role in the system. When creating a role, users are required to provide role name, role code, and role description, and may assign privileges to the role or allow the role to use default readonly privileges. The system shall validate the provided information before processing the request. If a role with the same role code already exists or any required information is invalid, the system shall notify the user and prevent the role from being created. If all information is valid, the system shall create the new role in the database and confirm that the role has been created successfully.
+Update Role
+The application needs to provide a function that allows users to update an existing role in the system. When updating a role, users are required to provide role name, role description, and privileges. The system shall validate the provided information before processing the update request. If any required information is invalid, the system shall notify the user and prevent the update. If all information is valid, the system shall update the role information in the database, confirm the successful update, and record the change for audit and tracking purposes, including details of the modified fields and the user who performed the action.
+Get list of Roles
+The application needs to provide a function that allows users to view a list of roles in the system. Users should be able to search for role information, apply filters, and sort the list using the available columns. By default, the list shall be sorted by role name. Each role record displayed shall include role name, role code, role description, and privileges. If there is no role data available, the system shall display a “No Data” message instead of an empty list.
+Delete Role
+The application needs to provide a function that allows users to delete a selected role from the system. When a role is selected for deletion, the system shall process the delete request. If the role exists and has not been deleted previously, the system shall remove the role and confirm that the deletion was successful. If the role cannot be found or has already been deleted, the system shall notify the user and prevent the deletion. The system shall record the deletion event for audit and tracking purposes, including information about the deleted role and the user who performed the action.
+Authentication/Authorize
+Login
+The application needs to provide a login function that allows users to access the system by entering their username and password. The system shall authenticate the provided credentials before granting access. If the user account exists and the credentials are valid, the system shall allow the user to log in and redirect the user to the homepage. If the authentication fails due to invalid credentials or a nonexistent account, the system shall notify the user that the login attempt was unsuccessful.
+Logout
+The application needs to provide a function that allows users to log out of the system. When a logout request is initiated, the system shall validate the current user session before processing the request. If the session is valid, the system shall clear the session information, end the user’s access, and redirect the user to the login page. If the session cannot be validated or the logout process cannot be completed, the system shall notify the user accordingly.
+Forget password
+The application needs to provide a function that allows users to reset their password if they forget it. When initiating the password reset process, users are required to provide their registered email address. The system shall validate the provided email before allowing the password reset to proceed. If the email is associated with an existing account, the user shall be allowed to create a new password. The system shall update the password if the new password is valid and confirm the successful change. If the provided email does not exist in the system or the new password is invalid, the system shall notify the user accordingly. The system shall record the password reset event for audit and tracking purposes.
+Reputation
+Rating & Review
+The system shall allow users to rate and review each other after a successful transaction. A seller shall be able to rate a buyer, and a buyer shall be able to rate a seller. Rating actions shall only be allowed after a completed order or a successfully ended auction. Each transaction shall allow at most one rating from each party, and users shall not be allowed to rate themselves. Rating information may include a score and an optional comment and shall be recorded with the time of submission.
+Reputation Score & Trust Level
+The system shall calculate a reputation score for each user based on aggregated factors such as ratings, transaction outcomes, penalties, and system activity. Based on the reputation score, the system shall assign a trust level to the user. Trust levels shall be used to determine user eligibility for certain actions and to influence how users are presented within the system.
+Transaction Reputation Summary
+The system shall maintain a summarized view of each user’s transaction history for reputation purposes. This summary shall include aggregated counts of transactions, successful and failed activities, and auction outcomes, without exposing full transaction details.
+Rule Enforcement Based on Reputation
+The system shall apply business rules based on a user’s reputation and trust level. Reputation checks shall be performed when users attempt to perform restricted actions such as bidding, creating auctions, or completing transactions. Depending on reputation status, the system may limit user capabilities, enforce additional requirements, or restrict access to certain features.
+Penalty & Violation Handling
+The system shall track violations and negative behaviours related to auction and commerce activities. Recorded penalties shall impact the user’s reputation score and trust level. Based on penalty severity or frequency, the system may temporarily restrict or suspend specific user actions.
+Reputation Visibility
+The system shall provide visibility of reputation information at different levels. Public users shall be able to view highlevel reputation indicators of other users. Administrators shall be able to view detailed reputation information, including rating history, penalties, and systemcalculated reputation data, and may adjust reputation values when required.
+Dispute Consideration
+The system shall support the association of disputes with reputation records. Ratings involved in disputes may be flagged and adjusted based on dispute outcomes.
+Audit & Tracking
+All reputationrelated actions, including ratings, penalties, adjustments, and reputation changes, shall be recorded for audit and tracking purposes.
+Notification Service
+Event Logs Management
+Add New Event Log
+The system needs to provide an automated event logging function. Whenever a new event message is published, the system shall automatically capture the event and create a corresponding event log record. The event log shall be stored in the database and must accurately reflect the content of the published event message. This process shall be executed automatically by the system without user interaction, and the successful insertion of the event log shall ensure the integrity and traceability of system events.
+View List Event Logs
+The application needs to provide a function that allows users to view a list of event logs in the system. Users shall be able to search for event log information, apply filters, and sort the list using the available columns. By default, the event logs shall be displayed in order of the most recent events. Each event log record displayed shall include action, event log message, and operator information. If no event log data is available or the search returns no results, the system shall display an empty list with a “No Data” message.
+View Event Log’s Detail
+The application needs to provide a function that allows users to view detailed information of a selected event log. When an event log is requested, the system shall retrieve and display the corresponding log details. The system shall only allow the event log information to be displayed if the log exists and has not been deleted. If the requested event log cannot be found or is not available, the system shall notify the user accordingly.
+Health Check
+Message Broker Health Check
+The system needs to provide an automated mechanism to continuously monitor the health and operational status of configured Message Broker(s). The system shall perform periodic health checks to verify broker availability and connectivity. If a broker becomes unresponsive, the system shall retry the check and, upon confirmed failure, record an error event with relevant details for monitoring and troubleshooting purposes. When the broker recovers, the system shall record a corresponding restoration event. During broker unavailability, operations that depend on the Message Broker shall be paused, while other system functions shall continue to operate normally. All monitoring activities and events shall be logged to ensure reliability, traceability, and ongoing system stability. 
+Notification
+Notification Channels
+The system needs to provide notification delivery through supported channels. In the MVP phase, the system shall support email and push notifications. Email notifications shall be used to deliver transactional and system messages, while push notifications shall be used for realtime auction and order updates.
+Event-Driven Notification Trigger
+The system needs to generate notifications based on events published by other system services. When a supported event occurs, the system shall receive the event and determine whether notifications should be created for that event. A single event may result in one or more notifications delivered through different channels.
+User Notification Preferences
+The system needs to allow users to manage their notification preferences. Users shall be able to enable or disable specific notification types and delivery channels. Transactional notifications related to orders and payments shall always be delivered and cannot be fully disabled. New users shall be assigned default notification preferences, which may be updated later.
+Notification Delivery & Retry Handling
+The system needs to manage the delivery of notifications and track their delivery status. Notifications may have different delivery states, and the system shall retry delivery for temporary failures according to defined rules. Notifications that fail due to nonrecoverable errors shall not be retried.
+Notification History
+The system needs to store a history of notifications sent to users. The system shall record notification details such as type, content, delivery time, and status. Users shall be able to view their notification history within the application.
+Notification Logging & Audit
+The system needs to log notificationrelated activities for monitoring and audit purposes. Logged information shall include notification creation, delivery attempts, failures, retries, and final delivery status.
+Catalog Service
+Product Management
+Create Product
+The system needs to provide a function that allows users to create a new product. When creating a product, users shall provide required product information. The system shall validate the provided information before creating the product. If the information is valid, the system shall create the product with an initial status and store it in the system. If the information is invalid, the system shall notify the user accordingly.
+Update Product
+The system needs to provide a function that allows users to update existing product information. When a product is updated, the system shall validate the updated information before applying the changes. If the update is valid, the system shall save the updated product information. If the update fails or contains invalid data, the system shall notify the user accordingly.
+Delete Product
+The system needs to provide a function that allows users to delete a selected product. When a delete request is made, the system shall process the request and remove the product if it exists and is eligible for deletion. If the product cannot be found or cannot be deleted, the system shall notify the user accordingly.
+View Product
+The system needs to provide a function that allows users to view detailed information of a selected product. When a product is requested, the system shall retrieve and display the product information if the product exists and is available. If the product cannot be found, the system shall notify the user accordingly.
+Get list of Products
+The system needs to provide a function that allows users to view a list of products in the system. Users shall be able to search, filter, and sort products using available criteria. The system shall display product information accordingly. If no product data is available, the system shall display a “No Data” message.
+Category Management
+Create Category
+The system needs to provide a function that allows users to create a new product category. When creating a category, users shall provide required category information. The system shall validate the information before creating the category. If the information is valid, the system shall create the category and store it in the system.
+Update Category
+The system needs to provide a function that allows users to update an existing category. The system shall validate updated category information before applying changes. If the update is valid, the system shall save the updated category information. If the update fails, the system shall notify the user accordingly.
+Delete Category
+The system needs to provide a function that allows users to delete a selected category. When a category deletion is requested, the system shall process the request if the category exists and is eligible for deletion. If the category cannot be found or cannot be deleted, the system shall notify the user accordingly.
+View Category
+The system needs to provide a function that allows users to view detailed information of a selected category. When a category is requested, the system shall retrieve and display category information if it exists. If the category cannot be found, the system shall notify the user accordingly.
+Get list of Categories
+The system needs to provide a function that allows users to view a list of categories. The system shall display categories in a structured manner and may support searching, filtering, or hierarchical navigation. If no category data is available, the system shall display a “No Data” message.
+Search & Discovery
+Product Search
+The system needs to provide a function that allows users to search for products in the system. Users shall be able to search for products based on available criteria such as product name, category, or price. The system shall return matching products based on the search criteria provided.
+Product Filter & Sort
+The system needs to provide a function that allows users to refine product search results. Users shall be able to apply filters and sorting options to product search results based on available attributes. The system shall display products according to the selected filter and sorting options.
+Product Discovery
+The system needs to provide a function that allows users to browse and discover products. The system shall present products based on predefined or dynamic discovery rules, such as popularity or auction timing, to help users explore available products.
+Commerce Services
+Shopping Cart
+Cart Lifecycle
+The system needs to provide a shopping cart function for users. Each user shall have at most one active shopping cart at a time. The system shall automatically create a cart when needed and may expire an inactive cart after a defined period of time.
+Add Item to Cart
+The system needs to allow users to add products to their shopping cart. Before adding an item, the system shall validate that the product exists and that the requested quantity is valid. If validation passes, the product shall be added to the cart.
+Update Cart Item
+The system needs to allow users to update items in their shopping cart. Users shall be able to modify item quantities. The system shall validate the update before applying the changes and notify the user if the update is not valid.
+Remove Cart Item
+The system needs to allow users to remove items from their shopping cart. When an item is removed, the system shall update the cart accordingly.
+Cart Price Calculation
+The system needs to calculate cart pricing information. The cart shall include calculated values such as subtotal, taxes, discounts, and estimated shipping fees. Final pricing shall be recalculated during checkout.
+Cart Validation
+The system needs to validate the shopping cart before checkout. Validation shall include checks to ensure products are still available, active, and that pricing information remains valid. If the cart is not valid, the system shall notify the user.
+Checkout & Payment
+Checkout Process
+The system needs to provide a checkout process that allows users to submit their cart for order creation. During checkout, users shall provide required information such as shipping address and payment method. The system shall present a final confirmation of pricing before proceeding.
+Payment Initiation
+The system needs to initiate a payment request for an order. Payment requests shall be associated with a specific order and may be processed through supported payment methods.
+Payment Confirmation
+The system needs to process payment confirmation responses. Payment results may include successful, failed, or pending outcomes. Payment processing shall be handled in an idempotent manner to prevent duplicate processing.
+Order Cancellation & Refund
+The system needs to allow eligible orders to be cancelled. When an order is cancelled after payment, the system shall initiate a refund process and track refund status.
+Order Management
+Order Creation
+The system needs to create orders based on completed checkout or valid auction results. Each order shall be assigned a unique identifier and shall store snapshot information of products and pricing at the time of order creation.
+Order Status Management
+The system needs to manage order status throughout the order lifecycle. Orders shall transition through defined statuses based on business events. Status transitions shall follow consistency rules defined by the system.
+Order Tracking
+The system needs to allow users to view detailed information of their orders. Order details shall include items, pricing, current status, and status history for tracking purposes.
+Order History
+The system needs to allow users to view a list of their past orders. Users shall be able to filter orders based on available criteria such as status or time period. If no order data is available, the system shall display a “No Data” message.
+Admin Order Management
+The system needs to provide administrators with the ability to view and manage all orders. Administrators may update order status within allowed limits and handle exceptional order cases.
+Invoice & Receipt Generation
+The system needs to generate invoices or receipts for completed orders. Generated documents shall be sent to the notification system for delivery to users.
+Idempotency Handling
+The system needs to ensure idempotent processing for critical operations, including order creation, payment confirmation, and refund requests.
+Consistence Enforcement
+The system needs to enforce consistency rules across order and payment processing. Successful payments shall result in paid orders, and failed payments shall not mark orders as paid. Auctionbased orders shall only be created from valid and completed auction results.
+Auction Services
+Auction Management
+Create Auction
+The system needs to provide a function that allows a seller to create a new auction for a product. When creating an auction, required information such as product identifier, seller identifier, starting price, bid increment, and auction start and end times shall be provided. The system shall validate seller eligibility, product validity, and ensure that no active auction already exists for the same product before creating the auction.
+Configure Auction
+The system needs to allow configuration of auction parameters, including starting price, bid increment, and auction duration. Auction configuration shall only be allowed before the auction starts. Once an auction has begun, its configuration shall no longer be editable.
+Auction Lifecycle Management
+The system needs to manage the lifecycle of an auction through predefined states. Auctions shall automatically transition to active status at the configured start time and shall automatically end when the configured end time is reached. The system shall prevent invalid state transitions.
+Auction Visibility & Access Control
+The system needs to control auction visibility and access. Auctions may be public or restricted. The system shall enforce rules that determine which users can view or participate in an auction.
+Auction Eligibility Validation
+The system needs to validate auction eligibility before allowing an auction to start. Validation rules may include seller status, seller reputation, and systemdefined auction limits. Auctions that do not meet eligibility requirements shall not be activated.
+Cancel Auction
+Auction Cancellation Eligibility
+The system needs to determine whether an auction is eligible for cancellation. Cancellation eligibility shall be evaluated based on the current auction status and defined business rules. Auctions that are not eligible for cancellation shall not be cancelled.
+Cancel Auction Processing
+The system needs to process auction cancellation requests. When an eligible auction is cancelled, the system shall update the auction status to cancelled and ensure that no further bidding activities are allowed.
+Cancel Auction Event Emission
+The system needs to emit an auction cancellation event when an auction is successfully cancelled. The event shall be published for other services to handle any required followup actions.
+Cancel Auction Consistency Handling
+The system needs to ensure consistency during auction cancellation. Once an auction is cancelled, the system shall prevent conflicting operations such as bid placement or auction settlement from occurring.
+Cancel Auction Audit Tracking
+The system needs to record auction cancellation activities for tracking and audit purposes. Recorded information shall include the auction identifier, cancellation time, and the actor who initiated the cancellation.
+Admin Cancel Auction
+The system needs to provide a function that allows an administrator to cancel an auction. When an administrator initiates an auction cancellation, the system shall validate that the auction exists. If the cancellation is processed successfully, the system shall update the auction status to cancelled and prevent any further bidding or settlement activities for that auction. The system shall emit an auction cancellation event indicating that the cancellation was performed by an administrator. The system shall record the action for audit and tracking purposes
+Bidding 
+Place Bid
+The system needs to allow users to place bids on active auctions. Before accepting a bid, the system shall validate that the auction is active, the bid amount meets minimum bid rules, and the bidder is eligible to participate. Bid placement shall be processed atomically to ensure correctness.
+Bid Concurrency Hanlding
+The system needs to handle concurrent bid submissions. The system shall ensure that the highest valid bid is consistently recorded and that valid bids are not lost during concurrent processing.
+Bid History Management
+The system needs to record bid history for auctions. Each bid record shall include bidder information, bid amount, and time of placement. Bid history may be displayed according to visibility rules defined by the system.
+Outbid Detection & Event Emission
+The system needs to detect when an existing bidder is outbid. When an outbid occurs, the system shall emit an event to notify other services that an outbid has happened.
+Anti-Sniping Handling
+The system may extend an auction’s end time when bids are placed within a defined time window near the auction end. The system shall enforce limits on auction extensions according to defined rules.
+Auction Settlement
+Auction End Processing
+The system needs to process auction completion when the auction end time is reached. Once an auction ends, the system shall lock the auction and prevent any further bids from being accepted.
+Winner Determination
+The system needs to determine the winning bidder when an auction ends. The highest valid bid shall be selected as the winner. If no valid bids exist, the auction shall be marked as unsuccessful.
+Auction Result Settlement
+The system needs to settle the auction outcome. For successful auctions, the system shall emit an event indicating that the auction has been won. For unsuccessful auctions, the system shall emit an event indicating failure.
+Order Creation Trigger
+The system needs to send auction settlement information to the commerce service. Settlement data shall include product information, final price, buyer information, and seller information. The auction service shall not create orders directly.
+Payment Deadline Enforcement
+The system needs to enforce payment deadlines for auction winners. If payment is not completed within the allowed time window, the system shall emit a payment timeout event and apply reputation penalties according to defined rules.
+Settlement Finalization
+The system needs to finalize auction settlement. Finalization shall include recording the winner, final price, settlement time, and marking the auction as settled.
+Idempotent Processing
+The system needs to ensure idempotent processing for critical auction operations, including bid placement, auction ending, and settlement processing.
+Consistency Guarantees
+The system needs to enforce consistency rules within the auction domain. Each auction shall have at most one winner. Once an auction ends, no additional bids shall be accepted. Settlement processing shall occur exactly once.
+Event Emission
+The system needs to emit domain events to support integration with other services. Events may include auction start, bid placement, outbid notifications, auction completion, and auction settlement results.
+Fulfillment Service
+Inventory/Warehouse 
+SKU-based Inventory Management
+The system needs to manage inventory at the SKU level. Inventory shall be tracked per SKU and per warehouse. Productlevel inventory management shall not be supported.
+Inventory Record Management
+The system needs to maintain inventory records for each SKU and warehouse combination. Each inventory record shall reflect total quantity, available quantity, reserved quantity, and unavailable quantity. Available quantity shall be derived from the inventory state.
+Inventory Reservation
+The system needs to support inventory reservation. Inventory shall be reserved when requested by other services, such as during checkout or after an auction ends. Reservation requests shall include SKU, warehouse, quantity, reference information, and expiration time.
+Reservation Validation & Timeout
+The system needs to validate inventory reservations before applying them. Reservations shall not exceed available inventory. Reservations shall automatically expire and be released if not confirmed within the allowed time window.
+Reservation Release
+The system needs to release reserved inventory when reservation conditions are no longer met. Released inventory shall be returned to available inventory.
+Reservation Consistency Handling
+The system needs to ensure that inventory reservation is processed atomically. The system shall prevent overselling and maintain consistency under concurrent reservation requests.
+Warehouse Management
+The system needs to support one or more warehouses. Each warehouse shall represent a physical or thirdparty storage location. Inventory shall be tracked separately per warehouse.
+Warehouse Selection
+The system needs to determine which warehouse(s) should be used to fulfill inventory requests. Warehouse selection shall follow defined rules. In the MVP phase, a fixed warehouse may be used.
+Stock Allocation
+The system needs to allocate inventory for orders. A single order may be fulfilled from one or multiple warehouses based on inventory availability and allocation rules.
+Inventory Movement Processing
+The system needs to process inventory movements. Movement types may include inventory intake, reservation, release, shipment, and adjustment. Each movement shall update inventory state accordingly.
+Inventory Ledger
+The system needs to maintain an immutable inventory ledger. Every inventory movement shall be recorded with timestamp, reference information, and movement type. Ledger records shall not be modified once created.
+Pick Process
+The system needs to support picking reserved inventory for fulfilment. Pick processing shall reduce reserved inventory and prepare inventory for shipment.
+Pack & Ship Support
+The system needs to support inventory updates during packing and shipping processes. Inventory state shall be updated when shipment actions occur.
+Inventory Update Rules
+The system needs to update inventory based on business events such as payment success, payment failure, order cancellation, and shipment completion. Inventory updates shall follow defined consistency rules.
+Auction Inventory Reservation
+The system needs to support inventory reservation for auction listings. Inventory may be reserved when an auction is created to prevent overselling.
+Auction Settlement Inventory Handling
+The system needs to handle inventory updates when an auction is settled. Reserved inventory shall be committed for successful auctions or released for unsuccessful auctions.
+Idempotent Inventory Operations
+The system needs to support idempotent processing for critical inventory operations, including reservation, release, and commit.
+Inventory Consistency Enforcement
+The system needs to enforce consistency rules to ensure that inventory states remain accurate across concurrent operations and service interactions.
+Shipping & Logistics
+Shipping Orchestration
+The system needs to provide a shipping orchestration function responsible for managing shipments, coordinating with multiple carriers, and standardizing shipping operations. The shipping service shall act as an orchestrator and shall not directly embed carrierspecific business logic into core workflows.
+Carrier Adapter Support
+The system needs to support integration with multiple shipping carriers through an adapter mechanism. Each carrier integration shall be encapsulated within an adapter to allow carrier changes or additions without impacting core shipping logic.
+Shipment Management
+The system needs to manage shipment entities associated with orders. Each shipment shall store information such as order reference, warehouse reference, carrier, service type, shipping fee, tracking number, and shipment status.
+Shipment Status Standardization
+The system needs to standardize shipment statuses internally. Carrierspecific shipment statuses shall be mapped to predefined internal shipment statuses to ensure consistent tracking and processing.
+Shipping Fee Quotation
+The system needs to calculate shipping fees by requesting shipping quotes from supported carriers. Based on provided shipment details, the system shall return available shipping options including carrier, estimated delivery time, and cost.
+Carrier Selection Handling
+The system needs to support selecting a shipping carrier based on defined rules or configurations. Carrier selection logic may evolve over time without requiring changes to core shipping workflows.
+Shipment Creation
+The system needs to create shipments after an order has been successfully paid. Upon shipment creation, the system shall coordinate with the selected carrier to obtain tracking information and store shipment details.
+Shipment Tracking
+The system needs to track shipment progress. Shipment status updates may be obtained by polling carrier systems or by receiving carrier callbacks. Shipment information shall be updated based on mapped internal statuses.
+Shipment Status Update Handling
+The system needs to process shipment status updates from carriers. Updates shall be validated, mapped to internal statuses, and applied in an idempotent manner.
+Shipment Event Emission
+The system needs to emit shipmentrelated events when shipment status changes occur. These events shall be published for other services to consume.
+Carrier Failure Handling
+The system needs to handle carrier integration failures gracefully. When carrier services are unavailable or return errors, the system shall apply retry and fallback mechanisms without blocking order processing.
+Retry & Circuit Breaker Support
+The system needs to apply retry policies and circuit breaker mechanisms when interacting with carriers. These mechanisms shall be applied per carrier to isolate failures and protect system stability.
+MultiCarrier Strategy
+The system needs to support shipping operations across multiple carriers. Carrier selection may be based on factors such as cost, delivery time, or reliability. Carrier strategy rules may evolve over time.
+Carrier Performance Tracking
+The system needs to track carrier performance metrics such as delivery success rate and delivery time. Tracked data may be used for operational monitoring and carrier evaluation.
+Idempotent Shipping Operations
+The system needs to ensure idempotent processing for critical shipping operations, including shipment creation and shipment status updates.
+Asynchronous Processing
+The system needs to process shipping operations asynchronously. Interactions with carrier systems shall not block core business flows.
+Other Requirements
+General implementation principles
+Each service in the system must have a clearly defined responsibility and business boundary (bounded context).Every service must have an explicit owner, either a team or an individual, who is responsible for its design, operation, and quality.
+Services are not allowed to:
+Access databases owned by other services
+Share database schemas or tables with other services
+Each service must fully own its data and expose access only through APIs or events. This rule is mandatory to ensure loose coupling, maintainability, and independent evolution of services.
+API & Contract Management
+Every service must expose clear and welldefined APIs.All APIs must:
+Be versioned (for example: /api/v1, /api/v2)
+Remain backward compatible whenever possible
+Each service must provide an OpenAPI (Swagger) specification that documents:
+Available endpoints
+Request and response formats
+Error responses
+Any contract between services (API or event schema) must be reviewed and approved before changes are introduced to prevent breaking dependent services.
+Configuration & Secrets Management
+Sensitive information must never be hardcoded in source code. This includes:
+API keys
+Database credentials
+Access tokens
+Configuration and secrets must be managed using:
+Environment variables for nonsensitive configuration
+A secure secret management system such as Vault or a cloudmanaged secrets service
+This approach ensures security, flexibility, and safe deployment across environments.
+Non-functional Requirements
+Performance & Scalability
+The system shall meet the following response time requirements under normal operating conditions:
+Function
+SLA
+User login / authentication
+≤ 500 ms
+Product search
+≤ 800 ms
+Add to cart
+≤ 500 ms
+Order creation
+≤ 1.5 seconds
+Auction bid placement
+≤ 300 ms
+Notification delivery
+≤ 1 second (asynchronous)
+Auction bidding is considered a critical path and shall be optimized for low latency.
+The system shall support the following minimum throughput targets:
+Service
+Target
+Catalog Service
+≥ 1,000 requests/second
+Commerce Service
+≥ 500 requests/second
+Auction Service (bidding)
+≥ 3,000 bids/minute
+Notification Service
+≥ 10,000 messages/minute
+All system services shall support horizontal scaling. Services shall be designed as stateless APIs and shall not rely on inmemory state, except for temporary caching or bidding optimization mechanisms.
+The Auction Service shall handle highconcurrency bidding scenarios on a single auction. The system shall use appropriate concurrency control mechanisms such as inmemory caching and optimistic locking to prevent data inconsistency.
+Availability & Reliability
+The system shall meet the following availability targets:
+Component
+SLA
+Core Platform
+99.9%
+Auction Service
+99.5%
+Payment Integration
+As defined by the payment provider
+Failures in noncritical services, such as the Notification Service, shall not cause order processing to fail.Payment gateway timeouts shall be retried up to three times and support manual reconciliation if required.The Auction Service shall ensure that no valid bid data is lost during service restarts.
+Data Consistency & Integrity
+The system shall enforce strong consistency for critical business data, including orders, payments, and auction results.Eventual consistency may be applied to noncritical components such as notifications, search indexing, and reporting.
+All critical APIs, including order creation, bid placement, and payment callbacks, shall be idempotent to prevent duplicate processing.
+Security & Compliance
+The system shall use OAuth 2.0 and JWTbased authentication. Tokens shall have defined expiration times and support refresh tokens.Rolebased access control (RBAC) shall be enforced for customers and administrators.
+All system traffic shall be encrypted using HTTPS/TLS. Mutual TLS may be applied for servicetoservice communication.Sensitive data such as passwords and payment references shall be encrypted at rest.The system shall not store card numbers or CVV data.
+The Payment Service shall not store sensitive card information and shall comply with minimum PCIDSS requirements.Payment logs shall store only masked or nonsensitive data.
+Observability & Monitoring
+The system shall use centralized logging with a standardized log format, including timestamp, trace identifier, and masked user identifiers.Log levels shall include INFO, WARN, and ERROR.
+The system shall collect metrics for request rate, error rate, and latency (p95 and p99).Alerts shall be triggered when error rates exceed 1% or when latency breaches defined SLA thresholds.
+Distributed tracing shall be supported across the system, covering API Gateway, internal services, and external integrations.Tracing is mandatory for critical flows such as checkout and auction settlement.
+Maintainability & Extensibility
+The system shall follow clean architecture principles and domaindriven design. Unit test coverage shall be at least 70%.
+APIs shall follow RESTful design principles and support versioning (e.g., /api/v1). Backward compatibility shall be maintained across versions.
+System configuration shall be externalized from code and support separate configurations for development, staging, and production environments.
+Deployment & Operations
+The system shall support automated CI/CD pipelines, including build, test, and deployment stages. Deployments shall support zerodowntime strategies such as rolling or bluegreen deployments.
+The system shall be containerized using Docker and support orchestration platforms such as Kubernetes or equivalent.
+Databases shall be backed up daily. The system shall support a recovery time objective (RTO) of no more than 4 hours and a recovery point objective (RPO) of no more than 15 minutes.
+Data Retention & Auditing
+The system shall retain data according to the following minimum requirements:
+Data Type
+Retention Period
+Orders
+≥ 5 years
+Auction history
+≥ 3 years
+System logs
+≥ 90 days
+Audit logs shall be generated for critical activities including login, order processing, payment, and auction results. Audit logs shall be immutable and not editable.
