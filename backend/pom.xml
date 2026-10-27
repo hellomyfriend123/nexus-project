@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      PROJECT NEXUS — BACKEND
+      Kiến trúc: 1 ứng dụng Spring Boot (nexus-app) + 6 module nghiệp vụ + 1 module dùng chung.
+      Mỗi module nghiệp vụ sở hữu MỘT schema PostgreSQL riêng và KHÔNG tham chiếu JPA sang module khác.
+
+      Phiên bản đã kiểm chứng (đọc trực tiếp từ artifact, không đoán):
+        - Spring Boot 4.1.1 (OSS support tới 31/07/2027)
+        - Java 21 LTS (build trên JDK 25 vẫn OK nhờ release=21)
+        - springdoc-openapi 3.1.1 (dòng 3.x cho Boot 4; 2.9.x là cho Boot 3)
+        - Boot 4 đã ĐỔI TÊN starter: spring-boot-starter-web  ->  spring-boot-starter-webmvc
+        - Boot 4 dùng Jackson 3 (tools.jackson.core:jackson-databind)
+        - Boot 4 tách starter test: @WebMvcTest nằm trong spring-boot-starter-webmvc-test
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.1.1</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.nexus</groupId>
+    <artifactId>nexus-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>nexus-parent</name>
+    <description>Project Nexus — marketplace e-commerce kết hợp đấu giá (OJT Team 1)</description>
+
+    <properties>
+        <java.version>25</java.version>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
+        <maven.compiler.release>25</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <springdoc.version>3.1.1</springdoc.version>
+    </properties>
+
+    <modules>
+        <module>nexus-common</module>
+        <module>nexus-user</module>
+        <module>nexus-catalog</module>
+        <module>nexus-fulfillment</module>
+        <module>nexus-commerce</module>
+        <module>nexus-auction</module>
+        <module>nexus-notification</module>
+        <module>nexus-app</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Module nội bộ: khai báo một lần, module con không cần ghi version -->
+            <dependency>
+                <groupId>com.nexus</groupId>
+                <artifactId>nexus-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nexus</groupId>
+                <artifactId>nexus-user</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nexus</groupId>
+                <artifactId>nexus-catalog</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nexus</groupId>
+                <artifactId>nexus-fulfillment</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nexus</groupId>
+                <artifactId>nexus-commerce</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nexus</groupId>
+                <artifactId>nexus-auction</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nexus</groupId>
+                <artifactId>nexus-notification</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Tài liệu API: dòng 3.x dành cho Spring Boot 4 -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <parameters>true</parameters>
+                        <!--
+                          BẮT BUỘC: từ JDK 23 trở đi javac KHÔNG tự chạy annotation processor
+                          tìm thấy trên classpath. Không khai báo đường dẫn này thì Lombok
+                          không sinh getter/builder và toàn bộ module sẽ lỗi compile.
+                        -->
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

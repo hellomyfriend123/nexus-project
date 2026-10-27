@@ -1,0 +1,56 @@
+# =====================================================================================
+# PROJECT NEXUS — BACKEND CI (GitLab)
+#
+# Giai đoạn 5 (an toàn trước): compile → unit test → package (jar artifact).
+# Docker build CHỈ bật khi runner hỗ trợ; KHÔNG push registry khi chưa có credentials.
+# =====================================================================================
+
+image: maven:3.9-eclipse-temurin-21
+
+stages:
+  - build
+  - test
+  - package
+
+variables:
+  # Cache Maven vào trong project để runner không cần ghi ~/.m2
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  MAVEN_CLI_OPTS: "-B -ntp --batch-mode"
+
+cache:
+  key: maven-cache
+  paths:
+    - .m2/repository/
+
+compile:
+  stage: build
+  script:
+    - mvn $MAVEN_CLI_OPTS -DskipTests compile
+
+unit-test:
+  stage: test
+  script:
+    - mvn $MAVEN_CLI_OPTS test
+
+package:
+  stage: package
+  script:
+    - mvn $MAVEN_CLI_OPTS -DskipTests package
+  artifacts:
+    paths:
+      - nexus-app/target/nexus-app-*.jar
+    expire_in: 1 week
+
+# ---------------------------------------------------------------------------
+# Build Docker image — CHỈ bật khi runner hỗ trợ Docker-in-Docker.
+# KHÔNG push lên registry khi chưa xác minh credentials (đúng yêu cầu Giai đoạn 5).
+# ---------------------------------------------------------------------------
+#docker-build:
+#  stage: package
+#  image: docker:27
+#  services:
+#    - docker:27-dind
+#  script:
+#    - docker build -t "$CI_REGISTRY_IMAGE/nexus-backend:$CI_COMMIT_SHORT_SHA" .
+#  rules:
+#    - if: $CI_COMMIT_BRANCH == "main"

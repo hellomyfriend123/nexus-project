@@ -12,6 +12,8 @@ backend/**/target/
 # OS
 Thumbs.db
 .DS_Store
+~$*
 
 # Secrets
 .env
+

@@ -1,0 +1,87 @@
+# =====================================================================================
+# PROJECT NEXUS — cấu hình ứng dụng
+#
+# Thông tin kết nối DB lấy từ biến môi trường (KHÔNG hard-code, KHÔNG commit mật khẩu).
+#   DB_URL      : jdbc:postgresql://<host>:<port>/<database>
+#   DB_USERNAME : user
+#   DB_PASSWORD : password
+#   DDL_AUTO    : update (dev) | validate (môi trường dùng chung / demo)
+#   JWT_SECRET  : chuỗi ký token — PHẢI đổi khi deploy
+# Xem file .env.example ở thư mục gốc.
+# =====================================================================================
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: always
+
+spring:
+  application:
+    name: nexus
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/nexus}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:5}
+      minimum-idle: 1
+      connection-timeout: 10000
+      pool-name: nexus-pool
+
+  jpa:
+    # dev: update | môi trường chung (Supabase): validate — DDL tạo bằng db/*.sql
+    hibernate:
+      ddl-auto: ${DDL_AUTO:update}
+    open-in-view: false
+    show-sql: ${SHOW_SQL:false}
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+        # dev tiện lợi: tự tạo schema nexus_user, nexus_catalog, ... nếu chưa có
+        hbm2ddl:
+          create_namespaces: true
+
+  jackson:
+    default-property-inclusion: non_null
+
+  # Tắt banner cho log gọn khi demo
+  main:
+    banner-mode: ${BANNER_MODE:console}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+  api-docs:
+    path: /v3/api-docs
+
+nexus:
+  security:
+    token:
+      secret: ${JWT_SECRET:nexus-dev-secret-doi-truoc-khi-nop}
+      ttl-minutes: ${TOKEN_TTL_MINUTES:480}
+    cors:
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+  auction:
+    # FR-33/FR-34: chu kỳ job tự chuyển SCHEDULED -> ACTIVE -> ENDED (mili giây)
+    scheduler-interval-ms: ${AUCTION_SCHEDULER_INTERVAL_MS:15000}
+
+logging:
+  level:
+    root: INFO
+    com.nexus: ${LOG_LEVEL:DEBUG}
+    org.hibernate.SQL: ${SQL_LOG_LEVEL:INFO}
+    org.springframework.security: INFO

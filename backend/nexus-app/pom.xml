@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.nexus</groupId>
+        <artifactId>nexus-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>nexus-app</artifactId>
+    <name>nexus-app</name>
+    <description>Ứng dụng Spring Boot duy nhất — gom 6 module nghiệp vụ vào một tiến trình</description>
+
+    <!--
+      Đây là module DUY NHẤT sinh ra file jar chạy được.
+      6 module còn lại là thư viện (jar) có ranh giới rõ ràng: mỗi module một schema,
+      không tham chiếu JPA sang module khác.
+      Muốn tách thành 6 tiến trình riêng (nếu hội đồng yêu cầu): thêm một main class +
+      application.yml cho từng module — phần code nghiệp vụ không phải sửa.
+    -->
+    <dependencies>
+        <dependency>
+            <groupId>com.nexus</groupId>
+            <artifactId>nexus-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nexus</groupId>
+            <artifactId>nexus-user</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nexus</groupId>
+            <artifactId>nexus-catalog</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nexus</groupId>
+            <artifactId>nexus-fulfillment</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nexus</groupId>
+            <artifactId>nexus-commerce</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nexus</groupId>
+            <artifactId>nexus-auction</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nexus</groupId>
+            <artifactId>nexus-notification</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Driver H2 Database: dùng cho dev local / demo / in-memory khi chưa có Postgres local -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.nexus.NexusApplication</mainClass>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>repackage</id>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

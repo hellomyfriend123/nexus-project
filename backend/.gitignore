@@ -1,0 +1,35 @@
+# ---- Java / Maven ----
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+*.war
+
+# Local Maven repository (được seed từ ~/.m2 vì sandbox chặn ghi ~/.m2)
+.m2repo/
+# Maven repo cục bộ dùng bởi GitLab CI (MAVEN_OPTS trỏ vào đây)
+.m2/
+
+# ---- IDE ----
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+
+# ---- OS ----
+Thumbs.db
+.DS_Store
+
+# ---- Secrets ----
+.env
+.env.local
+application-local.yml
+application-secret.yml
+
+# ---- Logs ----
+*.log
+logs/
