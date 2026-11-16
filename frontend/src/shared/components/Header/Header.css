@@ -1,0 +1,558 @@
+/* ==========================================================================
+   HEADER STYLES - PROJECT NEXUS
+   ========================================================================== */
+
+.nexus-header {
+  width: 100%;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+}
+
+.nexus-header-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* --------------------------------------------------------------------------
+   1. TOP UTILITY BAR
+   -------------------------------------------------------------------------- */
+.nexus-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 13px;
+  color: #4b5563;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.top-bar-left,
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.top-link {
+  color: #4b5563;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.15s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.top-link:hover {
+  color: #1d4ed8;
+}
+
+.top-link-primary {
+  color: #2563eb;
+  font-weight: 500;
+}
+
+.top-link-primary:hover {
+  text-decoration: underline;
+  color: #1d4ed8;
+}
+
+.top-bar-divider {
+  color: #d1d5db;
+  user-select: none;
+}
+
+.live-auction-link {
+  font-weight: 600;
+  color: #111827;
+}
+
+.live-auction-link:hover {
+  color: #dc2626;
+}
+
+/* User Account & Icons */
+.location-selector {
+  cursor: pointer;
+  color: #4b5563;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.location-selector strong {
+  color: #111827;
+  font-weight: 600;
+}
+
+.icon-btn-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: #374151;
+  background: transparent;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  font-size: 17px;
+  text-decoration: none;
+}
+
+.icon-btn-badge:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.badge-counter {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 9999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  border: 1.5px solid #ffffff;
+  line-height: 1;
+}
+
+.badge-red {
+  background-color: #dc2626;
+}
+
+.badge-blue {
+  background-color: #2563eb;
+}
+
+.avatar-circle-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #2563eb;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition:
+    transform 0.15s ease,
+    background-color 0.15s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.avatar-circle-btn:hover {
+  background-color: #1d4ed8;
+  transform: scale(1.05);
+}
+
+/* --------------------------------------------------------------------------
+   2. MAIN SEARCH & ACTION BAR
+   -------------------------------------------------------------------------- */
+.nexus-main-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px 0 12px;
+}
+
+/* Nexus Multi-color Logo */
+.nexus-logo {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 32px;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  user-select: none;
+  margin-right: 4px;
+}
+
+.logo-n {
+  color: #dc2626;
+}
+.logo-e {
+  color: #1e293b;
+}
+.logo-x {
+  color: #2563eb;
+}
+.logo-u {
+  color: #d97706;
+}
+.logo-s {
+  color: #92400e;
+}
+
+/* Category Button ("Danh mục") */
+.category-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.category-btn:hover,
+.category-btn.active {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.category-btn i.bi-grid-fill {
+  font-size: 15px;
+  color: #4b5563;
+}
+
+.category-btn i.bi-chevron-down {
+  font-size: 12px;
+  color: #6b7280;
+  transition: transform 0.2s ease;
+}
+
+.category-btn.active i.bi-chevron-down {
+  transform: rotate(180deg);
+}
+
+/* Search Bar Pill Container */
+.search-pill-container {
+  flex: 1;
+  max-width: 680px;
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 9999px;
+  padding: 3px 4px 3px 16px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  position: relative;
+}
+
+.search-pill-container:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.search-lens-icon {
+  font-size: 16px;
+  color: #6b7280;
+  margin-right: 10px;
+}
+
+.search-input-field {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: #111827;
+  background: transparent;
+  padding: 7px 0;
+  min-width: 140px;
+}
+
+.search-input-field::placeholder {
+  color: #6b7280;
+  font-size: 13.5px;
+}
+
+.camera-search-btn {
+  background: none;
+  border: none;
+  padding: 6px 10px;
+  color: #6b7280;
+  font-size: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.camera-search-btn:hover {
+  color: #2563eb;
+  background-color: #f3f4f6;
+}
+
+.search-divider {
+  width: 1px;
+  height: 22px;
+  background-color: #e5e7eb;
+  margin: 0 8px;
+}
+
+.category-select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.category-select-btn {
+  background: none;
+  border: none;
+  font-size: 13.5px;
+  color: #4b5563;
+  padding: 6px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.category-select-btn:hover {
+  color: #111827;
+}
+
+.search-submit-btn {
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 9px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    transform 0.1s ease;
+  white-space: nowrap;
+}
+
+.search-submit-btn:hover {
+  background-color: #1d4ed8;
+}
+
+.search-submit-btn:active {
+  transform: scale(0.98);
+}
+
+/* Sell / Create Auction Action Button */
+.btn-sell-auction {
+  background-color: #dc2626;
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.2s ease,
+    transform 0.1s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25);
+}
+
+.btn-sell-auction:hover {
+  background-color: #b91c1c;
+  box-shadow: 0 4px 10px rgba(220, 38, 38, 0.35);
+}
+
+.btn-sell-auction:active {
+  transform: scale(0.98);
+}
+
+.btn-sell-auction i {
+  font-size: 16px;
+}
+
+/* --------------------------------------------------------------------------
+   3. BOTTOM CATEGORY NAVIGATION BAR
+   -------------------------------------------------------------------------- */
+.nexus-subnav-bar {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 10px 0 12px;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.nexus-subnav-bar::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.subnav-link {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #4b5563;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+  position: relative;
+  padding: 4px 2px;
+}
+
+.subnav-link:hover {
+  color: #2563eb;
+}
+
+.subnav-link.active {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.subnav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #2563eb;
+  border-radius: 2px;
+}
+
+/* Special highlight for Hot Auction tab */
+.subnav-link.highlight-tab {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.subnav-link.highlight-tab:hover {
+  color: #b91c1c;
+}
+
+/* --------------------------------------------------------------------------
+   DROPDOWNS & POPOVERS (DANH MỤC, NOTIFICATIONS, CART)
+   -------------------------------------------------------------------------- */
+.dropdown-menu-custom {
+  position: absolute;
+  top: calc(100% + 8px);
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+  z-index: 1050;
+  animation: fadeInDown 0.2s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.category-dropdown-panel {
+  left: 0;
+  width: 280px;
+  padding: 8px;
+}
+
+.category-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  color: #374151;
+  border-radius: 8px;
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.category-dropdown-item:hover {
+  background-color: #f3f4f6;
+  color: #2563eb;
+}
+
+.category-dropdown-item i {
+  font-size: 16px;
+  color: #6b7280;
+  width: 20px;
+  text-align: center;
+}
+
+.popover-menu-right {
+  right: 0;
+  width: 320px;
+  padding: 12px 0;
+}
+
+/* Responsive queries */
+@media (max-width: 1024px) {
+  .nexus-main-bar {
+    gap: 12px;
+  }
+  .search-pill-container {
+    max-width: 480px;
+  }
+  .top-bar-left,
+  .top-bar-right {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .nexus-top-bar {
+    font-size: 12px;
+  }
+  .top-link-hide-mobile {
+    display: none;
+  }
+  .nexus-main-bar {
+    flex-wrap: wrap;
+  }
+  .search-pill-container {
+    order: 3;
+    max-width: 100%;
+    width: 100%;
+    margin-top: 6px;
+  }
+  .btn-sell-auction {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+  .category-btn {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+}
+
+/* Compact the shared animated logo only inside the catalog header. */
+.nexus-header .catalog-logo { width: 145px; flex: 0 0 145px; }
+.nexus-header .catalog-logo .u205.nexus-logo { min-height: 60px; padding: 8px 0; margin: 0; }
+.nexus-header .catalog-logo .u205-l { font-size: 36px; }

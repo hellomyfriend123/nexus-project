@@ -1,0 +1,27 @@
+/* Lucian UX/UI Prompt #363 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#363 */
+/* The original 340×330 framed demo is adapted to one shared viewport layer. */
+.u363-shell{position:relative;isolation:isolate;min-height:100vh;min-height:100dvh}
+.u363-content{position:relative;z-index:1;min-height:100vh;min-height:100dvh}
+.u363{
+  --ux-surface:var(--nx-background,var(--nx-surface,#F4F2EE));
+  --ux-ink-3:var(--nx-ink-3,#8E8A97);
+  position:fixed;inset:0;z-index:0;overflow:hidden;
+  background:var(--ux-surface);pointer-events:none;font-family:inherit;
+  box-sizing:border-box;
+}
+.u363 .u363-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+[data-theme="dark"] .u363{
+  --ux-surface:var(--nx-background-dark,var(--nx-surface-dark,#07080D));
+  --ux-ink-3:var(--nx-ink-3-dark,rgba(244,240,232,.42));
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]):not([data-theme="dark"]) .u363{
+  --ux-surface:var(--nx-background-dark,var(--nx-surface-dark,#07080D));
+  --ux-ink-3:var(--nx-ink-3-dark,rgba(244,240,232,.42));
+}}
+/* Page backdrops only: cards, controls, headers and other surfaces stay opaque. */
+.u363-shell .u363-content .u062-page,
+.u363-shell .u363-content .auth-page,
+.u363-shell .u363-content .u089-page,
+.u363-shell .u363-content .nx-buyer-layout{background:transparent}
+/* Confine the margin reset to applications mounting this shared background. */
+body:has(.u363-shell){margin:0}

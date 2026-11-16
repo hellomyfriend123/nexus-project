@@ -1,0 +1,72 @@
+﻿/* Lucian #205 letter geometry and spring visuals, without gallery controls/card. */
+.u205.nexus-logo {
+  --logo-ink: var(--ux-ink, #16151b);
+  --logo-accent: var(--ux-accent, var(--nx-primary, #315bf4));
+  --logo-shadow: var(--ux-shadow-strong, rgba(40, 30, 80, 0.3));
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  width: 100%;
+  min-height: 128px;
+  padding: 50px 0 16px;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+.u205.nexus-logo .u205-l {
+  position: relative;
+  display: inline-block;
+  font-size: clamp(40px, 14vw, 62px);
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: color-mix(
+    in oklab,
+    var(--logo-accent) calc(var(--t, 0) * 100%),
+    var(--logo-ink)
+  );
+  transform: translateY(var(--y, 0px)) scaleY(var(--sy, 1));
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+.u205.nexus-logo .u205-l::after {
+  content: '';
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: -14px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--logo-shadow);
+  opacity: calc(0.5 - var(--t, 0) * 0.35);
+  transform: translateY(calc(var(--y, 0px) * -1))
+    scaleX(calc(1 - var(--t, 0) * 0.5));
+  filter: blur(2px);
+}
+.u205.nexus-logo:focus-visible {
+  outline: 2px solid var(--logo-accent);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+:root[data-theme='dark'] .u205.nexus-logo {
+  --logo-ink: var(--ux-ink, #f4f0e8);
+  --logo-accent: var(--ux-accent, #b7a4ff);
+  --logo-shadow: var(--ux-shadow-strong, rgba(0, 0, 0, 0.72));
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .u205.nexus-logo {
+    --logo-ink: var(--ux-ink, #f4f0e8);
+    --logo-accent: var(--ux-accent, #b7a4ff);
+    --logo-shadow: var(--ux-shadow-strong, rgba(0, 0, 0, 0.72));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .u205.nexus-logo .u205-l {
+    transform: none;
+    will-change: auto;
+  }
+}

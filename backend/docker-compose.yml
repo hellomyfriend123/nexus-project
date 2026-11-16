@@ -1,15 +1,12 @@
 # =====================================================================================
 # PROJECT NEXUS — LOCAL DEVELOPMENT (PostgreSQL + App)
 #
-# Dùng:
-#   cp .env.example .env      # rồi điền giá trị (file .env KHÔNG commit)
-#   docker compose up --build
+# Dùng:  cp .env.example .env   (điền giá trị)   rồi   docker compose up --build
 #
-# LƯU Ý:
-#   - Secret lấy từ .env / biến môi trường, KHÔNG hard-code, KHÔNG commit .env.
-#   - db/*.sql chỉ được nạp khi volume Postgres còn TRỐNG (lần init đầu tiên);
-#     các script dùng IF NOT EXISTS / ON CONFLICT nên KHÔNG phá dữ liệu cũ.
-#   - Đổi cổng host nếu 5432/8080 đang bận: đặt POSTGRES_PORT / APP_PORT trong .env.
+# BẢO MẬT:
+#   - Secret lấy từ biến môi trường / file .env (KHÔNG commit, KHÔNG bake vào image).
+#   - db/*.sql được nạp CHỈ KHI volume postgres còn trống (lần khởi tạo đầu);
+#     mọi script đều dùng IF NOT EXISTS / ON CONFLICT DO NOTHING nên KHÔNG phá dữ liệu cũ.
 # =====================================================================================
 
 services:
@@ -26,7 +23,7 @@ services:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - nexus_pgdata:/var/lib/postgresql/data
-      # Nạp DDL + seed khi volume trống (idempotent, không phá dữ liệu).
+      # Khởi tạo schema/bảng/seed (00..99) chỉ khi volume trống — idempotent, không phá dữ liệu.
       - ./db:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres} -d ${DB_NAME:-nexus}"]

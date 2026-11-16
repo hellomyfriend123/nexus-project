@@ -1,0 +1,76 @@
+.rainbow::before{
+  background:linear-gradient(45deg,red,orange,yelllow,green,blue,indigo,violet,red);
+  background-size:400%;
+  animation:rainbow 5s linear infinite;
+}
+
+@keyframes rainbow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 400% 50%;
+  }
+}
+
+/* Desktop-only catalog UI. Product imagery and content are mock placeholders. */
+body:has(.nx-buyer-layout) {
+  margin: 0;
+  background: #faf8f7;
+}
+.nx-buyer-layout {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #25252b;
+  line-height: 1.5;
+  font-size: 14px;
+  min-width: 1080px;
+}
+.nx-buyer-layout * {
+  box-sizing: border-box;
+}
+.nx-buyer-layout a {
+  text-decoration: none;
+  color: inherit;
+}
+.nx-buyer-layout button,
+.nx-buyer-layout input,
+.nx-buyer-layout select {
+  font: inherit;
+}
+.nx-buyer-layout button {
+  cursor: pointer;
+}
+.nx-buyer-layout button:focus-visible,
+.nx-buyer-layout a:focus-visible,
+.nx-buyer-layout input:focus-visible,
+.nx-buyer-layout select:focus-visible {
+  outline: 2px solid #275ce6;
+  outline-offset: 3px;
+}
+.nx-container {
+  width: calc(100% - 64px);
+  max-width: 1320px;
+  margin: 0 auto;
+}
+.nx-home {
+  padding: 24px 0 45px;
+}
+.nx-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 22px;
+  padding: 10px 18px;
+  font-weight: 650;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* Preserve the shared grid contract for both Home and Product. */
+.nx-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}

@@ -1,0 +1,42 @@
+.nx-alert {
+  --nx-alert-color: #1742a1;
+  --nx-alert-bg: #eff5ff;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid currentColor;
+  border-radius: 12px;
+  background: var(--nx-alert-bg);
+  color: var(--nx-alert-color);
+  font: 14px/1.5 'Segoe UI', Arial, sans-serif;
+  overflow-wrap: anywhere;
+}
+.nx-alert--success { --nx-alert-color: #166534; --nx-alert-bg: #f0fdf4; }
+.nx-alert--error { --nx-alert-color: #991b1b; --nx-alert-bg: #fef2f2; }
+.nx-alert--warning { --nx-alert-color: #854d0e; --nx-alert-bg: #fefce8; }
+.nx-alert .nx-alert__icon {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 20px;
+  height: 20px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-weight: 700;
+}
+.nx-alert .nx-alert__content { flex: 1; min-width: 0; }
+.nx-alert .nx-alert__title { display: block; margin-bottom: 2px; }
+.nx-alert .nx-alert__close {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font-size: 22px;
+  cursor: pointer;
+}
+.nx-alert .nx-alert__close:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }

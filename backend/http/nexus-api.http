@@ -1,0 +1,600 @@
+### =====================================================================================
+### PROJECT NEXUS — bộ request mẫu theo ROLE (dùng được trong IntelliJ HTTP Client / VS Code REST Client)
+###
+### Cách dùng:
+###   1. Chạy ứng dụng:  java -jar nexus-app\target\nexus-app-1.0.0-SNAPSHOT.jar
+###   2. Chạy lần lượt: đăng nhập ADMIN -> đăng ký SELLER/BUYER -> đăng nhập -> gọi API theo role
+###   3. Token tự động được lưu vào biến qua `> {% ... %}` (response handler)
+###
+### Tài khoản ADMIN demo do seeder tạo ở lần chạy đầu: admin@nexus.local / Admin@123
+### =====================================================================================
+
+@host = http://localhost:8080
+@contentType = application/json
+
+### ---------------------------------------------------------------------------------
+### 0. HEALTH + TÀI LIỆU API (không cần token)
+### ---------------------------------------------------------------------------------
+
+### Health check
+GET {{host}}/actuator/health
+
+### Danh sách API (mở trên trình duyệt: {{host}}/swagger-ui.html)
+GET {{host}}/v3/api-docs
+
+
+### ---------------------------------------------------------------------------------
+### 1. CÔNG KHAI — FR-01 Register, FR-02 Login
+### ---------------------------------------------------------------------------------
+
+### FR-02 — Đăng nhập ADMIN (lưu token vào biến adminToken)
+# @name loginAdmin
+POST {{host}}/api/v1/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "admin@nexus.local",
+  "password": "Admin@123"
+}
+
+> {% client.global.set("adminToken", response.body.accessToken); %}
+
+### FR-01 — Đăng ký một SELLER mới
+POST {{host}}/api/v1/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "seller1@nexus.local",
+  "username": "seller1",
+  "password": "Seller@123",
+  "fullName": "Nguyễn Văn Bán",
+  "phone": "0901234567",
+  "role": "SELLER"
+}
+
+### FR-01 — Đăng ký một BUYER mới
+POST {{host}}/api/v1/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "buyer1@nexus.local",
+  "username": "buyer1",
+  "password": "Buyer@123",
+  "fullName": "Trần Thị Mua",
+  "phone": "0912345678",
+  "role": "BUYER"
+}
+
+### FR-01 — Đăng ký trùng email phải trả 409 CONFLICT
+POST {{host}}/api/v1/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "buyer1@nexus.local",
+  "username": "buyer1-khac",
+  "password": "Buyer@123",
+  "fullName": "Trùng email",
+  "role": "BUYER"
+}
+
+### FR-02 — Đăng nhập SELLER (lưu token)
+# @name loginSeller
+POST {{host}}/api/v1/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "seller1@nexus.local",
+  "password": "Seller@123"
+}
+
+> {% client.global.set("sellerToken", response.body.accessToken); %}
+
+### FR-02 — Đăng nhập BUYER (lưu token)
+# @name loginBuyer
+POST {{host}}/api/v1/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "buyer1@nexus.local",
+  "password": "Buyer@123"
+}
+
+> {% client.global.set("buyerToken", response.body.accessToken); %}
+
+### FR-02 — Sai mật khẩu phải trả 401 UNAUTHORIZED
+POST {{host}}/api/v1/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "buyer1@nexus.local",
+  "password": "sai-mat-khau"
+}
+
+
+### ---------------------------------------------------------------------------------
+### 2. BUYER — FR-03 Profile
+### ---------------------------------------------------------------------------------
+
+### FR-03 — Xem profile của chính mình
+GET {{host}}/api/v1/buyer/profile
+Authorization: Bearer {{buyerToken}}
+
+### FR-03 — Cập nhật profile
+PUT {{host}}/api/v1/buyer/profile
+Authorization: Bearer {{buyerToken}}
+Content-Type: {{contentType}}
+
+{
+  "fullName": "Trần Thị Mua",
+  "phone": "0999888777",
+  "address": "12 Nguyễn Trãi, Thanh Xuân, Hà Nội",
+  "dateOfBirth": "2003-05-20",
+  "gender": "FEMALE"
+}
+
+
+### ---------------------------------------------------------------------------------
+### 3. SELLER — FR-05/07/08 Product, FR-09/10 Category
+### ---------------------------------------------------------------------------------
+
+### FR-09 — Admin tạo category gốc
+POST {{host}}/api/v1/admin/catalog/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Điện thoại",
+  "description": "Điện thoại di động các loại",
+  "parentId": null,
+  "sortOrder": 1
+}
+
+> {% client.global.set("categoryId", response.body.id); %}
+
+### FR-09 — Xem cây danh mục (mọi role đã đăng nhập)
+GET {{host}}/api/v1/catalog/categories
+Authorization: Bearer {{buyerToken}}
+
+### FR-05 — Seller tạo sản phẩm
+POST {{host}}/api/v1/seller/catalog/products
+Authorization: Bearer {{sellerToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "iPhone 15 Pro Max 256GB",
+  "description": "Máy nguyên seal, bảo hành 12 tháng",
+  "basePrice": 28990000.00,
+  "categoryId": "{{categoryId}}",
+  "images": [
+    { "imageUrl": "https://example.com/iphone-1.jpg", "isPrimary": true, "sortOrder": 1 }
+  ]
+}
+
+> {% client.global.set("productId", response.body.id); %}
+
+### FR-07 — Seller cập nhật sản phẩm của mình
+PUT {{host}}/api/v1/seller/catalog/products/{{productId}}
+Authorization: Bearer {{sellerToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "iPhone 15 Pro Max 256GB (giá mới)",
+  "description": "Giảm giá sốc",
+  "basePrice": 27490000.00
+}
+
+### FR-10 — Gán sản phẩm vào danh mục
+PATCH {{host}}/api/v1/seller/catalog/products/{{productId}}/category
+Authorization: Bearer {{sellerToken}}
+Content-Type: {{contentType}}
+
+{
+  "categoryId": "{{categoryId}}"
+}
+
+### FR-06/11/12 — Tìm kiếm + lọc + sắp xếp (mọi role)
+GET {{host}}/api/v1/catalog/products?keyword=iphone&minPrice=1000000&maxPrice=40000000&page=0&size=10&sort=basePrice,asc
+Authorization: Bearer {{buyerToken}}
+
+### FR-06 — Chi tiết sản phẩm
+GET {{host}}/api/v1/catalog/products/{{productId}}
+Authorization: Bearer {{buyerToken}}
+
+### FR-08 — Seller xoá mềm sản phẩm của mình (204)
+DELETE {{host}}/api/v1/seller/catalog/products/{{productId}}
+Authorization: Bearer {{sellerToken}}
+
+
+### ---------------------------------------------------------------------------------
+### 4. SELLER — FR-13/14 SKU & tồn kho, FR-38/39 Shipment
+### ---------------------------------------------------------------------------------
+
+### FR-05 (một phần) — Seller tạo SKU + tồn kho ban đầu ở kho mặc định
+POST {{host}}/api/v1/seller/fulfillment/skus
+Authorization: Bearer {{sellerToken}}
+Content-Type: {{contentType}}
+
+{
+  "productId": "{{productId}}",
+  "skuCode": "IP15PM-256-TITAN",
+  "name": "iPhone 15 Pro Max - Titan tự nhiên - 256GB",
+  "initialQuantity": 10
+}
+
+> {% client.global.set("inventoryId", response.body.inventoryId); %}
+
+### FR-13 — Seller xem tồn kho của mình
+GET {{host}}/api/v1/seller/fulfillment/inventories?page=0&size=20
+Authorization: Bearer {{sellerToken}}
+
+### FR-14 — Tăng tồn kho
+PATCH {{host}}/api/v1/seller/fulfillment/inventories/{{inventoryId}}
+Authorization: Bearer {{sellerToken}}
+Content-Type: {{contentType}}
+
+{
+  "operation": "INCREASE",
+  "quantity": 5
+}
+
+### FR-14 — Giảm quá số lượng đang có phải bị chặn (422)
+PATCH {{host}}/api/v1/seller/fulfillment/inventories/{{inventoryId}}
+Authorization: Bearer {{sellerToken}}
+Content-Type: {{contentType}}
+
+{
+  "operation": "DECREASE",
+  "quantity": 999999
+}
+
+### FR-38 — Seller tạo vận đơn cho đơn hàng
+POST {{host}}/api/v1/seller/fulfillment/shipments
+Authorization: Bearer {{sellerToken}}
+Content-Type: {{contentType}}
+
+{
+  "orderId": "{{orderId}}",
+  "trackingNumber": "GHN123456789"
+}
+
+> {% client.global.set("shipmentId", response.body.id); %}
+
+### FR-39 — Cập nhật trạng thái vận đơn
+PATCH {{host}}/api/v1/seller/fulfillment/shipments/{{shipmentId}}/status
+Authorization: Bearer {{sellerToken}}
+Content-Type: {{contentType}}
+
+{
+  "status": "SHIPPED"
+}
+
+### FR-40 — Buyer theo dõi vận đơn theo đơn hàng
+GET {{host}}/api/v1/buyer/fulfillment/shipments?orderId={{orderId}}
+Authorization: Bearer {{buyerToken}}
+
+
+### ---------------------------------------------------------------------------------
+### 5. BUYER — FR-15..25 Cart, Checkout, Payment, Order
+### ---------------------------------------------------------------------------------
+
+### FR-15 — Xem giỏ (tự tạo nếu chưa có)
+GET {{host}}/api/v1/buyer/commerce/cart
+Authorization: Bearer {{buyerToken}}
+
+### FR-16 — Thêm sản phẩm vào giỏ
+POST {{host}}/api/v1/buyer/commerce/cart/items
+Authorization: Bearer {{buyerToken}}
+Content-Type: {{contentType}}
+
+{
+  "productId": "{{productId}}",
+  "skuId": null,
+  "sellerId": "{{sellerId}}",
+  "productName": "iPhone 15 Pro Max 256GB",
+  "quantity": 1,
+  "unitPrice": 27490000.00
+}
+
+### FR-17 — Cập nhật số lượng
+PUT {{host}}/api/v1/buyer/commerce/cart/items/{{cartItemId}}
+Authorization: Bearer {{buyerToken}}
+Content-Type: {{contentType}}
+
+{
+  "quantity": 3
+}
+
+### FR-18 — Xoá khỏi giỏ (204)
+DELETE {{host}}/api/v1/buyer/commerce/cart/items/{{cartItemId}}
+Authorization: Bearer {{buyerToken}}
+
+### FR-19 + FR-22 — Checkout tạo đơn
+POST {{host}}/api/v1/buyer/commerce/checkout
+Authorization: Bearer {{buyerToken}}
+Content-Type: {{contentType}}
+
+{
+  "receiverName": "Trần Thị Mua",
+  "receiverPhone": "0999888777",
+  "shippingAddress": "12 Nguyễn Trãi, Thanh Xuân, Hà Nội",
+  "paymentMethod": "MOCK",
+  "discountCode": null
+}
+
+> {% client.global.set("orderId", response.body.id); %}
+
+### FR-20/48 — Áp thử discount code
+POST {{host}}/api/v1/buyer/commerce/checkout/apply-discount
+Authorization: Bearer {{buyerToken}}
+Content-Type: {{contentType}}
+
+{
+  "code": "SALE10",
+  "orderAmount": 27490000.00,
+  "orderType": "DIRECT"
+}
+
+### FR-23 — Buyer xem đơn của mình
+GET {{host}}/api/v1/buyer/commerce/orders?page=0&size=10
+Authorization: Bearer {{buyerToken}}
+
+### FR-21 — Tạo giao dịch với idempotency key (gọi 2 lần phải trả cùng 1 payment)
+POST {{host}}/api/v1/buyer/commerce/orders/{{orderId}}/payments
+Authorization: Bearer {{buyerToken}}
+Content-Type: {{contentType}}
+
+{
+  "paymentMethod": "MOCK",
+  "amount": 27490000.00,
+  "idempotencyKey": "idem-demo-0001"
+}
+
+> {% client.global.set("paymentId", response.body.id); %}
+
+### FR-21 — Xác nhận kết quả thanh toán
+POST {{host}}/api/v1/buyer/commerce/payments/{{paymentId}}/confirm
+Authorization: Bearer {{buyerToken}}
+Content-Type: {{contentType}}
+
+{
+  "result": "SUCCESS"
+}
+
+### FR-25 — Buyer huỷ đơn (chỉ khi PENDING/CONFIRMED)
+POST {{host}}/api/v1/buyer/commerce/orders/{{orderId}}/cancel
+Authorization: Bearer {{buyerToken}}
+
+
+### ---------------------------------------------------------------------------------
+### 6. SELLER — FR-23/24 Đơn hàng đến
+### ---------------------------------------------------------------------------------
+
+### FR-23 — Seller xem đơn hàng của mình
+GET {{host}}/api/v1/seller/commerce/orders?page=0&size=10
+Authorization: Bearer {{sellerToken}}
+
+### FR-24 — Seller chuyển trạng thái đơn
+PATCH {{host}}/api/v1/seller/commerce/orders/{{orderId}}/status
+Authorization: Bearer {{sellerToken}}
+Content-Type: {{contentType}}
+
+{
+  "status": "CONFIRMED"
+}
+
+
+### ---------------------------------------------------------------------------------
+### 7. SELLER — FR-26..37 Auction
+### ---------------------------------------------------------------------------------
+
+### FR-26 — Seller tạo phiên đấu giá
+POST {{host}}/api/v1/seller/auction/auctions
+Authorization: Bearer {{sellerToken}}
+Content-Type: {{contentType}}
+
+{
+  "productId": "{{productId}}",
+  "startingPrice": 5000000.00,
+  "startTime": "2026-10-08T10:00:00Z",
+  "endTime": "2026-10-15T10:00:00Z"
+}
+
+> {% client.global.set("auctionId", response.body.id); %}
+
+### FR-27 — Seller sửa cấu hình (chỉ khi SCHEDULED)
+PUT {{host}}/api/v1/seller/auction/auctions/{{auctionId}}
+Authorization: Bearer {{sellerToken}}
+Content-Type: {{contentType}}
+
+{
+  "startingPrice": 6000000.00,
+  "startTime": "2026-10-08T10:00:00Z",
+  "endTime": "2026-10-16T10:00:00Z"
+}
+
+### FR-29 — Danh sách phiên đấu giá
+GET {{host}}/api/v1/auction/auctions?status=ACTIVE&page=0&size=10
+Authorization: Bearer {{buyerToken}}
+
+### FR-28 — Chi tiết phiên
+GET {{host}}/api/v1/auction/auctions/{{auctionId}}
+Authorization: Bearer {{buyerToken}}
+
+### FR-30 — Buyer đặt giá (phải > giá hiện tại)
+POST {{host}}/api/v1/buyer/auction/auctions/{{auctionId}}/bids
+Authorization: Bearer {{buyerToken}}
+Content-Type: {{contentType}}
+
+{
+  "amount": 7000000.00
+}
+
+### FR-30 — Đặt giá thấp hơn phải bị từ chối (422) và lưu bid REJECTED
+POST {{host}}/api/v1/buyer/auction/auctions/{{auctionId}}/bids
+Authorization: Bearer {{buyerToken}}
+Content-Type: {{contentType}}
+
+{
+  "amount": 1000.00
+}
+
+### FR-31 — Lịch sử đặt giá
+GET {{host}}/api/v1/auction/auctions/{{auctionId}}/bids?page=0&size=20
+Authorization: Bearer {{buyerToken}}
+
+### Kết quả chốt phiên (sau khi hết giờ — scheduler chạy mỗi 15 giây)
+GET {{host}}/api/v1/auction/auctions/{{auctionId}}/settlement
+Authorization: Bearer {{buyerToken}}
+
+### FR-37 — Seller huỷ phiên
+POST {{host}}/api/v1/seller/auction/auctions/{{auctionId}}/cancel
+Authorization: Bearer {{sellerToken}}
+
+
+### ---------------------------------------------------------------------------------
+### 8. BUYER — FR-41/42/43/44 Đánh giá
+### ---------------------------------------------------------------------------------
+
+### FR-41/42 — Buyer đánh giá sản phẩm (sau khi đơn COMPLETED)
+POST {{host}}/api/v1/buyer/catalog/products/{{productId}}/reviews
+Authorization: Bearer {{buyerToken}}
+Content-Type: {{contentType}}
+
+{
+  "score": 5,
+  "comment": "Máy đẹp, giao nhanh",
+  "orderId": "{{orderId}}"
+}
+
+### FR-41 — Xem đánh giá sản phẩm
+GET {{host}}/api/v1/catalog/products/{{productId}}/reviews?page=0&size=10
+Authorization: Bearer {{buyerToken}}
+
+### FR-43/44 — Buyer đánh giá Seller
+POST {{host}}/api/v1/buyer/commerce/seller-ratings
+Authorization: Bearer {{buyerToken}}
+Content-Type: {{contentType}}
+
+{
+  "orderId": "{{orderId}}",
+  "sellerId": "{{sellerId}}",
+  "score": 5,
+  "comment": "Người bán uy tín"
+}
+
+
+### ---------------------------------------------------------------------------------
+### 9. BUYER — FR-49..51 Notification
+### ---------------------------------------------------------------------------------
+
+### FR-50 — Thông báo của tôi
+GET {{host}}/api/v1/notification/notifications?page=0&size=20
+Authorization: Bearer {{buyerToken}}
+
+### FR-50 — Chỉ lấy thông báo chưa đọc
+GET {{host}}/api/v1/notification/notifications?unreadOnly=true&page=0&size=20
+Authorization: Bearer {{buyerToken}}
+
+### Số thông báo chưa đọc (badge)
+GET {{host}}/api/v1/notification/notifications/unread-count
+Authorization: Bearer {{buyerToken}}
+
+### FR-51 — Đánh dấu 1 thông báo đã đọc
+PATCH {{host}}/api/v1/notification/notifications/{{notificationId}}/read
+Authorization: Bearer {{buyerToken}}
+
+### FR-51 — Đánh dấu tất cả đã đọc
+PATCH {{host}}/api/v1/notification/notifications/read-all
+Authorization: Bearer {{buyerToken}}
+
+
+### ---------------------------------------------------------------------------------
+### 10. ADMIN — FR-04/52/53/54/55/56/57/58/59
+### ---------------------------------------------------------------------------------
+
+### FR-04/52 — Danh sách người dùng + tìm kiếm/lọc
+GET {{host}}/api/v1/admin/users?keyword=buyer&status=ACTIVE&page=0&size=20
+Authorization: Bearer {{adminToken}}
+
+### FR-04 — Đổi trạng thái tài khoản
+PATCH {{host}}/api/v1/admin/users/{{userId}}/status
+Authorization: Bearer {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "status": "INACTIVE"
+}
+
+### FR-53 — Admin xem sản phẩm toàn hệ thống
+GET {{host}}/api/v1/admin/catalog/products?page=0&size=20
+Authorization: Bearer {{adminToken}}
+
+### FR-53 — Admin đổi trạng thái sản phẩm
+PATCH {{host}}/api/v1/admin/catalog/products/{{productId}}/status
+Authorization: Bearer {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "status": "ACTIVE"
+}
+
+### FR-59/45 — Admin kiểm duyệt đánh giá
+GET {{host}}/api/v1/admin/catalog/reviews?page=0&size=20
+Authorization: Bearer {{adminToken}}
+
+### FR-59 — Ẩn một đánh giá
+PATCH {{host}}/api/v1/admin/catalog/reviews/{{reviewId}}/status
+Authorization: Bearer {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "status": "HIDDEN"
+}
+
+### FR-55 — Admin giám sát tồn kho toàn hệ thống
+GET {{host}}/api/v1/admin/fulfillment/inventories?page=0&size=20
+Authorization: Bearer {{adminToken}}
+
+### FR-56 — Admin xem tất cả đơn hàng
+GET {{host}}/api/v1/admin/commerce/orders?status=PENDING&page=0&size=20
+Authorization: Bearer {{adminToken}}
+
+### FR-46/58 — Admin tạo campaign khuyến mãi
+POST {{host}}/api/v1/admin/commerce/campaigns
+Authorization: Bearer {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Sale cuối năm 2026",
+  "description": "Giảm giá toàn sàn",
+  "startDate": "2026-12-01",
+  "endDate": "2026-12-31",
+  "status": "ACTIVE"
+}
+
+> {% client.global.set("campaignId", response.body.id); %}
+
+### FR-47/58 — Admin tạo discount code
+POST {{host}}/api/v1/admin/commerce/discount-codes
+Authorization: Bearer {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "campaignId": "{{campaignId}}",
+  "code": "SALE10",
+  "discountType": "PERCENTAGE",
+  "discountValue": 10,
+  "minOrderAmount": 1000000,
+  "usageLimit": 100,
+  "startAt": "2026-12-01T00:00:00Z",
+  "endAt": "2026-12-31T23:59:59Z",
+  "status": "ACTIVE"
+}
+
+### FR-57 — Admin xem tất cả phiên đấu giá
+GET {{host}}/api/v1/admin/auction/auctions?page=0&size=20
+Authorization: Bearer {{adminToken}}
+
+### FR-57 — Admin huỷ phiên đấu giá có vấn đề
+POST {{host}}/api/v1/admin/auction/auctions/{{auctionId}}/cancel
+Authorization: Bearer {{adminToken}}

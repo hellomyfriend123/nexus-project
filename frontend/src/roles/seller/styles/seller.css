@@ -1,0 +1,307 @@
+/* ==========================================================================
+   Nexus Seller Portal Styles (Tuân thủ thiết kế Buyer & Nexus Brand)
+   Phông chữ: 'Segoe UI', Arial, sans-serif
+   Màu chủ đạo: #315bf4 (Nexus Blue), Nền: #faf8f7
+   ========================================================================== */
+
+.nx-seller-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #faf8f7;
+  font-family: 'Segoe UI', Arial, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #25252b;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+/* Sidebar */
+.nx-seller-sidebar {
+  width: 260px;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 100;
+  transition: width 0.2s ease;
+  flex-shrink: 0;
+}
+
+.nx-seller-sidebar.collapsed {
+  width: 72px;
+}
+
+.nx-seller-sidebar-header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.nx-seller-sidebar-nav {
+  padding: 16px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.nx-seller-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: #4b5563;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.nx-seller-nav-item:hover {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.nx-seller-nav-item.active {
+  background-color: #eff6ff;
+  color: #315bf4;
+  font-weight: 600;
+}
+
+.nx-seller-nav-item i {
+  font-size: 1.15rem;
+  width: 20px;
+  text-align: center;
+}
+
+.nx-seller-sidebar-footer {
+  padding: 14px 16px;
+  border-top: 1px solid #e5e7eb;
+  background-color: #fcfcfc;
+}
+
+/* Main Area */
+.nx-seller-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.nx-seller-topbar {
+  height: 64px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+}
+
+.nx-seller-content {
+  padding: 24px;
+  flex: 1;
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Page Header */
+.nx-seller-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.nx-seller-page-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.nx-seller-page-desc {
+  margin: 4px 0 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+/* Cards */
+.nx-seller-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  margin-bottom: 20px;
+}
+
+.nx-seller-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.nx-seller-stat-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.nx-seller-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.nx-seller-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+}
+
+.nx-seller-stat-info h4 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.nx-seller-stat-info p {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* API Badge Pills */
+.nx-api-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-family: monospace;
+}
+
+.nx-api-badge.get { background: #e0f2fe; color: #0369a1; }
+.nx-api-badge.post { background: #dcfce7; color: #15803d; }
+.nx-api-badge.put { background: #fef3c7; color: #b45309; }
+.nx-api-badge.patch { background: #f3e8ff; color: #7e22ce; }
+.nx-api-badge.delete { background: #fee2e2; color: #b91c1c; }
+
+/* Status Badges */
+.nx-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.nx-badge-success { background: #ecfdf5; color: #047857; }
+.nx-badge-warning { background: #fffbeb; color: #b45309; }
+.nx-badge-danger { background: #fef2f2; color: #b91c1c; }
+.nx-badge-info { background: #f0f9ff; color: #0284c7; }
+.nx-badge-secondary { background: #f3f4f6; color: #4b5563; }
+
+/* Tables */
+.nx-seller-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.nx-seller-table th {
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.nx-seller-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.nx-seller-table tbody tr:hover {
+  background: #fbfcfe;
+}
+
+/* Modals */
+.nx-seller-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.nx-seller-modal {
+  background: #ffffff;
+  border-radius: 12px;
+  max-width: 650px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.nx-seller-modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nx-seller-modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.nx-seller-modal-footer {
+  padding: 14px 20px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  background: #f8fafc;
+}

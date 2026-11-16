@@ -1,0 +1,42 @@
+﻿/* Lucian #051 motion only. Existing detail design and global theme are unchanged. */
+.u051-detail {
+  position: relative;
+}
+.u051-detail .u051-fly {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 34px;
+  height: 64px;
+  z-index: 5;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+.u051-detail .u051-fly svg {
+  width: 100%;
+  height: 100%;
+}
+.u051-detail .u051-detail-cart {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.u051-detail .u051-detail-cart b {
+  display: inline-block;
+  min-width: 20px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: var(--nx-primary, #315bf4);
+  color: white;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+@media (prefers-reduced-motion: reduce) {
+  .u051-detail .u051-fly,
+  .u051-detail .u051-detail-cart,
+  .u051-detail .u051-detail-cart b {
+    animation: none !important;
+    transition: none !important;
+  }
+}

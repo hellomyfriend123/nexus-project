@@ -1,0 +1,28 @@
+﻿/* Registration uses the same #062 card, tokens and input motion as login. */
+.u062.u062-register-card .u062-register-pane {
+  position: relative;
+}
+.u062.u062-register-card header > p {
+  margin: 6px 0 18px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ux-ink-3);
+}
+.u062.u062-register-card .u062-field-hint {
+  margin: 7px 0 0;
+  font-size: 11px;
+  color: var(--ux-ink-2);
+}
+.u062.u062-register-card .u062-go {
+  display: block;
+  margin-top: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 12px;
+}
+.u062.u062-register-card .u062-notice {
+  margin: 0 0 16px;
+}
+.u062.u062-register-card form + .u062-notice {
+  margin: 16px 0 0;
+}
