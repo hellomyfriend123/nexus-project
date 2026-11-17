@@ -1,4 +1,4 @@
-import type { Product } from '../types/product';
+import type { Listing as Product } from '../../../services/api/catalog';
 import ProductCard from './ProductCard';
 function ProductList({ products }: { products: Product[] }) {
   return (

@@ -40,13 +40,20 @@ test('Register validation and initial UI', async () => {
     assert.ok(validateRegister({ ...valid, email: 'invalid' }).email);
     assert.ok(validateRegister({ ...valid, password: 'short' }).password);
     assert.ok(validateRegister({ ...valid, username: 'ab' }).username);
-    assert.ok(validateRegister({ ...valid, username: 'a'.repeat(101) }).username);
+    assert.ok(validateRegister({ ...valid, username: 'a'.repeat(51) }).username);
     assert.ok(validateRegister({ ...valid, fullName: 'a'.repeat(151) }).fullName);
     assert.ok(validateRegister({ ...valid, email: 'a'.repeat(256) }).email);
     assert.ok(validateRegister({ ...valid, phone: 'not-phone' }).phone);
     assert.deepEqual(validateRegister({ ...valid, phone: '+84901234567' }), {});
-    assert.ok(validateRegister({ ...valid, password: 'a'.repeat(129) }).password);
-    assert.deepEqual(validateRegister({ ...valid, password: '123456', confirmPassword: '123456' }), {});
+    assert.ok(validateRegister({ ...valid, password: 'a'.repeat(73) }).password);
+    assert.ok(validateRegister({ ...valid, password: '123456', confirmPassword: '123456' }).password);
+    for (const username of ['name with spaces', 'invalid@name', 'tên']) assert.ok(validateRegister({ ...valid, username }).username);
+    for (const username of ['a'.repeat(50), 'name._-123']) assert.deepEqual(validateRegister({ ...valid, username }), {});
+    for (const password of ['a'.repeat(72), '12345678']) assert.deepEqual(validateRegister({ ...valid, password, confirmPassword: password }), {});
+    for (const phone of ['+84 (90) 123-4567', '12345678901234567890']) assert.deepEqual(validateRegister({ ...valid, phone }), {});
+    assert.ok(validateRegister({ ...valid, phone: '1'.repeat(21) }).phone);
+    assert.ok(validateRegister({ ...valid, password: ' '.repeat(8) }).password);
+    assert.deepEqual(validateRegister({ ...valid, email: 'test@example.technology' }), {});
     assert.ok(
       validateRegister({ ...valid, confirmPassword: 'different' })
         .confirmPassword,
@@ -69,9 +76,9 @@ test('Register validation and initial UI', async () => {
     assert.match(html, /id="register-title"/);
     assert.match(html, /id="register-phone"[^>]*type="tel"/);
     assert.doesNotMatch(html.match(/<input id="register-phone"[^>]*>/)[0], /required/);
-    assert.match(html, /minLength="6"/);
+    assert.match(html, /minLength="8"/);
     assert.doesNotMatch(html, /mô phỏng|Chưa kết nối Backend/);
-    assert.match(html, /maxLength="128"/);
+    assert.match(html, /maxLength="72"/);
     assert.ok(html.includes('class="u062-register-btn">Đăng nhập</button>'));
     assert.equal((html.match(/type="password"/g) || []).length, 2);
     for (const field of ['username', 'phone', 'fullName', 'email', 'password', 'confirmPassword']) {

@@ -33,8 +33,13 @@ Copy `.env.example` → `.env`, điền giá trị thật. Bảng đầy đủ:
    ```
    psql "$DB_URL" -f db/00-create-schemas.sql -f db/01-user.sql ... -f db/99-seed.sql
    ```
-3. Đặt `DDL_AUTO=validate` — Hibernate chỉ **kiểm tra** schema, không tự sửa.
-4. Cảnh báo RLS: schema `public` của Supabase bị expose qua Data API — mọi bảng của Nexus nằm trong schema riêng (`nexus_*`), KHÔNG đặt vào `public`.
+3. Nếu database đã tồn tại và thiếu `nexus_user.user_roles.assigned_at`, chạy migration bổ sung:
+   ```
+   psql "$DB_URL" -v ON_ERROR_STOP=1 -f db/07-user-roles-assigned-at.sql
+   ```
+   Các bản ghi phân quyền cũ sẽ nhận thời điểm chạy migration vì thời điểm tạo ban đầu không có sẵn.
+4. Đặt `DDL_AUTO=validate` — Hibernate chỉ **kiểm tra** schema, không tự sửa.
+5. Cảnh báo RLS: schema `public` của Supabase bị expose qua Data API — mọi bảng của Nexus nằm trong schema riêng (`nexus_*`), KHÔNG đặt vào `public`.
 
 ## 4. Docker
 

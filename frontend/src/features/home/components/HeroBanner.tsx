@@ -1,24 +1,17 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { products, formatPrice } from '../../product/services/productService';
-import ProductImage from '../../product/components/ProductImage';
+import { formatPrice } from '../../product/services/productService';
+import { useHomeProducts } from '../hooks/useHomeProducts';
+import { notify } from '../../../shared/components/Toast';
+import { CatalogImage } from '../../product/components/CatalogProductCard';
 
 function HeroBanner() {
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
-  const featured =
-    products.find((product) => /RTX|GeForce|GPU/i.test(product.name)) ??
-    products[0];
+  const { products } = useHomeProducts();
+  const featured = products[0];
+  function copyCoupon() { setCopied(false); setCopyError(true); notify.error('Chưa có API công bố ưu đãi này. Không thể xác nhận mã NEXUS10.'); }
 
-  async function copyCoupon() {
-    try {
-      await navigator.clipboard.writeText('NEXUS10');
-      setCopied(true);
-      setCopyError(false);
-    } catch {
-      setCopyError(true);
-    }
-  }
 
   return (
     <section className="nx-hero" aria-labelledby="home-hero-title">
@@ -68,9 +61,9 @@ function HeroBanner() {
         </div>
         <span className="nx-coupon-feedback" role="status">
           {copyError
-            ? 'Mã ưu đãi của bạn: NEXUS10. Đây là mã mô phỏng, chưa kết nối thanh toán.'
+            ? 'Mã ưu đãi của bạn: NEXUS10. Mã chưa được máy chủ xác nhận; không đảm bảo áp dụng.'
             : copied
-              ? 'Đã sao chép mã NEXUS10. Mã chỉ phục vụ bản mô phỏng UI.'
+              ? 'Đã sao chép mã NEXUS10. Không đảm bảo áp dụng mã.'
               : ''}
         </span>
       </div>
@@ -85,7 +78,7 @@ function HeroBanner() {
             to={`/products/${featured.id}`}
             aria-label={`Khám phá ${featured.name}`}
           >
-            <ProductImage kind={featured.image} label={featured.name} />
+            <CatalogImage url={featured.primaryImageUrl} name={featured.name} />
           </Link>
         )}
         {featured ? (
@@ -96,7 +89,7 @@ function HeroBanner() {
             <strong>{featured.name}</strong>
             <div>
               <span>Giá hiện tại</span>
-              <b>{formatPrice(featured.price)}</b>
+              <b>{formatPrice(featured.basePrice)}</b>
             </div>
             <span className="nx-hero-price-note">
               Cơ hội nâng cấp góc máy của bạn <span aria-hidden="true">↗</span>

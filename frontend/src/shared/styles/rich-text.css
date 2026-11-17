@@ -1,0 +1,19 @@
+﻿/* Shared content semantics only: no page layout, colors or editor chrome. */
+.nx-rich-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.nx-rich-text p, .nx-rich-text div, .nx-rich-text ul, .nx-rich-text ol {
+  margin: 0 0 .5rem;
+  color: inherit;
+  font: inherit;
+}
+.nx-rich-text ul, .nx-rich-text ol { padding-left: 1.5rem; }
+.nx-rich-text ul { list-style-type: disc; }
+.nx-rich-text ol { list-style-type: decimal; }
+.nx-rich-text li { display: list-item; color: inherit; font: inherit; }
+.nx-rich-text li > ul, .nx-rich-text li > ol { margin-bottom: 0; }
+.nx-rich-text b, .nx-rich-text strong { font-weight: 700; }
+.nx-rich-text i, .nx-rich-text em { font-style: italic; }
+/* Preserve the outer paragraph spacing in existing detail description slots. */
+.nx-rich-text-display { margin: 0 0 1rem; }

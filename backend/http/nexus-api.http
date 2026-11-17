@@ -598,3 +598,15 @@ Authorization: Bearer {{adminToken}}
 ### FR-57 — Admin huỷ phiên đấu giá có vấn đề
 POST {{host}}/api/v1/admin/auction/auctions/{{auctionId}}/cancel
 Authorization: Bearer {{adminToken}}
+
+### Upload ảnh sản phẩm (thay {id} bằng productId thực, sellerToken bằng token đăng nhập)
+POST {{host}}/api/v1/seller/catalog/products/{id}/images/upload
+Authorization: Bearer {{sellerToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="product.jpg"
+Content-Type: image/jpeg
+
+< ./path/to/your/image.jpg
+--boundary--

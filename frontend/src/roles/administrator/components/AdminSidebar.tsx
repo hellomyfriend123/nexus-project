@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import NexusLogo from '../../../shared/components/Logo/NexusLogo';
-import { getSession, logout } from '../../../features/auth/services/auth.api';
+import { useAdminLayoutSession } from '../hooks/useAdminLayoutSession';
+import { adminMenuItems } from '../services/adminNavigation';
 
 interface AdminSidebarProps {
   collapsed?: boolean;
@@ -8,54 +9,7 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ collapsed = false }: AdminSidebarProps) {
   const navigate = useNavigate();
-  const session = getSession();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } finally {
-      navigate('/login');
-    }
-  };
-
-  const menuItems = [
-    {
-      to: '/admin',
-      end: true,
-      label: 'Tổng quan (Dashboard)',
-      icon: 'bi-grid-1x2-fill',
-    },
-    {
-      to: '/admin/users',
-      label: 'Quản lý người dùng',
-      icon: 'bi-people-fill',
-      badge: 'FR-04',
-    },
-    {
-      to: '/admin/catalog',
-      label: 'Danh mục & Sản phẩm',
-      icon: 'bi-box-seam-fill',
-      badge: 'Catalog',
-    },
-    {
-      to: '/admin/commerce',
-      label: 'Đơn hàng & Khuyến mãi',
-      icon: 'bi-receipt-cutoff',
-      badge: 'Commerce',
-    },
-    {
-      to: '/admin/fulfillment',
-      label: 'Tồn kho & Kho hàng',
-      icon: 'bi-building-fill-gear',
-      badge: 'Fulfillment',
-    },
-    {
-      to: '/admin/auctions',
-      label: 'Quản lý đấu giá',
-      icon: 'bi-hammer',
-      badge: 'Auction',
-    },
-  ];
+  const { session, handleLogout } = useAdminLayoutSession();
 
   return (
     <aside className="nx-admin-sidebar">
@@ -67,7 +21,7 @@ export function AdminSidebar({ collapsed = false }: AdminSidebarProps) {
       </div>
 
       <nav className="nx-admin-nav">
-        {menuItems.map((item) => (
+        {adminMenuItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}

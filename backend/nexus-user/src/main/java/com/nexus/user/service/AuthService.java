@@ -37,4 +37,16 @@ public interface AuthService {
 
     /** FR-02 — thông tin người dùng đang đăng nhập (đọc từ token, không nhận từ client). */
     UserResponse getCurrentUser(UUID userId);
+
+    /**
+     * FR-02 (mở rộng) — đổi mã dùng-một-lần của luồng OAuth2 lấy phiên đăng nhập.
+     * <p>
+     * Backend không đặt access token lên URL sau khi Google chuyển hướng về; nó chỉ đưa một mã
+     * ngắn hạn, dùng một lần. Endpoint này đổi mã đó thành {@link AuthResponse} — <b>cùng hình dạng
+     * với {@link #login}</b>, nên frontend lưu phiên bằng đúng đoạn mã hiện có.
+     *
+     * @throws com.nexus.common.exception.BusinessException {@code UNAUTHORIZED} nếu mã sai, đã dùng
+     *                                                      hoặc đã hết hạn
+     */
+    AuthResponse exchangeOAuth2Code(String code);
 }

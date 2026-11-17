@@ -4,7 +4,9 @@ import com.nexus.common.api.ErrorCode;
 import com.nexus.common.exception.BusinessException;
 import com.nexus.common.exception.DuplicateResourceException;
 import com.nexus.common.exception.ResourceNotFoundException;
+import com.nexus.common.security.SocialLoginResult;
 import com.nexus.common.security.TokenService;
+import com.nexus.common.security.oauth2.OAuth2LoginCodeStore;
 import com.nexus.user.dto.common.UserResponse;
 import com.nexus.user.dto.publicapi.AuthResponse;
 import com.nexus.user.dto.publicapi.LoginRequest;
@@ -52,6 +54,7 @@ public class AuthServiceImpl implements AuthService {
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
+    private final OAuth2LoginCodeStore oAuth2LoginCodeStore;
 
     @Override
     @Transactional
@@ -139,6 +142,29 @@ public class AuthServiceImpl implements AuthService {
         }
 
         return UserMapper.toResponse(user, roleService.findRoleCodesOfUser(userId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AuthResponse exchangeOAuth2Code(String code) {
+        // Mã chỉ dùng được MỘT lần: consume() xoá khỏi kho ngay khi đọc (xem OAuth2LoginCodeStore).
+        // Nhờ vậy nếu URL callback bị lộ qua lịch sử trình duyệt/log proxy thì cũng không tái sử dụng được.
+        SocialLoginResult result = oAuth2LoginCodeStore.consume(code)
+                .orElseThrow(() -> new BusinessException(ErrorCode.UNAUTHORIZED,
+                        "Mã đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại."));
+
+        User user = userRepository.findByIdAndDeletedAtIsNull(result.userId())
+                .orElseThrow(() -> new ResourceNotFoundException("Người dùng", result.userId()));
+
+        // Kiểm tra lại trạng thái: tài khoản có thể đã bị Admin khoá trong 60 giây mã còn sống.
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            throw new BusinessException(ErrorCode.FORBIDDEN,
+                    "Tài khoản " + describe(user.getStatus()) + " nên không thể đăng nhập");
+        }
+
+        log.info("Đổi mã OAuth2 thành công: {}", user.getEmail());
+        return AuthResponse.of(result.accessToken(), result.expiresInSeconds(),
+                UserMapper.toResponse(user, result.roles()));
     }
 
     /** Email là duy nhất và không phân biệt hoa thường → luôn lưu/tra cứu ở dạng chữ thường. */

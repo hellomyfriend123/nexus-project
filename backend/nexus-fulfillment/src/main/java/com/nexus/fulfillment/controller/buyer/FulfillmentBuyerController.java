@@ -1,5 +1,6 @@
 package com.nexus.fulfillment.controller.buyer;
 
+import com.nexus.common.security.SecurityUtils;
 import com.nexus.fulfillment.dto.common.ShipmentResponse;
 import com.nexus.fulfillment.service.ShipmentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,9 +19,7 @@ import java.util.UUID;
 
 /**
  * Buyer — theo dõi vận đơn của một đơn hàng (FR-40).
- * <p>
- * TODO (giai đoạn business logic): khi nối {@code nexus-commerce}, service sẽ kiểm tra
- *       Order thuộc Buyer đang đăng nhập trước khi trả dữ liệu (hiện chỉ tra theo orderId).
+ * Buyer chỉ tra cứu vận đơn của Order thuộc tài khoản đang đăng nhập.
  */
 @RestController
 @RequestMapping("/api/v1/buyer/fulfillment")
@@ -35,7 +34,9 @@ public class FulfillmentBuyerController {
     @Operation(summary = "FR-40 — Buyer theo dõi vận đơn theo mã đơn hàng",
             description = "Trả về danh sách vận đơn (mới nhất trước) của đơn hàng cần tra cứu.")
     @ApiResponse(responseCode = "200", description = "Danh sách vận đơn của đơn hàng")
+    @ApiResponse(responseCode = "403", description = "Đơn hàng thuộc Buyer khác")
+    @ApiResponse(responseCode = "404", description = "Không tìm thấy đơn hàng")
     public ResponseEntity<List<ShipmentResponse>> trackShipments(@RequestParam UUID orderId) {
-        return ResponseEntity.ok(shipmentService.listByOrderId(orderId));
+        return ResponseEntity.ok(shipmentService.listByOrderId(SecurityUtils.currentUserId(), orderId));
     }
 }

@@ -1,12 +1,12 @@
 import type { RouteObject } from 'react-router-dom';
 import AdminGuard from './layouts/AdminGuard';
 import AdminLayout from './layouts/AdminLayout';
-import AdminDashboardPage from './pages/AdminDashboardPage';
-import AdminUsersPage from './pages/AdminUsersPage';
-import AdminCatalogPage from './pages/AdminCatalogPage';
-import AdminCommercePage from './pages/AdminCommercePage';
-import AdminFulfillmentPage from './pages/AdminFulfillmentPage';
-import AdminAuctionsPage from './pages/AdminAuctionsPage';
+import AdminDashboardPage from '../../features/admin/pages/AdminDashboardPage';
+import AdminUsersPage from '../../features/admin/pages/AdminUsersPage';
+import AdminCatalogPage from '../../features/admin/pages/AdminCatalogPage';
+import AdminCommercePage from '../../features/admin/pages/AdminCommercePage';
+import AdminFulfillmentPage from '../../features/admin/pages/AdminFulfillmentPage';
+import AdminAuctionsPage from '../../features/admin/pages/AdminAuctionsPage';
 
 const administratorRoutes: RouteObject[] = [
   {

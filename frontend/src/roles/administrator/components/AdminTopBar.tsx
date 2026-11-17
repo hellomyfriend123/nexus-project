@@ -1,29 +1,8 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getSession, logout } from '../../../features/auth/services/auth.api';
-
-interface AdminTopBarProps {
-  onSearch?: (query: string) => void;
-  title?: string;
-}
+import { useAdminTopBar } from '../hooks/useAdminTopBar';
+import type { AdminTopBarProps } from '../types/adminLayout.types';
 
 export function AdminTopBar({ onSearch, title }: AdminTopBarProps) {
-  const [query, setQuery] = useState('');
-  const session = getSession();
-  const navigate = useNavigate();
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (onSearch) onSearch(query);
-  };
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } finally {
-      navigate('/login');
-    }
-  };
+  const { query, setQuery, session, handleSearch, handleLogout } = useAdminTopBar(onSearch);
 
   return (
     <header className="nx-admin-topbar">
@@ -43,7 +22,7 @@ export function AdminTopBar({ onSearch, title }: AdminTopBarProps) {
       <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', background: '#ecfdf5', color: '#059669', padding: '4px 10px', borderRadius: '16px', fontWeight: 600 }}>
           <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', display: 'inline-block' }}></span>
-          Backend Nexus: Connected (Port 8080)
+          Backend Nexus: REST API
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

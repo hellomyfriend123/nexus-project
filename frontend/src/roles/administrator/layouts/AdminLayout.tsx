@@ -2,7 +2,7 @@ import { Outlet } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import AdminSidebar from '../components/AdminSidebar';
 import AdminTopBar from '../components/AdminTopBar';
-import '../styles/admin.css';
+import '../../../features/admin/styles/admin.css';
 
 export function AdminLayout() {
   return (

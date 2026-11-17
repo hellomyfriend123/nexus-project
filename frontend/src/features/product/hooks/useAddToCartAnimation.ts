@@ -95,8 +95,8 @@ function useAddToCartAnimation(onAdded: () => void) {
     const fly = document.createElement('div');
     fly.className = 'u051-fly';
     fly.setAttribute('aria-hidden', 'true');
-    const clone = image.querySelector('svg')?.cloneNode(true) as
-      SVGSVGElement | undefined;
+    const clone = image.querySelector('svg, img')?.cloneNode(true) as
+      SVGSVGElement | HTMLImageElement | undefined;
     if (!clone) {
       land();
       return;

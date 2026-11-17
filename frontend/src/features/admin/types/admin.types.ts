@@ -15,6 +15,8 @@ export interface AdminUserSummary {
 }
 
 export interface AdminUserDetails extends AdminUserSummary {
+  phone?: string;
+  roles?: string[];
   address?: string;
   avatarUrl?: string;
   totalOrders: number;
@@ -24,15 +26,17 @@ export interface AdminUserDetails extends AdminUserSummary {
 
 // Catalog types
 export interface AdminCategory {
+  status: 'ACTIVE' | 'INACTIVE';
+  sortOrder?: number;
   id: string;
   name: string;
-  slug: string;
+  slug?: string;
   parentId?: string | null;
   parentName?: string;
   description?: string;
-  productCount: number;
+  productCount?: number;
   isActive: boolean;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export type ProductStatus = 'DRAFT' | 'ACTIVE' | 'INACTIVE';
@@ -40,19 +44,19 @@ export type ProductStatus = 'DRAFT' | 'ACTIVE' | 'INACTIVE';
 export interface AdminProduct {
   id: string;
   name: string;
-  sku: string;
+  sku?: string;
   categoryName: string;
   categoryId: string;
   price: number;
   originalPrice?: number;
-  stockQuantity: number;
+  stockQuantity?: number;
   status: ProductStatus;
   sellerName: string;
   imageUrl?: string;
   createdAt: string;
 }
 
-export type ReviewStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+export type ReviewStatus = 'VISIBLE' | 'HIDDEN';
 
 export interface AdminReview {
   id: string;
@@ -116,31 +120,32 @@ export interface AdminCoupon {
 // Fulfillment types
 export interface AdminInventoryItem {
   id: string;
-  sku: string;
+  sku?: string;
   productName: string;
   warehouseId: string;
   warehouseName: string;
   quantityOnHand: number;
   quantityReserved: number;
   quantityAvailable: number;
-  reorderLevel: number;
+  reorderLevel?: number;
   status: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
 }
 
 export interface AdminWarehouse {
+  createdAt?: string;
   id: string;
   name: string;
   code: string;
   address: string;
-  city: string;
-  capacityTotal: number;
-  capacityUsed: number;
-  status: 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE';
-  contactPhone: string;
+  city?: string;
+  capacityTotal?: number;
+  capacityUsed?: number;
+  status: 'ACTIVE' | 'INACTIVE';
+  contactPhone?: string;
 }
 
 // Auction types
-export type AuctionStatus = 'UPCOMING' | 'ACTIVE' | 'ENDED' | 'CANCELLED';
+export type AuctionStatus = 'SCHEDULED' | 'ACTIVE' | 'ENDED' | 'CANCELLED';
 
 export interface AdminBid {
   id: string;

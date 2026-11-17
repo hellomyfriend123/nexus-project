@@ -1,5 +1,5 @@
 ﻿import { useId, useState } from 'react';
-import type { Product } from '../../product/types/product';
+import type { Listing as Product } from '../../../services/api/catalog';
 import ProductCard from '../../product/components/ProductCard';
 import '../styles/home-product-pager.css';
 

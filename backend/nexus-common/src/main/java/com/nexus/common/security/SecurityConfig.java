@@ -76,6 +76,20 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login").permitAll()
+                        // Luồng Google OAuth2: client chưa có token nên phải công khai.
+                        // (Chain riêng của OAuth2 được ưu tiên hơn và đã khớp các URL này;
+                        //  các dòng dưới là lớp phòng thủ thứ hai nếu chain đó không được bật.)
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/oauth2/exchange").permitAll()
+                        .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
+                        // Catalog: khách CHƯA đăng nhập được xem sản phẩm/danh mục/đánh giá.
+                        // Chỉ mở GET — mọi thao tác ghi (POST/PUT/PATCH/DELETE) vẫn phải xác thực.
+                        // Đây là mở ở tầng filter; controller còn @PreAuthorize riêng (xem
+                        // CatalogQueryController) nên phải sửa cả hai, nếu không sẽ vẫn 401.
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/catalog/products",
+                                "/api/v1/catalog/products/*",
+                                "/api/v1/catalog/products/*/reviews",
+                                "/api/v1/catalog/categories").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated())

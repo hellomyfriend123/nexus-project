@@ -100,6 +100,14 @@ psql "$DB_URL" -f db/06-notification.sql
 psql "$DB_URL" -f db/99-seed.sql
 ```
 
+Với database đã có từ trước nhưng thiếu `nexus_user.user_roles.assigned_at`, chạy migration bổ sung một lần:
+
+```bash
+psql "$DB_URL" -v ON_ERROR_STOP=1 -f db/07-user-roles-assigned-at.sql
+```
+
+Migration gán thời điểm chạy migration cho các bản ghi phân quyền cũ vì không có dữ liệu thời điểm gốc.
+
 > Trên DB dùng chung / demo, đặt `DDL_AUTO=validate` để Hibernate **không** tự sửa schema.
 > Trên máy cá nhân có thể để `DDL_AUTO=update` cho nhanh.
 > **Tuyệt đối không** dùng `create`, `create-drop`, `DROP`, `TRUNCATE` trên Supabase.

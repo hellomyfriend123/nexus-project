@@ -166,4 +166,25 @@ class CartServiceImplTest {
         assertThat(response.items()).isEmpty();
         verify(cartRepository).save(any(Cart.class));
     }
+
+    @Test
+@DisplayName("Mỗi Buyer chỉ thấy giỏ của chính mình")
+void getOrCreateActiveCart_twoBuyers_getSeparateCarts() {
+    UUID buyerA = UUID.randomUUID();
+    UUID buyerB = UUID.randomUUID();
+    Cart cartA = Cart.builder().buyerId(buyerA).status(CartStatus.ACTIVE).subtotal(BigDecimal.ZERO.setScale(2)).build();
+    cartA.setId(UUID.randomUUID());
+    Cart cartB = Cart.builder().buyerId(buyerB).status(CartStatus.ACTIVE).subtotal(BigDecimal.ZERO.setScale(2)).build();
+    cartB.setId(UUID.randomUUID());
+    when(cartRepository.findByBuyerIdAndStatus(buyerA, CartStatus.ACTIVE)).thenReturn(Optional.of(cartA));
+    when(cartRepository.findByBuyerIdAndStatus(buyerB, CartStatus.ACTIVE)).thenReturn(Optional.of(cartB));
+    when(cartItemRepository.findAllByCartId(cartA.getId())).thenReturn(List.of());
+    when(cartItemRepository.findAllByCartId(cartB.getId())).thenReturn(List.of());
+
+    CartResponse a = cartService.getOrCreateActiveCart(buyerA);
+    CartResponse b = cartService.getOrCreateActiveCart(buyerB);
+
+    assertThat(a.id()).isNotEqualTo(b.id());
+
+}
 }

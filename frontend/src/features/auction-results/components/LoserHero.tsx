@@ -1,0 +1,6 @@
+﻿import type { AuctionSummary } from '../types/auctionResult';
+import { formatMoney } from '../services/auctionResultService';
+export default function LoserHero({ summary }: { summary: AuctionSummary; onAction: (label: string) => void }) {
+  const difference = summary.personalBid == null ? null : summary.winningBid - summary.personalBid;
+  return <section className="ar-loser-hero"><p className="ar-eyebrow">◆ PHIÊN ĐÃ KẾT THÚC</p><div className="ar-loser-title"><div><h1>Bạn không thắng phiên đấu giá này</h1><p>Phiên #{summary.auctionId} đã chốt lúc {summary.endedAt}. API không xác nhận vị trí Á quân hoặc quyền mua dự phòng.</p></div><div className="ar-actions"><button className="ar-button ar-primary" disabled>Cơ hội thứ hai chưa khả dụng</button><a className="ar-button ar-white" href="#ar-recommendations">Xem đề xuất</a></div></div><div className="ar-loser-stats"><div><small>GIÁ CAO NHẤT CỦA BẠN</small><strong>{formatMoney(summary.personalBid)}</strong></div><div><small>GIÁ THẮNG CHUNG CUỘC</small><strong className="ar-red">{formatMoney(summary.winningBid)}</strong></div><div><small>MỨC CHÊNH LỆCH</small><strong className="ar-gold">{formatMoney(difference)}</strong></div><div><small>KÝ QUỸ BẢO CHỨNG</small><strong className="ar-blue">Chưa có dữ liệu</strong><small>API chưa cung cấp trạng thái hoàn cọc</small></div></div></section>;
+}

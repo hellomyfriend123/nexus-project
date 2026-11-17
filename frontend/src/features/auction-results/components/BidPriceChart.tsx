@@ -1,0 +1,1 @@
+﻿export default function BidPriceChart() { return <section className="ar-panel ar-chart"><h2>Biểu đồ giá</h2><p>Chưa có dữ liệu phân tích giá. Lịch sử giá hợp lệ được hiển thị trong biên bản đấu giá.</p></section>; }

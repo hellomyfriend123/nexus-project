@@ -53,6 +53,9 @@ test('real API adapter: payloads, errors, persistence, expiry, abort and logout'
       delete invalid[field];
       assert.throws(() => api.saveSession(invalid, true), `missing ${field} must be rejected`);
     }
+    for (const accessToken of [123, {}, '   ']) {
+      assert.throws(() => api.saveSession({ ...session, accessToken }, true));
+    }
     const details = [{ field: 'email', message: 'Already registered' }];
     globalThis.fetch = async () => Response.json({ message: 'Duplicate account', details }, { status: 409 });
     await assert.rejects(api.register(input), (e) => e.status === 409 && e.message === 'Duplicate account' && e.details[0].field === 'email');
@@ -70,7 +73,7 @@ test('real API adapter: payloads, errors, persistence, expiry, abort and logout'
     assert.ok(!localStorage.getItem('nexus.auth.session').includes(input.password));
     globalThis.fetch = async (url, options) => { last = { url, options }; return Response.json(wireUser); };
     assert.deepEqual(await api.me(), user);
-    assert.equal(last.options.headers.Authorization, 'Bearer ' + session.accessToken);
+    assert.equal(new Headers(last.options.headers).get('Authorization'), 'Bearer ' + session.accessToken);
     globalThis.fetch = async () => new Response(null, { status: 204 });
     await api.logout();
     assert.equal(api.getSession(), null);
@@ -95,6 +98,41 @@ test('real API adapter: payloads, errors, persistence, expiry, abort and logout'
     assert.equal(api.getSession(), null);
     globalThis.fetch = async () => new Response('not json', { status: 502 });
     await assert.rejects(api.register(input), (e) => e.status === 502);
+    globalThis.fetch = async () => ({ status: 200, ok: true, text: async () => { throw new TypeError('stream closed'); } });
+    await assert.rejects(api.register(input), e => e instanceof api.AuthApiError && e.status === 0);
+    // Stale authenticated failures must not sign out a newer session.
+    const client = await server.ssrLoadModule('/src/services/api/client.ts');
+    for (const invoke of [() => api.me(), () => client.api('/api/v1/buyer/cart')]) {
+      api.saveSession(session, false);
+      let respond;
+      globalThis.fetch = () => new Promise(resolve => { respond = resolve; });
+      const pending = invoke();
+      const latest = { ...session, accessToken: 'newer-session' };
+      api.saveSession(latest, true);
+      respond(Response.json({ message: 'Expired' }, { status: 401 }));
+      await assert.rejects(pending, error => error.status === 401);
+      assert.equal(api.getSession().accessToken, latest.accessToken);
+    }
+    for (const cancel of ['logout', 'new-login']) {
+      api.clearSession();
+      let respond;
+      globalThis.fetch = () => new Promise(resolve => { respond = resolve; });
+      const pending = api.login({ identifier: 'test@example.com', password: input.password, role: 'buyer' }, false);
+      const firstRespond = respond;
+      let newer;
+      if (cancel === 'logout') api.clearSession();
+      else {
+        newer = api.login({ identifier: 'test@example.com', password: input.password, role: 'buyer' }, false);
+        respond(Response.json(wireSession()));
+        await newer;
+      }
+      firstRespond(Response.json(wireSession()));
+      await assert.rejects(pending, error => error.name === 'AbortError');
+      if (cancel === 'logout') assert.equal(api.getSession(), null);
+      else assert.equal(api.getSession().accessToken, session.accessToken);
+    }
+    globalThis.fetch = async () => Response.json({ ...wireSession(), expiresIn: Number.MAX_VALUE });
+    await assert.rejects(api.login({ identifier: 'test@example.com', password: input.password, role: 'buyer' }, true), error => error instanceof api.AuthApiError);
     globalThis.fetch = async () => Response.json({});
     await assert.rejects(api.register(input), (e) => e.status === 0);
     await assert.rejects(api.login({ identifier: 'testuser', password: input.password, role: 'buyer' }, true));

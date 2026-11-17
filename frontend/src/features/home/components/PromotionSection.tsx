@@ -41,20 +41,20 @@ function PromotionSection() {
 
       <section className="nx-stats" aria-label="Nexus qua những con số">
         <div className="nx-stat">
-          <strong>1.4M+</strong>
-          <span>Giao dịch đã xác thực</span>
+          <strong>—</strong>
+          <span>Chưa có thống kê giao dịch</span>
         </div>
         <div className="nx-stat">
-          <strong>99.8%</strong>
-          <span>Độ tin cậy người mua & bán</span>
+          <strong>—</strong>
+          <span>Chưa có thống kê độ tin cậy</span>
         </div>
         <div className="nx-stat">
-          <strong>&lt; 3 Giây</strong>
-          <span>Khớp lệnh đấu giá siêu tốc</span>
+          <strong>—</strong>
+          <span>Chưa có thống kê tốc độ</span>
         </div>
         <div className="nx-stat">
-          <strong>100%</strong>
-          <span>Bảo hiểm hàng hóa hoàn toàn</span>
+          <strong>—</strong>
+          <span>Chưa có dữ liệu bảo hiểm</span>
         </div>
       </section>
 

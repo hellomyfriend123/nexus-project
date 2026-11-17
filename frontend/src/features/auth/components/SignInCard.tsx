@@ -1,151 +1,12 @@
 // Lucian UX/UI Prompt #062 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#062
-import { useEffect, useRef, useState } from 'react';
-import type { FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useSignIn } from '../hooks/useSignIn';
 import NexusLogo from '../../../shared/components/Logo/NexusLogo';
 import RoleSelector from './RoleSelector';
 import SocialSignIn from './SocialSignIn';
-import { clearSession, getSession, login, adminAccount, loginAsMockAdmin } from '../services/auth.api';
-import { getAuthErrorFeedback } from '../services/auth.feedback';
-import { notify } from '../../../shared/components/Toast';
-import type { AuthRole } from '../types/auth';
 import '../styles/sign-in-card.css';
 
 function SignInCard() {
-  const [role, setRole] = useState<AuthRole>('buyer');
-  const [identifier, setIdentifier] = useState('');
-  const [password, setPassword] = useState('');
-  const [remember, setRemember] = useState(true);
-  const [shown, setShown] = useState(false);
-  const [caps, setCaps] = useState(false);
-  const [phase, setPhase] = useState<'idle' | 'busy' | 'ok' | 'welcome'>(
-    'idle',
-  );
-  const [errors, setErrors] = useState({ identifier: '', password: '' });
-  const [notice, setNotice] = useState('');
-  const [shake, setShake] = useState(false);
-  const failedField = useRef<'identifier' | 'password' | null>(null);
-  const passwordRef = useRef<HTMLInputElement>(null);
-  const identifierRef = useRef<HTMLInputElement>(null);
-  const backRef = useRef<HTMLButtonElement>(null);
-  const request = useRef(0);
-  const controller = useRef<AbortController | null>(null);
-  const busyRef = useRef(false);
-  const focusPasswordOnReset = useRef(false);
-  const timers = useRef(new Map<ReturnType<typeof setTimeout>, () => void>());
-  const busy = phase === 'busy' || phase === 'ok';
-  const welcome = phase === 'welcome';
-  const navigate = useNavigate();
-
-  useEffect(
-    () => () => {
-      request.current += 1;
-      controller.current?.abort();
-      timers.current.forEach((resolve, timer) => {
-        clearTimeout(timer);
-        resolve();
-      });
-      timers.current.clear();
-    },
-    [],
-  );
-  useEffect(() => {
-    if (welcome) backRef.current?.focus({ preventScroll: true });
-    else if (focusPasswordOnReset.current) {
-      focusPasswordOnReset.current = false;
-      passwordRef.current?.focus({ preventScroll: true });
-    }
-  }, [welcome]);
-
-  useEffect(() => {
-    if (phase !== 'idle' || !failedField.current) return;
-    const field = failedField.current;
-    failedField.current = null;
-    const input =
-      field === 'identifier' ? identifierRef.current : passwordRef.current;
-    input?.focus();
-    if (field === 'password') input?.select();
-  }, [phase]);
-
-  function wait(ms: number) {
-    return new Promise<void>((resolve) => {
-      const timer = setTimeout(() => {
-        timers.current.delete(timer);
-        resolve();
-      }, ms);
-      timers.current.set(timer, resolve);
-    });
-  }
-  function clearFeedback() {
-    setErrors({ identifier: '', password: '' });
-    setNotice('');
-    setShake(false);
-  }
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (busyRef.current) return;
-    clearFeedback();
-    const nextErrors = {
-      identifier: identifier.trim()
-        ? ''
-        : 'Vui lòng nhập tên đăng nhập, email.',
-      password: password ? '' : 'Vui lòng nhập mật khẩu.',
-    };
-    setErrors(nextErrors);
-    if (nextErrors.identifier || nextErrors.password) {
-      (nextErrors.identifier ? identifierRef : passwordRef).current?.focus();
-      return;
-    }
-    const id = ++request.current;
-    controller.current?.abort();
-    controller.current = new AbortController();
-    busyRef.current = true;
-    setPhase('busy');
-    const reduced = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches;
-    try {
-      await Promise.all([
-        login({ identifier, password, role }, remember, controller.current.signal),
-        wait(reduced ? 0 : 1100),
-      ]);
-      if (request.current !== id) return;
-      setPassword('');
-      setPhase('ok');
-      await wait(reduced ? 0 : 650);
-      if (request.current === id) setPhase('welcome');
-    } catch (error) {
-      if (request.current === id) {
-        setPhase('idle');
-        setShake(true);
-        const feedback = getAuthErrorFeedback(error, 'login');
-        if (feedback.kind === 'credentials') {
-          setErrors({ identifier: '', password: feedback.message });
-          failedField.current = 'password';
-        } else {
-          if (feedback.kind === 'toast') {
-            notify.error(feedback.message, { toastId: 'auth-login-error' });
-          } else if (feedback.kind === 'notice') {
-            setNotice(feedback.message);
-          }
-        }
-      }
-    } finally {
-      if (request.current === id) busyRef.current = false;
-    }
-  }
-  function resetAccount() {
-    request.current += 1;
-    controller.current?.abort();
-    clearSession();
-    busyRef.current = false;
-    focusPasswordOnReset.current = true;
-    setPhase('idle');
-    setPassword('');
-    setShown(false);
-    setCaps(false);
-    clearFeedback();
-  }
+  const { role, setRole, identifier, setIdentifier, password, setPassword, remember, setRemember, shown, setShown, caps, setCaps, phase, errors, notice, setNotice, shake, setShake, passwordRef, identifierRef, backRef, busy, welcome, navigate, clearFeedback, handleSubmit, resetAccount, signInWithGoogle } = useSignIn();
 
   return (
     <section
@@ -176,16 +37,16 @@ function SignInCard() {
         />
         <div className={`u062-f${errors.identifier ? ' bad' : ''}`}>
           <label htmlFor="login-identifier">
-            Tên đăng nhập / Email
+            Email
           </label>
           <div className="u062-box">
             <input
               ref={identifierRef}
               id="login-identifier"
-              name="username"
+              name="email"
               autoComplete="username"
               maxLength={255}
-              placeholder="Tên đăng nhập, email hoặc số điện thoại"
+              placeholder="Email"
               value={identifier}
               disabled={busy}
               onChange={(event) => {
@@ -295,9 +156,7 @@ function SignInCard() {
         </button>
         <SocialSignIn
           disabled={busy}
-          onGoogle={() =>
-            notify.info('Đăng nhập Google chưa được triển khai trong bản UI này.', { toastId: 'auth-google-unavailable' })
-          }
+          onGoogle={signInWithGoogle}
         />
         <p className="u062-register">
           Chưa có tài khoản?{' '}
@@ -309,31 +168,6 @@ function SignInCard() {
             Đăng ký
           </button>
         </p>
-        <div style={{ marginTop: '12px', padding: '10px', background: '#f8fafc', borderRadius: '8px', border: '1px dashed #cbd5e1', fontSize: '12px', textAlign: 'center' }}>
-          <span style={{ color: '#64748b' }}>Tài khoản Admin kiểm thử: </span>
-          <button
-            type="button"
-            style={{ background: 'none', border: 'none', color: '#315bf4', fontWeight: 600, cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
-            onClick={() => {
-              setIdentifier(adminAccount.email);
-              setPassword(adminAccount.password);
-              clearFeedback();
-            }}
-          >
-            Điền nhanh
-          </button>
-          {' | '}
-          <button
-            type="button"
-            style={{ background: 'none', border: 'none', color: '#059669', fontWeight: 600, cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
-            onClick={() => {
-              loginAsMockAdmin(true);
-              navigate('/admin');
-            }}
-          >
-            Vào thẳng /admin ⚡
-          </button>
-        </div>
       </form>
       <div
         className="u062-pane u062-hi"
@@ -345,26 +179,6 @@ function SignInCard() {
         <p>
           Đăng nhập thành công. Phiên đăng nhập của bạn đã được tạo.
         </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', marginBottom: '10px' }}>
-          {getSession()?.roles?.includes('ADMINISTRATOR') && (
-            <button
-              type="button"
-              className="btn btn-primary w-100"
-              style={{ padding: '8px 16px', borderRadius: '8px', fontWeight: 600 }}
-              onClick={() => navigate('/admin')}
-            >
-              <i className="bi bi-speedometer2 me-1"></i> Truy cập Admin Portal (/admin)
-            </button>
-          )}
-          <button
-            type="button"
-            className="btn btn-outline-secondary w-100"
-            style={{ padding: '8px 16px', borderRadius: '8px' }}
-            onClick={() => navigate('/')}
-          >
-            Vào trang chủ Sàn Nexus
-          </button>
-        </div>
         <button
           ref={backRef}
           type="button"

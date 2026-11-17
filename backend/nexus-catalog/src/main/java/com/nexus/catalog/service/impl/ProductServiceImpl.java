@@ -43,7 +43,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * Cài đặt nghiệp vụ sản phẩm (FR-05, FR-06, FR-07, FR-08, FR-10, FR-11, FR-12, FR-53).
+ * Cài đặt nghiệp vụ sản phẩm (FR-05, FR-06, FR-07, FR-08, FR-10, FR-11, FR-12,
+ * FR-53).
  */
 @Service
 @RequiredArgsConstructor
@@ -52,7 +53,9 @@ public class ProductServiceImpl implements ProductService {
 
     private static final int DEFAULT_PAGE_SIZE = 20;
 
-    /** FR-12 — chỉ cho phép sắp xếp theo các thuộc tính có ý nghĩa với người dùng. */
+    /**
+     * FR-12 — chỉ cho phép sắp xếp theo các thuộc tính có ý nghĩa với người dùng.
+     */
     private static final Set<String> ALLOWED_SORT_PROPERTIES = Set.of("basePrice", "createdAt", "name");
 
     private static final String DEFAULT_SORT_PROPERTY = "createdAt";
@@ -65,7 +68,8 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse create(UUID sellerId, CreateProductRequest request) {
         // 1) Danh mục là bắt buộc và phải tồn tại (FR-05)
         Category category = requireCategory(request.categoryId());
-        // 2) Giá cơ bản phải lớn hơn 0 (FR-05) — kiểm tra lại ở service để an toàn cả khi gọi nội bộ
+        // 2) Giá cơ bản phải lớn hơn 0 (FR-05) — kiểm tra lại ở service để an toàn cả
+        // khi gọi nội bộ
         BigDecimal basePrice = requirePositivePrice(request.basePrice());
         String name = requireName(request.name());
 
@@ -94,8 +98,10 @@ public class ProductServiceImpl implements ProductService {
         product.setBasePrice(basePrice);
         productRepository.save(product);
 
-        // Ghi chú (MVP): chiến lược đơn giản — xoá toàn bộ ảnh cũ rồi thêm lại danh sách ảnh mới.
-        // Số ảnh mỗi sản phẩm nhỏ nên chấp nhận được; nếu cần tối ưu sẽ diff theo imageUrl ở giai đoạn sau.
+        // Ghi chú (MVP): chiến lược đơn giản — xoá toàn bộ ảnh cũ rồi thêm lại danh
+        // sách ảnh mới.
+        // Số ảnh mỗi sản phẩm nhỏ nên chấp nhận được; nếu cần tối ưu sẽ diff theo
+        // imageUrl ở giai đoạn sau.
         productImageRepository.deleteByProductId(product.getId());
         List<ProductImage> images = saveImages(product.getId(), request.images());
         return ProductMapper.toResponse(product, images, resolveCategoryName(product.getCategoryId()));
@@ -104,7 +110,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void delete(UUID sellerId, UUID productId) {
         Product product = requireOwnedProduct(sellerId, productId);
-        // TODO (business logic): FR-08 — chặn xoá sản phẩm đang có auction/transaction active; cần gọi module auction/commerce ở giai đoạn sau.
+        // TODO (business logic): FR-08 — chặn xoá sản phẩm đang có auction/transaction
+        // active; cần gọi module auction/commerce ở giai đoạn sau.
         softDelete(product);
     }
 
@@ -112,7 +119,8 @@ public class ProductServiceImpl implements ProductService {
     public void deleteByAdmin(UUID productId) {
         Product product = productRepository.findByIdAndDeletedAtIsNull(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", productId));
-        // Cùng quy tắc FR-08 như Seller — xem TODO trong delete(sellerId, productId) về auction/transaction.
+        // Cùng quy tắc FR-08 như Seller — xem TODO trong delete(sellerId, productId) về
+        // auction/transaction.
         softDelete(product);
     }
 
@@ -129,9 +137,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<ProductSummaryResponse> search(String keyword, UUID categoryId, BigDecimal minPrice,
-                                                       BigDecimal maxPrice, ProductStatus status, Pageable pageable) {
-        Specification<Product> specification =
-                ProductSpecification.filter(keyword, categoryId, minPrice, maxPrice, status);
+            BigDecimal maxPrice, ProductStatus status, Pageable pageable) {
+        Specification<Product> specification = ProductSpecification.filter(keyword, categoryId, minPrice, maxPrice,
+                status);
         Page<Product> page = productRepository.findAll(specification, sanitizePageable(pageable));
         Map<UUID, String> categoryNames = resolveCategoryNames(page.getContent());
         Map<UUID, String> primaryImages = resolvePrimaryImages(page.getContent());
@@ -152,9 +160,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<ProductSummaryResponse> adminSearch(String keyword, UUID categoryId, ProductStatus status,
-                                                            boolean includeDeleted, Pageable pageable) {
-        Specification<Product> specification =
-                ProductSpecification.filter(keyword, categoryId, null, null, status, includeDeleted);
+            boolean includeDeleted, Pageable pageable) {
+        Specification<Product> specification = ProductSpecification.filter(keyword, categoryId, null, null, status,
+                includeDeleted);
         Page<Product> page = productRepository.findAll(specification, sanitizePageable(pageable));
         Map<UUID, String> categoryNames = resolveCategoryNames(page.getContent());
         Map<UUID, String> primaryImages = resolvePrimaryImages(page.getContent());
@@ -176,7 +184,8 @@ public class ProductServiceImpl implements ProductService {
         return toDetailResponse(product);
     }
 
-    // ------------------------------------------------------------------ tiện ích nội bộ
+    // ------------------------------------------------------------------ tiện ích
+    // nội bộ
 
     private void softDelete(Product product) {
         product.setDeletedAt(Instant.now());
@@ -194,8 +203,10 @@ public class ProductServiceImpl implements ProductService {
     /**
      * Chi tiết sản phẩm: kèm ảnh + tên danh mục.
      * <p>
-     * Phần "seller" hiện chỉ có {@code sellerId} (tham chiếu chéo module bằng UUID).
-     * Giai đoạn sau, khi được phép phụ thuộc {@code nexus-user}, sẽ gọi service của module user
+     * Phần "seller" hiện chỉ có {@code sellerId} (tham chiếu chéo module bằng
+     * UUID).
+     * Giai đoạn sau, khi được phép phụ thuộc {@code nexus-user}, sẽ gọi service của
+     * module user
      * để bổ sung tên/email Seller — KHÔNG join JPA sang module khác (§2).
      */
     private ProductResponse toDetailResponse(Product product) {
@@ -226,7 +237,10 @@ public class ProductServiceImpl implements ProductService {
         return names;
     }
 
-    /** Nạp ảnh chính cho cả trang kết quả bằng MỘT truy vấn; ưu tiên ảnh có cờ primary = true. */
+    /**
+     * Nạp ảnh chính cho cả trang kết quả bằng MỘT truy vấn; ưu tiên ảnh có cờ
+     * primary = true.
+     */
     private Map<UUID, String> resolvePrimaryImages(List<Product> products) {
         Set<UUID> productIds = products.stream()
                 .map(product -> product.getId())
@@ -248,7 +262,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
-     * FR-12 — chỉ giữ các thuộc tính sắp xếp được phép; nếu không còn điều kiện hợp lệ nào
+     * FR-12 — chỉ giữ các thuộc tính sắp xếp được phép; nếu không còn điều kiện hợp
+     * lệ nào
      * thì mặc định sắp xếp theo {@code createdAt} giảm dần (mới nhất trước).
      */
     private Pageable sanitizePageable(Pageable pageable) {
@@ -303,5 +318,15 @@ public class ProductServiceImpl implements ProductService {
             throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Tên sản phẩm không được để trống");
         }
         return normalized;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void verifyOwnership(UUID sellerId, UUID productId) {
+        Product product = productRepository.findByIdAndDeletedAtIsNull(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Sản phẩm", productId));
+        if (!product.getSellerId().equals(sellerId)) {
+            throw new ForbiddenOperationException("Bạn không phải chủ sở hữu sản phẩm này");
+        }
     }
 }

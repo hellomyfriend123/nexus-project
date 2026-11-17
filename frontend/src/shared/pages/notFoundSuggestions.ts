@@ -1,7 +1,16 @@
 ﻿// Only implemented, publicly reachable destinations belong in the recovery list.
 export const recoveryRoutes = [
+  { path: '/', label: 'Trang chủ' },
   { path: '/login', label: 'Đăng nhập' },
   { path: '/register', label: 'Đăng ký' },
+  { path: '/categories', label: 'Danh mục sản phẩm' },
+  { path: '/products', label: 'Danh sách sản phẩm' },
+  { path: '/cart', label: 'Giỏ hàng & Thanh toán' },
+  { path: '/buyer-hub', label: 'Trung tâm người mua' },
+  { path: '/seller-hub', label: 'Trung tâm người bán' },
+  { path: '/seller/products', label: 'Quản lý sản phẩm & Tồn kho' },
+  { path: '/seller/products/new', label: 'Đăng bán sản phẩm mới' },
+  { path: '/seller/orders/success', label: 'Đơn bán hàng — cần chọn đơn' },
 ] as const;
 
 export function editDistance(left: string, right: string): number {

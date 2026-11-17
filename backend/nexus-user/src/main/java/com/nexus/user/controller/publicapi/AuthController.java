@@ -4,6 +4,7 @@ import com.nexus.common.security.SecurityUtils;
 import com.nexus.user.dto.common.UserResponse;
 import com.nexus.user.dto.publicapi.AuthResponse;
 import com.nexus.user.dto.publicapi.LoginRequest;
+import com.nexus.user.dto.publicapi.OAuth2ExchangeRequest;
 import com.nexus.user.dto.publicapi.RegisterRequest;
 import com.nexus.user.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -70,5 +71,20 @@ public class AuthController {
         // KHÔNG nhận userId từ client — luôn lấy từ token (SecurityUtils)
         UUID currentUserId = SecurityUtils.currentUserId();
         return ResponseEntity.ok(authService.getCurrentUser(currentUserId));
+    }
+
+    /**
+     * Đổi mã dùng-một-lần (nhận từ URL callback của OAuth2) lấy phiên đăng nhập thật.
+     * <p>
+     * Phải {@code permitAll} vì tại thời điểm này client <b>chưa có</b> token — mã chính là
+     * bằng chứng xác thực. Mã sống 60 giây và chỉ dùng được một lần.
+     */
+    @PostMapping("/oauth2/exchange")
+    @PreAuthorize("permitAll()")
+    @Operation(summary = "FR-02 — Đổi mã đăng nhập Google lấy access token")
+    @ApiResponse(responseCode = "200", description = "Đổi mã thành công, trả về access token")
+    @ApiResponse(responseCode = "401", description = "Mã không hợp lệ, đã dùng hoặc đã hết hạn")
+    public ResponseEntity<AuthResponse> exchangeOAuth2Code(@Valid @RequestBody OAuth2ExchangeRequest request) {
+        return ResponseEntity.ok(authService.exchangeOAuth2Code(request.code()));
     }
 }

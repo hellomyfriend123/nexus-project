@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
-import { categories } from '../../category/services/categoryService';
+import { useCategories } from '../../category/hooks/useCategories';
 import CategoryCard from '../../category/components/CategoryCard';
 
 function FeaturedCategories() {
+ const categories = useCategories();
   return (
     <>
       <div className="nx-section-heading nx-category-heading">

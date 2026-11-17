@@ -16,6 +16,6 @@ public interface ShipmentService {
     /** FR-39 — chỉ chuyển PENDING → SHIPPED → DELIVERED; chỉ Seller sở hữu vận đơn. */
     ShipmentResponse updateStatus(UUID sellerId, UUID shipmentId, UpdateShipmentStatusRequest request);
 
-    /** FR-40 — Buyer xem vận đơn theo mã đơn hàng. */
-    List<ShipmentResponse> listByOrderId(UUID orderId);
+    /** FR-40 — Buyer xem vận đơn theo mã đơn hàng, sau khi xác minh quyền sở hữu Order. */
+    List<ShipmentResponse> listByOrderId(UUID buyerId, UUID orderId);
 }

@@ -1,20 +1,6 @@
-import { apiClient } from './client';
+import { api as apiClient } from './client';
 import type { PageResponse } from './client';
-import type {
-  AdminUserDetails,
-  UserStatus,
-  AdminCategory,
-  AdminProduct,
-  AdminReview,
-  AdminOrder,
-  AdminCampaign,
-  AdminCoupon,
-  AdminInventoryItem,
-  AdminWarehouse,
-  AdminAuction,
-  OrderStatus,
-  ProductStatus,
-} from '../../features/admin/types/admin.types';
+import type { DetailedAdminCampaign, DetailedAdminCoupon, DetailedAdminOrder, DetailedAdminUser, UserStatus, OrderStatus, ProductStatus, CategoryResponse, ProductResponse, WarehouseResponse, ReviewResponse, InventoryResponse, AuctionResponse, CategoryRequest, CampaignRequest, DiscountCodeRequest, WarehouseRequest, AuctionMutationResponse } from './admin.contracts';
 
 // ==========================================
 // 1. USERS ADMIN API (FR-04, FR-52)
@@ -35,17 +21,17 @@ export const adminUsersApi = {
     if (params?.page !== undefined) sp.set('page', String(params.page));
     if (params?.size !== undefined) sp.set('size', String(params.size));
     const qs = sp.toString();
-    return apiClient<PageResponse<AdminUserDetails>>(`/api/v1/admin/users${qs ? `?${qs}` : ''}`);
+    return apiClient<PageResponse<DetailedAdminUser>>(`/api/v1/admin/users${qs ? `?${qs}` : ''}`);
   },
 
   // U-2: Get user details
   getById: (id: string) => {
-    return apiClient<AdminUserDetails>(`/api/v1/admin/users/${id}`);
+    return apiClient<DetailedAdminUser>(`/api/v1/admin/users/${id}`);
   },
 
   // U-3: Update user status (ACTIVE, INACTIVE, LOCKED)
   updateStatus: (id: string, status: UserStatus) => {
-    return apiClient<AdminUserDetails>(`/api/v1/admin/users/${id}/status`, {
+    return apiClient<DetailedAdminUser>(`/api/v1/admin/users/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status }),
     });
@@ -63,22 +49,22 @@ export const adminCatalogApi = {
     if (params?.page !== undefined) sp.set('page', String(params.page));
     if (params?.size !== undefined) sp.set('size', String(params.size));
     const qs = sp.toString();
-    return apiClient<PageResponse<AdminCategory>>(`/api/v1/admin/catalog/categories${qs ? `?${qs}` : ''}`);
+    return apiClient<PageResponse<CategoryResponse>>(`/api/v1/admin/catalog/categories${qs ? `?${qs}` : ''}`);
   },
 
   getCategory: (id: string) => {
-    return apiClient<AdminCategory>(`/api/v1/admin/catalog/categories/${id}`);
+    return apiClient<CategoryResponse>(`/api/v1/admin/catalog/categories/${id}`);
   },
 
-  createCategory: (data: { name: string; slug?: string; description?: string; parentId?: string | null }) => {
-    return apiClient<AdminCategory>('/api/v1/admin/catalog/categories', {
+  createCategory: (data: CategoryRequest) => {
+    return apiClient<CategoryResponse>('/api/v1/admin/catalog/categories', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   },
 
-  updateCategory: (id: string, data: { name: string; slug?: string; description?: string; parentId?: string | null }) => {
-    return apiClient<AdminCategory>(`/api/v1/admin/catalog/categories/${id}`, {
+  updateCategory: (id: string, data: CategoryRequest) => {
+    return apiClient<CategoryResponse>(`/api/v1/admin/catalog/categories/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
@@ -107,11 +93,11 @@ export const adminCatalogApi = {
     if (params?.page !== undefined) sp.set('page', String(params.page));
     if (params?.size !== undefined) sp.set('size', String(params.size));
     const qs = sp.toString();
-    return apiClient<PageResponse<AdminProduct>>(`/api/v1/admin/catalog/products${qs ? `?${qs}` : ''}`);
+    return apiClient<PageResponse<ProductResponse>>(`/api/v1/admin/catalog/products${qs ? `?${qs}` : ''}`);
   },
 
   updateProductStatus: (id: string, status: ProductStatus) => {
-    return apiClient<AdminProduct>(`/api/v1/admin/catalog/products/${id}/status`, {
+    return apiClient<ProductResponse>(`/api/v1/admin/catalog/products/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status }),
     });
@@ -131,13 +117,13 @@ export const adminCatalogApi = {
     if (params?.page !== undefined) sp.set('page', String(params.page));
     if (params?.size !== undefined) sp.set('size', String(params.size));
     const qs = sp.toString();
-    return apiClient<PageResponse<AdminReview>>(`/api/v1/admin/catalog/reviews${qs ? `?${qs}` : ''}`);
+    return apiClient<PageResponse<ReviewResponse>>(`/api/v1/admin/catalog/reviews${qs ? `?${qs}` : ''}`);
   },
 
-  updateReviewStatus: (id: string, status: 'VISIBLE' | 'HIDDEN' | 'APPROVED' | 'REJECTED') => {
+  updateReviewStatus: (id: string, status: 'VISIBLE' | 'HIDDEN') => {
     // Mapping: VISIBLE / HIDDEN per backend controller FR-59
-    const backendStatus = status === 'APPROVED' ? 'VISIBLE' : status === 'REJECTED' ? 'HIDDEN' : status;
-    return apiClient<AdminReview>(`/api/v1/admin/catalog/reviews/${id}/status`, {
+    const backendStatus = status;
+    return apiClient<ReviewResponse>(`/api/v1/admin/catalog/reviews/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status: backendStatus }),
     });
@@ -163,22 +149,22 @@ export const adminCommerceApi = {
     if (params?.page !== undefined) sp.set('page', String(params.page));
     if (params?.size !== undefined) sp.set('size', String(params.size));
     const qs = sp.toString();
-    return apiClient<PageResponse<AdminOrder>>(`/api/v1/admin/commerce/orders${qs ? `?${qs}` : ''}`);
+    return apiClient<PageResponse<DetailedAdminOrder>>(`/api/v1/admin/commerce/orders${qs ? `?${qs}` : ''}`);
   },
 
   getOrder: (id: string) => {
-    return apiClient<AdminOrder>(`/api/v1/admin/commerce/orders/${id}`);
+    return apiClient<DetailedAdminOrder>(`/api/v1/admin/commerce/orders/${id}`);
   },
 
   updateOrderStatus: (id: string, status: OrderStatus) => {
-    return apiClient<AdminOrder>(`/api/v1/admin/commerce/orders/${id}/status`, {
+    return apiClient<DetailedAdminOrder>(`/api/v1/admin/commerce/orders/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status }),
     });
   },
 
   cancelOrder: (id: string) => {
-    return apiClient<AdminOrder>(`/api/v1/admin/commerce/orders/${id}/cancel`, {
+    return apiClient<DetailedAdminOrder>(`/api/v1/admin/commerce/orders/${id}/cancel`, {
       method: 'POST',
     });
   },
@@ -190,22 +176,22 @@ export const adminCommerceApi = {
     if (params?.page !== undefined) sp.set('page', String(params.page));
     if (params?.size !== undefined) sp.set('size', String(params.size));
     const qs = sp.toString();
-    return apiClient<PageResponse<AdminCampaign>>(`/api/v1/admin/commerce/campaigns${qs ? `?${qs}` : ''}`);
+    return apiClient<PageResponse<DetailedAdminCampaign>>(`/api/v1/admin/commerce/campaigns${qs ? `?${qs}` : ''}`);
   },
 
   getCampaign: (id: string) => {
-    return apiClient<AdminCampaign>(`/api/v1/admin/commerce/campaigns/${id}`);
+    return apiClient<DetailedAdminCampaign>(`/api/v1/admin/commerce/campaigns/${id}`);
   },
 
-  createCampaign: (data: Partial<AdminCampaign>) => {
-    return apiClient<AdminCampaign>('/api/v1/admin/commerce/campaigns', {
+  createCampaign: (data: CampaignRequest) => {
+    return apiClient<DetailedAdminCampaign>('/api/v1/admin/commerce/campaigns', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   },
 
-  updateCampaign: (id: string, data: Partial<AdminCampaign>) => {
-    return apiClient<AdminCampaign>(`/api/v1/admin/commerce/campaigns/${id}`, {
+  updateCampaign: (id: string, data: CampaignRequest) => {
+    return apiClient<DetailedAdminCampaign>(`/api/v1/admin/commerce/campaigns/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
@@ -225,29 +211,29 @@ export const adminCommerceApi = {
     if (params?.page !== undefined) sp.set('page', String(params.page));
     if (params?.size !== undefined) sp.set('size', String(params.size));
     const qs = sp.toString();
-    return apiClient<PageResponse<AdminCoupon>>(`/api/v1/admin/commerce/discount-codes${qs ? `?${qs}` : ''}`);
+    return apiClient<PageResponse<DetailedAdminCoupon>>(`/api/v1/admin/commerce/discount-codes${qs ? `?${qs}` : ''}`);
   },
 
   getDiscountCode: (id: string) => {
-    return apiClient<AdminCoupon>(`/api/v1/admin/commerce/discount-codes/${id}`);
+    return apiClient<DetailedAdminCoupon>(`/api/v1/admin/commerce/discount-codes/${id}`);
   },
 
-  createDiscountCode: (data: Partial<AdminCoupon>) => {
-    return apiClient<AdminCoupon>('/api/v1/admin/commerce/discount-codes', {
+  createDiscountCode: (data: DiscountCodeRequest) => {
+    return apiClient<DetailedAdminCoupon>('/api/v1/admin/commerce/discount-codes', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   },
 
-  updateDiscountCode: (id: string, data: Partial<AdminCoupon>) => {
-    return apiClient<AdminCoupon>(`/api/v1/admin/commerce/discount-codes/${id}`, {
+  updateDiscountCode: (id: string, data: DiscountCodeRequest) => {
+    return apiClient<DetailedAdminCoupon>(`/api/v1/admin/commerce/discount-codes/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
   },
 
   updateDiscountCodeStatus: (id: string, status: 'ACTIVE' | 'INACTIVE') => {
-    return apiClient<AdminCoupon>(`/api/v1/admin/commerce/discount-codes/${id}/status`, {
+    return apiClient<DetailedAdminCoupon>(`/api/v1/admin/commerce/discount-codes/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status }),
     });
@@ -277,7 +263,7 @@ export const adminFulfillmentApi = {
     if (params?.page !== undefined) sp.set('page', String(params.page));
     if (params?.size !== undefined) sp.set('size', String(params.size));
     const qs = sp.toString();
-    return apiClient<PageResponse<AdminInventoryItem>>(`/api/v1/admin/fulfillment/inventories${qs ? `?${qs}` : ''}`);
+    return apiClient<PageResponse<InventoryResponse>>(`/api/v1/admin/fulfillment/inventories${qs ? `?${qs}` : ''}`);
   },
 
   // Warehouses
@@ -287,29 +273,22 @@ export const adminFulfillmentApi = {
     if (params?.page !== undefined) sp.set('page', String(params.page));
     if (params?.size !== undefined) sp.set('size', String(params.size));
     const qs = sp.toString();
-    return apiClient<PageResponse<AdminWarehouse>>(`/api/v1/admin/fulfillment/warehouses${qs ? `?${qs}` : ''}`);
+    return apiClient<PageResponse<WarehouseResponse>>(`/api/v1/admin/fulfillment/warehouses${qs ? `?${qs}` : ''}`);
   },
 
   getWarehouse: (id: string) => {
-    return apiClient<AdminWarehouse>(`/api/v1/admin/fulfillment/warehouses/${id}`);
+    return apiClient<WarehouseResponse>(`/api/v1/admin/fulfillment/warehouses/${id}`);
   },
 
-  createWarehouse: (data: {
-    name: string;
-    code: string;
-    address: string;
-    city: string;
-    capacityTotal: number;
-    contactPhone?: string;
-  }) => {
-    return apiClient<AdminWarehouse>('/api/v1/admin/fulfillment/warehouses', {
+  createWarehouse: (data: WarehouseRequest & { code: string }) => {
+    return apiClient<WarehouseResponse>('/api/v1/admin/fulfillment/warehouses', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   },
 
-  updateWarehouse: (id: string, data: Partial<AdminWarehouse>) => {
-    return apiClient<AdminWarehouse>(`/api/v1/admin/fulfillment/warehouses/${id}`, {
+  updateWarehouse: (id: string, data: WarehouseRequest) => {
+    return apiClient<WarehouseResponse>(`/api/v1/admin/fulfillment/warehouses/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
@@ -328,12 +307,12 @@ export const adminAuctionApi = {
     if (params?.page !== undefined) sp.set('page', String(params.page));
     if (params?.size !== undefined) sp.set('size', String(params.size));
     const qs = sp.toString();
-    return apiClient<PageResponse<AdminAuction>>(`/api/v1/admin/auction/auctions${qs ? `?${qs}` : ''}`);
+    return apiClient<PageResponse<AuctionResponse>>(`/api/v1/admin/auction/auctions${qs ? `?${qs}` : ''}`);
   },
 
   // A-2: Emergency cancel auction
   cancel: (id: string) => {
-    return apiClient<AdminAuction>(`/api/v1/admin/auction/auctions/${id}/cancel`, {
+    return apiClient<AuctionMutationResponse>(`/api/v1/admin/auction/auctions/${id}/cancel`, {
       method: 'POST',
     });
   },

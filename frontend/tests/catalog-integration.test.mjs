@@ -24,7 +24,9 @@ test('catalog routes preserve auth/404-only background and URL search', async ()
       assert.doesNotMatch(html, /nx-buyer-layout/);
     }
     const searched = render('/products?q=Fenrir');
-    assert.match(searched, /Kashtira Fenrir/);
+    assert.match(searched, /value="Fenrir"/);
+    assert.match(searched, /Đang tải sản phẩm/);
+    assert.doesNotMatch(searched, /Kashtira Fenrir/);
     assert.doesNotMatch(searched, /Dimension Shifter|Ultimate Slayer/);
     const missing = render('/products?q=not-a-real-product');
     assert.doesNotMatch(missing, /Dimension Shifter|Kashtira Fenrir/);

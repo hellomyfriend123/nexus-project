@@ -92,42 +92,52 @@
   font-weight: 600;
 }
 
-.icon-btn-badge {
+.nexus-header .icon-btn-badge {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 32px;
   height: 32px;
-  color: #374151;
-  background: transparent;
+  flex: 0 0 32px;
+  padding: 0;
+  border: 0;
+  appearance: none;
+  line-height: 1;
+  overflow: visible;
+  cursor: pointer;
+  color: #000;
+  background: #fff;
   border-radius: 50%;
-  transition: all 0.2s ease;
-  font-size: 17px;
+  transition: transform .15s ease, background-color .15s ease;
   text-decoration: none;
 }
 
-.icon-btn-badge:hover {
+.nexus-header .icon-btn-badge:hover {
   background-color: #f3f4f6;
-  color: #111827;
+  color: #000;
+  transform: scale(1.05);
 }
 
-.badge-counter {
+.nexus-header .icon-btn-badge > .badge-counter {
   position: absolute;
-  top: 0;
-  right: -2px;
-  min-width: 17px;
-  height: 17px;
+  top: -7px;
+  right: -7px;
+  min-width: 18px;
+  height: 18px;
   padding: 0 4px;
+  box-sizing: border-box;
   border-radius: 9999px;
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
-  border: 1.5px solid #ffffff;
+  color: #fff;
+  border: 2px solid #fff;
   line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 .badge-red {
@@ -556,3 +566,24 @@
 .nexus-header .catalog-logo { width: 145px; flex: 0 0 145px; }
 .nexus-header .catalog-logo .u205.nexus-logo { min-height: 60px; padding: 8px 0; margin: 0; }
 .nexus-header .catalog-logo .u205-l { font-size: 36px; }
+
+/* Normalize Bootstrap icon-font baseline in the two header action buttons. */
+.nexus-header .icon-btn-badge > .bi {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.nexus-header .icon-btn-badge > .bi::before {
+  display: block;
+  line-height: 1;
+  vertical-align: 0;
+}
+.nexus-header .icon-btn-badge:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 3px;
+}

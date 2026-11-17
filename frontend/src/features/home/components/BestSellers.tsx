@@ -1,11 +1,9 @@
 import { Link } from 'react-router-dom';
-import { products } from '../../product/services/productService';
+import { useHomeProducts } from '../hooks/useHomeProducts';
 import HomeProductPager from './HomeProductPager';
 
 function BestSellers() {
-  const buyNowProducts = products.filter(
-    (product) => product.mode === 'buy-now',
-  );
+  const { products: buyNowProducts, loading, error } = useHomeProducts(false);
 
   return (
     <section className="nx-section" aria-labelledby="home-buy-now-title">
@@ -25,7 +23,7 @@ function BestSellers() {
           Xem tất cả sản phẩm <span aria-hidden="true">→</span>
         </Link>
       </div>
-      <HomeProductPager products={buyNowProducts} label="Mua trực tiếp" />
+      {loading ? <p role="status">Đang tải sản phẩm…</p> : error ? <p role="alert">{error}</p> : <HomeProductPager products={buyNowProducts} label="Mua trực tiếp" />}
     </section>
   );
 }

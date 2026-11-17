@@ -9,6 +9,7 @@ import com.nexus.fulfillment.dto.seller.UpdateShipmentStatusRequest;
 import com.nexus.fulfillment.entity.Shipment;
 import com.nexus.fulfillment.enums.ShipmentStatus;
 import com.nexus.fulfillment.repository.ShipmentRepository;
+import com.nexus.fulfillment.service.BuyerOrderOwnershipVerifier;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +25,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,11 +39,15 @@ class ShipmentServiceImplTest {
     private static final UUID SELLER_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
     private static final UUID OTHER_SELLER_ID = UUID.fromString("22222222-2222-2222-2222-222222222222");
     private static final UUID ORDER_ID = UUID.fromString("33333333-3333-3333-3333-333333333333");
+    private static final UUID BUYER_ID = UUID.fromString("66666666-6666-6666-6666-666666666666");
     private static final UUID SHIPMENT_ID = UUID.fromString("44444444-4444-4444-4444-444444444444");
     private static final UUID WAREHOUSE_ID = UUID.fromString("55555555-5555-5555-5555-555555555555");
 
     @Mock
     private ShipmentRepository shipmentRepository;
+
+    @Mock
+    private BuyerOrderOwnershipVerifier buyerOrderOwnershipVerifier;
 
     @InjectMocks
     private ShipmentServiceImpl shipmentService;
@@ -165,19 +171,42 @@ class ShipmentServiceImplTest {
         when(shipmentRepository.findAllByOrderIdOrderByCreatedAtDesc(ORDER_ID))
                 .thenReturn(List.of(shipment(ShipmentStatus.SHIPPED)));
 
-        List<ShipmentResponse> responses = shipmentService.listByOrderId(ORDER_ID);
+        List<ShipmentResponse> responses = shipmentService.listByOrderId(BUYER_ID, ORDER_ID);
 
         assertThat(responses).hasSize(1);
         assertThat(responses.getFirst().status()).isEqualTo(ShipmentStatus.SHIPPED);
         assertThat(responses.getFirst().orderId()).isEqualTo(ORDER_ID);
+        verify(buyerOrderOwnershipVerifier).verifyBuyerOwnsOrder(BUYER_ID, ORDER_ID);
+    }
+
+    @Test
+    @DisplayName("FR-40: Buyer không sở hữu Order → không được tra vận đơn")
+    void listByOrderIdShouldNotQueryShipmentsWhenBuyerDoesNotOwnOrder() {
+        doThrow(new ForbiddenOperationException("Order belongs to another Buyer"))
+                .when(buyerOrderOwnershipVerifier).verifyBuyerOwnsOrder(BUYER_ID, ORDER_ID);
+
+        assertThatThrownBy(() -> shipmentService.listByOrderId(BUYER_ID, ORDER_ID))
+                .isInstanceOf(ForbiddenOperationException.class);
+
+        verify(shipmentRepository, never()).findAllByOrderIdOrderByCreatedAtDesc(ORDER_ID);
     }
 
     @Test
     @DisplayName("FR-40: thiếu orderId → BusinessException")
     void listByNullOrderIdShouldFail() {
-        assertThatThrownBy(() -> shipmentService.listByOrderId(null))
+        assertThatThrownBy(() -> shipmentService.listByOrderId(BUYER_ID, null))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("orderId");
+    }
+
+    @Test
+    @DisplayName("FR-40: thiếu Buyer hiện tại → BusinessException")
+    void listByOrderIdWithoutBuyerShouldFail() {
+        assertThatThrownBy(() -> shipmentService.listByOrderId(null, ORDER_ID))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("Buyer");
+
+        verify(buyerOrderOwnershipVerifier, never()).verifyBuyerOwnsOrder(any(), any());
     }
 
     // ---------------------------------------------------------------- helpers

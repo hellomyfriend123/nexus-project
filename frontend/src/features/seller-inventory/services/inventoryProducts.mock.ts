@@ -1,0 +1,17 @@
+// Preserved design fixtures; live API data is not replaced by these values.
+﻿import type { InventoryProduct } from '../types/inventory';
+import photo0 from '../../../assets/images/seller-inventory/product-0.jpg';
+import photo1 from '../../../assets/images/seller-inventory/product-1.jpg';
+import photo2 from '../../../assets/images/seller-inventory/product-2.jpg';
+import photo3 from '../../../assets/images/seller-inventory/product-3.jpg';
+import photo4 from '../../../assets/images/seller-inventory/product-4.jpg';
+import photo5 from '../../../assets/images/seller-inventory/product-5.jpg';
+
+export const inventoryProducts: InventoryProduct[] = [
+  { id: 'r6', name: 'Máy ảnh Canon EOS R6 Mark II Body Fullbox', sku: 'CAM-CANON-R6M2-089', category: 'Thiết bị số > Máy ảnh Mirrorless', categoryId: 'camera', image: photo0, condition: 'Like New 99%', conditionId: 'like-new', verified: 'Serial #88204192', photoLabel: '8 ảnh', price: 36900000, oldPrice: '38.500.000 đ (-4%)', priceNote: 'Cho trả giá (Min 35M)', stock: 'Còn 01 máy', sold: 'Đã bán: 4', views: '2.4k', likes: '142', engagement: 'CR: 4.8% (Tốt)', status: 'listed', visible: true },
+  { id: 'sony', name: 'Ống kính Sony FE 24-70mm f/2.8 GM II Mới Fullbox', sku: 'LENS-SONY-2470', category: 'Ống kính > Ống kính Sony E-Mount', categoryId: 'lens', image: photo1, condition: 'Mới 100%', conditionId: 'new', verified: 'Bảo hành Sony VN', photoLabel: 'LIVE', price: 28500000, priceNote: 'Khởi điểm: 15.000.000 đ', priceBadge: '35 lượt bid', stock: 'Còn 01 chiếc', sold: 'Đấu giá độc quyền', views: '4.8k', likes: '318', engagement: 'Đang sôi động', status: 'auction', visible: true },
+  { id: 'r5', name: 'Thân máy ảnh Canon EOS R5 45MP 8K Raw Cinema', sku: 'CAM-CANON-R5-012', category: 'Thiết bị số > Máy ảnh Fullframe', categoryId: 'camera', image: photo2, condition: 'Like New 99%', conditionId: 'like-new', verified: 'Chụp 3.200 Shot', photoLabel: '12 ảnh', price: 52800000, priceNote: 'Giá niêm yết chuẩn', priceBadge: 'Giá cố định không mặc cả', stock: 'Còn 02 máy', sold: 'Đã bán: 8', views: '1.8k', likes: '96', engagement: 'CR: 3.2%', status: 'listed', visible: true },
+  { id: 'rf', name: 'Ống kính Canon RF 70-200mm f/2.8L IS USM', sku: 'LENS-RF-70200', category: 'Ống kính > Canon RF Mount', categoryId: 'lens', image: photo3, condition: 'Mới 100% Fullbox', conditionId: 'new', photoLabel: 'HẾT HÀNG', price: 48000000, priceNote: 'Tạm dừng giao dịch', stock: 'Hết hàng (0)', sold: 'Đã bán: 15', views: '950', likes: '64', engagement: '21 khách đặt chuông báo', status: 'out', visible: false },
+  { id: 'fuji', name: 'Fujifilm X-T5 Silver Body Fullbox Đẹp Keng', sku: 'CAM-FUJI-XT5', category: 'Thiếu: Mô tả bảo hành & Video test cảm biến', categoryId: 'camera', image: photo4, condition: 'Đã dùng 98%', conditionId: 'used', photoLabel: '4 ảnh', price: 37500000, priceNote: 'Chưa niêm yết lên sàn', stock: 'Kho sẵn: 1', sold: 'Đã bán: 0', views: 'Chưa có dữ liệu', engagement: 'Bản lưu nội bộ', status: 'draft', visible: false },
+  { id: 'leica', name: 'Máy ảnh Leica Q2 Monochrom Matte Black Special', sku: 'CAM-LEICA-Q2M', category: 'Đồ sưu tầm > Máy ảnh Luxury', categoryId: 'collectible', image: photo5, condition: 'Like New 99.9%', conditionId: 'like-new', verified: 'Đang check Nexus Verified Seri', photoLabel: '15 ảnh', price: 118000000, priceNote: 'Giá niêm yết thẩm định', stock: 'Còn 01 chiếc', sold: 'Hàng hiếm', views: 'Chờ duyệt', engagement: 'Dự kiến: 2h nữa', status: 'serial', visible: false },
+];

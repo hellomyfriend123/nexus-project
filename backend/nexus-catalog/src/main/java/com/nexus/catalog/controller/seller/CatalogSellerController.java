@@ -22,12 +22,17 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.nexus.catalog.dto.seller.ImageUploadResponse;
+import com.nexus.catalog.service.SupabaseStorageService;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import java.util.UUID;
 
 /**
  * Endpoint quản lý sản phẩm của Seller.
- * {@code sellerId} luôn lấy từ token ({@link SecurityUtils#currentUserId()}), KHÔNG nhận từ request.
+ * {@code sellerId} luôn lấy từ token ({@link SecurityUtils#currentUserId()}),
+ * KHÔNG nhận từ request.
  */
 @RestController
 @RequestMapping("/api/v1/seller/catalog/products")
@@ -36,6 +41,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CatalogSellerController {
 
+    private final SupabaseStorageService storageService;
     private final ProductService productService;
 
     @PostMapping
@@ -65,7 +71,19 @@ public class CatalogSellerController {
     @Operation(summary = "FR-10 — Seller gán/đổi danh mục cho sản phẩm của chính mình")
     @ApiResponse(responseCode = "200", description = "Gán danh mục thành công")
     public ProductResponse assignCategory(@PathVariable UUID id,
-                                          @Valid @RequestBody AssignCategoryRequest request) {
+            @Valid @RequestBody AssignCategoryRequest request) {
         return productService.assignCategory(SecurityUtils.currentUserId(), id, request);
+    }
+
+    @PostMapping(value = "/{id}/images/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload ảnh sản phẩm lên Supabase Storage — trả về publicUrl")
+    @ApiResponse(responseCode = "200", description = "Upload thành công, trả về URL công khai")
+    public ResponseEntity<ImageUploadResponse> uploadImage(
+            @PathVariable UUID id,
+            @RequestParam("file") MultipartFile file) {
+        // Verify the seller owns this product before accepting the upload
+        productService.verifyOwnership(SecurityUtils.currentUserId(), id);
+        String publicUrl = storageService.uploadProductImage(id, file);
+        return ResponseEntity.ok(new ImageUploadResponse(publicUrl));
     }
 }

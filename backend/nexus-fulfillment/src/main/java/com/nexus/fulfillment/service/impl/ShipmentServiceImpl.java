@@ -10,6 +10,7 @@ import com.nexus.fulfillment.entity.Shipment;
 import com.nexus.fulfillment.enums.ShipmentStatus;
 import com.nexus.fulfillment.mapper.ShipmentMapper;
 import com.nexus.fulfillment.repository.ShipmentRepository;
+import com.nexus.fulfillment.service.BuyerOrderOwnershipVerifier;
 import com.nexus.fulfillment.service.ShipmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import java.util.UUID;
 public class ShipmentServiceImpl implements ShipmentService {
 
     private final ShipmentRepository shipmentRepository;
+    private final BuyerOrderOwnershipVerifier buyerOrderOwnershipVerifier;
 
     @Override
     @Transactional
@@ -84,10 +86,14 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ShipmentResponse> listByOrderId(UUID orderId) {
+    public List<ShipmentResponse> listByOrderId(UUID buyerId, UUID orderId) {
         if (orderId == null) {
             throw new BusinessException("Thiếu tham số orderId để tra cứu vận đơn");
         }
+        if (buyerId == null) {
+            throw new BusinessException("Thiếu Buyer hiện tại để tra cứu vận đơn");
+        }
+        buyerOrderOwnershipVerifier.verifyBuyerOwnsOrder(buyerId, orderId);
         return ShipmentMapper.toResponseList(shipmentRepository.findAllByOrderIdOrderByCreatedAtDesc(orderId));
     }
 }

@@ -1,11 +1,9 @@
 import { Link } from 'react-router-dom';
-import { products } from '../../product/services/productService';
+import { useHomeProducts } from '../hooks/useHomeProducts';
 import HomeProductPager from './HomeProductPager';
 
 function NewArrivals() {
-  const auctionProducts = products.filter(
-    (product) => product.mode === 'auction',
-  );
+  const { products: auctionProducts, loading, error } = useHomeProducts(true);
 
   return (
     <section className="nx-section" aria-labelledby="home-auctions-title">
@@ -26,7 +24,7 @@ function NewArrivals() {
           Xem tất cả phiên đấu giá <span aria-hidden="true">→</span>
         </Link>
       </div>
-      <HomeProductPager products={auctionProducts} label="Đấu giá trực tiếp" />
+      {loading ? <p role="status">Đang tải sản phẩm…</p> : error ? <p role="alert">{error}</p> : <HomeProductPager products={auctionProducts} label="Đấu giá trực tiếp" />}
     </section>
   );
 }

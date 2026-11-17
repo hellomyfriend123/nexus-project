@@ -49,4 +49,6 @@ public interface ProductService {
 
     /** FR-53 — Admin đổi trạng thái sản phẩm (DRAFT / ACTIVE / INACTIVE). */
     ProductResponse updateStatus(UUID productId, UpdateProductStatusRequest request);
+
+    void verifyOwnership(UUID sellerId, UUID productId);
 }

@@ -286,6 +286,46 @@ class ProductServiceImplTest {
         then(productRepository).should().save(product);
     }
 
+    // ------------------------------------------------------------------ verifyOwnership
+
+    @Test
+    @DisplayName("verifyOwnership: productId không tồn tại → ResourceNotFoundException")
+    void verifyOwnership_khiProductKhongTonTai_nemResourceNotFoundException() {
+        UUID sellerId = UUID.randomUUID();
+        UUID productId = UUID.randomUUID();
+        given(productRepository.findByIdAndDeletedAtIsNull(productId)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productService.verifyOwnership(sellerId, productId))
+                .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("verifyOwnership: sellerId không khớp với chủ sở hữu sản phẩm → ForbiddenOperationException")
+    void verifyOwnership_khiKhongPhaiChuSoHuu_nemForbiddenOperationException() {
+        UUID ownerId = UUID.randomUUID();
+        UUID attackerId = UUID.randomUUID();
+        UUID productId = UUID.randomUUID();
+        Product product = product(productId, ownerId, UUID.randomUUID());
+        given(productRepository.findByIdAndDeletedAtIsNull(productId)).willReturn(Optional.of(product));
+
+        assertThatThrownBy(() -> productService.verifyOwnership(attackerId, productId))
+                .isInstanceOf(ForbiddenOperationException.class)
+                .hasMessageContaining("Bạn không phải chủ sở hữu sản phẩm này");
+    }
+
+    @Test
+    @DisplayName("verifyOwnership: đúng chủ sở hữu sản phẩm → thực thi thành công không ném exception")
+    void verifyOwnership_khiLaChuSoHuu_thanhCong() {
+        UUID sellerId = UUID.randomUUID();
+        UUID productId = UUID.randomUUID();
+        Product product = product(productId, sellerId, UUID.randomUUID());
+        given(productRepository.findByIdAndDeletedAtIsNull(productId)).willReturn(Optional.of(product));
+
+        productService.verifyOwnership(sellerId, productId);
+
+        then(productRepository).should().findByIdAndDeletedAtIsNull(productId);
+    }
+
     // ------------------------------------------------------------------ dữ liệu mẫu
 
     private static Category category(UUID id, String name) {

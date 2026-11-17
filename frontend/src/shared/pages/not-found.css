@@ -111,7 +111,13 @@ min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:24px 
 .u089-re{height:28px;padding:0 10px;border:0;border-radius:999px;background:var(--ux-surface-2);font-size:12px;font-weight:750;color:var(--ux-ink-2);opacity:0;visibility:hidden;transition:opacity .3s,visibility 0s .3s}
 .u089.found .u089-re{opacity:1;visibility:visible;transition:opacity .3s}
 .u089-re:hover{color:var(--ux-ink);background:var(--ux-surface-3)}
-.u089-sug{margin:4px 0 0;padding:0;list-style:none}
+.u089-sug{margin:4px 0 0;padding:0 4px 0 0;list-style:none;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-gutter:stable;scrollbar-width:thin;scrollbar-color:var(--ux-ink-3) var(--ux-surface-2)}
+.u089 > :not(.u089-sug){flex-shrink:0}
+.u089-sug::-webkit-scrollbar{width:6px}
+.u089-sug::-webkit-scrollbar-track{background:var(--ux-surface-2);border-radius:999px}
+.u089-sug::-webkit-scrollbar-thumb{background:var(--ux-ink-3);border-radius:999px}
+.u089-sug .u089-row code{min-width:0;max-width:48%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.u089-sug .u089-row small{min-width:0;overflow:hidden;text-overflow:ellipsis}
 .u089-row{display:flex;align-items:center;gap:10px;width:100%;height:44px;padding:0 12px;border:0;border-radius:14px;background:transparent;text-align:left;transition:background-color .2s,opacity .3s}
 .u089-row:hover{background:var(--ux-surface-2)}
 .u089-row:active{transform:scale(.98)}

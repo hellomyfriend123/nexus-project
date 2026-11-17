@@ -64,6 +64,10 @@ class AuthServiceImplTest {
     @Mock
     private TokenService tokenService;
 
+    /** Cần cho {@code exchangeOAuth2Code} — luồng đăng nhập Google. */
+    @Mock
+    private com.nexus.common.security.oauth2.OAuth2LoginCodeStore oAuth2LoginCodeStore;
+
     @InjectMocks
     private AuthServiceImpl authService;
 

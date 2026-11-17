@@ -342,6 +342,11 @@
   font-size: 11px;
   color: #7b737f;
 }
+.nx-purchase-quantity {
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
 .nx-bid-label small {
   font-size: 9px;
 }
@@ -402,7 +407,8 @@
 .nx-description > h3 {
   font-size: 15px;
 }
-.nx-description > p {
+.nx-description > p,
+.nx-description > .nx-description-content {
   color: #817c86;
   font-size: 14px;
 }
