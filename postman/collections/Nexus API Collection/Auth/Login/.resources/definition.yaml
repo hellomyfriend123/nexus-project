@@ -1,0 +1,62 @@
+$kind: collection
+description: |-
+  StartFragment
+
+  ### LOGIN API – Authentication Testing
+
+  **Mục đích:**  
+  Kiểm thử chức năng xác thực người dùng (User Authentication) của hệ thống Nexus thông qua API đăng nhập.
+
+  **Endpoint:**
+
+  - Method: `POST`
+      
+  - URL: `/api/v1/auth/login`
+      
+
+  **Phạm vi kiểm thử:**
+
+  - Đăng nhập bằng Email hoặc Username.
+      
+  - Kiểm tra thông tin đăng nhập hợp lệ và không hợp lệ.
+      
+  - Kiểm tra validation đối với dữ liệu đầu vào.
+      
+  - Kiểm tra trạng thái tài khoản trước khi cấp JWT.
+      
+  - Kiểm tra cấu trúc Login Response và thông tin JWT Access Token.
+      
+
+  **Danh sách Test Cases:**
+
+  - `LOG-01`: Đăng nhập thành công bằng Email – Expected: `200 OK`.
+      
+  - `LOG-02`: Đăng nhập thành công bằng Username – Expected: `200 OK`.
+      
+  - `LOG-03`: Sai mật khẩu – Expected: `401 Unauthorized`.
+      
+  - `LOG-04`: Tài khoản không tồn tại – Expected: `401 Unauthorized`.
+      
+  - `LOG-05`: Identifier để trống – Expected: `400 Bad Request`.
+      
+  - `LOG-06`: Password để trống – Expected: `400 Bad Request`.
+      
+
+  **Preconditions:**
+
+  - Backend Nexus đang hoạt động.
+      
+  - Database có tài khoản đã đăng ký.
+      
+  - Sử dụng đúng thông tin tài khoản và mật khẩu tương ứng.
+      
+  - Các request đăng nhập không yêu cầu Bearer Token.
+      
+
+  **Expected Result:**  
+  API trả về đúng HTTP Status Code, Response Body và thông tin xác thực theo API Specification. Khi đăng nhập thành công, Access Token được lưu vào Environment để phục vụ kiểm thử các API yêu cầu xác thực.
+
+  **Note:** Các test case phải được đánh giá dựa trên cả HTTP Status Code và Response Body.
+
+  EndFragment
+order: 12000

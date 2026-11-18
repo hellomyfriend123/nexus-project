@@ -1,0 +1,14 @@
+$kind: http-request
+description: ""
+url: http://localhost:8080/api/v1/auth/login
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"identifier\": \"buyer_test01\",\r
+
+    \    \"password\": \"Test123456\"\r
+
+    }"
+order: 3000

@@ -1,0 +1,68 @@
+$kind: collection
+description: |-
+  StartFragment
+
+  ### REGISTER API – User Registration Testing
+
+  **Mục đích:**  
+  Kiểm thử chức năng đăng ký tài khoản Buyer (User Registration) của hệ thống Nexus, đảm bảo dữ liệu đầu vào hợp lệ, không trùng lặp và tài khoản được tạo đúng quy định nghiệp vụ.
+
+  **Endpoint:**
+
+  - Method: `POST`
+      
+  - URL: `/api/v1/public/auth/register`
+      
+
+  **Phạm vi kiểm thử:**
+
+  - Đăng ký tài khoản mới với dữ liệu hợp lệ.
+      
+  - Kiểm tra tính duy nhất của Username và Email.
+      
+  - Kiểm tra validation các trường Username, Email, Full Name và Password.
+      
+  - Kiểm tra mã HTTP Status và nội dung Response.
+      
+  - Kiểm tra thông tin tài khoản sau khi đăng ký thành công.
+      
+  - Kiểm tra Role mặc định được gán cho tài khoản mới.
+      
+
+  **Danh sách Test Cases:**
+
+  - `REG-01`: Đăng ký hợp lệ – Expected: `201 Created`.
+      
+  - `REG-02`: Email đã tồn tại – Expected: `409 Conflict`.
+      
+  - `REG-03`: Username đã tồn tại – Expected: `409 Conflict`.
+      
+  - `REG-04`: Username để trống – Expected: `400 Bad Request`.
+      
+  - `REG-05`: Email sai định dạng – Expected: `400 Bad Request`.
+      
+  - `REG-06`: Password dưới 6 ký tự – Expected: `400 Bad Request`.
+      
+  - `REG-07`: Full Name để trống – Expected: `400 Bad Request`.
+      
+  - `REG-08`: Password để trống – Expected: `400 Bad Request`.
+      
+
+  **Preconditions:**
+
+  - Backend Nexus đang hoạt động.
+      
+  - Database đã được khởi tạo và có Role mặc định `BUYER`.
+      
+  - Sử dụng Username và Email chưa tồn tại đối với trường hợp đăng ký hợp lệ.
+      
+  - API đăng ký là Public Endpoint, không yêu cầu Bearer Token.
+      
+
+  **Expected Result:**  
+  API trả về đúng HTTP Status Code và Response Body theo API Specification. Khi đăng ký thành công, hệ thống tạo tài khoản với trạng thái `ACTIVE`, mã hóa mật khẩu bằng BCrypt và gán Role mặc định `BUYER`.
+
+  **Note:** Mỗi test case cần sử dụng dữ liệu phù hợp với mục đích kiểm thử. Đối với trường hợp kiểm tra dữ liệu trùng lặp, cần đảm bảo dữ liệu tương ứng đã tồn tại trong Database.
+
+  EndFragment
+order: 14000

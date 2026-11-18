@@ -1,0 +1,7 @@
+name: Nexus - Local
+values:
+  - key: baseUrl
+    value: 'http://localhost:8080/swagger-ui/index.html#/'
+  - key: accessToken
+    value: ''
+color: 180
