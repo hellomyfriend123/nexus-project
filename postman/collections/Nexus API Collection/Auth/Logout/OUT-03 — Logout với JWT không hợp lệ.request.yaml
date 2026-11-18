@@ -1,0 +1,8 @@
+$kind: http-request
+url: http://localhost:8080/api/v1/auth/logout
+method: POST
+auth:
+  type: bearer
+  credentials:
+    token: hellocucdang
+order: 4000

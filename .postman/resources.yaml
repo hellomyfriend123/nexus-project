@@ -1,0 +1,8 @@
+workspace:
+  id: f57ceb5d-8580-4a39-9988-a2b545032ba5
+localResources:
+  specs:
+    - ../APIs/specs/New Specification/nexus-auth-api.json
+resourceNameMappings:
+  specs:
+    - ../APIs/specs/New Specification/nexus-auth-api.json: Nexus Auth API

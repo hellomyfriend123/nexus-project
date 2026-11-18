@@ -1,0 +1,76 @@
+$kind: collection
+description: |-
+  StartFragment
+
+  ### LOGOUT API – User Logout Testing
+
+  **Mục đích:**  
+  Kiểm thử chức năng đăng xuất (User Logout) của hệ thống Nexus, đảm bảo endpoint yêu cầu xác thực và trả về phản hồi chính xác khi người dùng thực hiện đăng xuất.
+
+  **Endpoint:**
+
+  - Method: `POST`
+      
+  - URL: `/api/v1/auth/logout`
+      
+
+  **Authentication:**
+
+  - Required: Bearer Token (JWT).
+      
+  - Header: `Authorization: Bearer {{accessToken}}`.
+      
+
+  **Phạm vi kiểm thử:**
+
+  - Gửi yêu cầu Logout với JWT hợp lệ.
+      
+  - Kiểm tra trường hợp không cung cấp JWT.
+      
+  - Kiểm tra trường hợp JWT không hợp lệ.
+      
+  - Kiểm tra trường hợp JWT đã hết hạn.
+      
+  - Kiểm tra HTTP Status Code và Response Body.
+      
+  - Kiểm tra thao tác xóa Access Token ở phía Client sau khi Logout thành công.
+      
+
+  **Danh sách Test Cases đề xuất:**
+
+  - `OUT-01`: Logout thành công với JWT hợp lệ – Expected: `204 No Content`.
+      
+  - `OUT-02`: Logout không có JWT – Expected: `401 Unauthorized`.
+      
+  - `OUT-03`: Logout với JWT không hợp lệ – Expected: `401 Unauthorized`.
+      
+  - `OUT-04`: Logout với JWT hết hạn – Expected: `401 Unauthorized`.
+      
+
+  **Preconditions:**
+
+  - Backend Nexus đang hoạt động.
+      
+  - Người dùng đã đăng nhập thành công.
+      
+  - Environment có biến `accessToken`.
+      
+  - Các request cần xác thực phải gửi Bearer Token trong Authorization Header.
+      
+
+  **Expected Result:**
+
+  - JWT hợp lệ: API trả về `204 No Content`.
+      
+  - JWT thiếu, không hợp lệ hoặc hết hạn: API trả về `401 Unauthorized`.
+      
+  - Không có Response Body khi Logout thành công.
+      
+  - Client thực hiện xóa Access Token khỏi nơi lưu trữ sau khi nhận được phản hồi Logout thành công.
+      
+
+  **Important Note:**  
+  Backend hiện tại sử dụng Stateless JWT Authentication. Endpoint Logout chỉ trả về `204 No Content`, không thực hiện thu hồi hoặc vô hiệu hóa JWT ở phía Server. Vì vậy, xóa token ở Client không đồng nghĩa token đã bị thu hồi; token vẫn có thể được sử dụng cho đến khi hết hạn nếu không có cơ chế thu hồi khác.
+
+  EndFragment
+order: 15000

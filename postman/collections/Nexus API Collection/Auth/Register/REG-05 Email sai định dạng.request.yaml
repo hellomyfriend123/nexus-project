@@ -1,0 +1,18 @@
+$kind: http-request
+description: ""
+url: http://localhost:8080/api/v1/public/auth/register
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"username\": \"buyer_test05\",\r
+
+    \    \"email\": \"buyer_test05\",\r
+
+    \    \"fullName\": \"Buyer Test 05\",\r
+
+    \    \"password\": \"Test123456\"\r
+
+    }"
+order: 5000
