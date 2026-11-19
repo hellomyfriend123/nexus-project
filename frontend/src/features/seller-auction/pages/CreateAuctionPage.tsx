@@ -1,32 +1,28 @@
-import AuctionHeader from '../components/AuctionHeader';
-import AuctionProductSection from '../components/AuctionProductSection';
-import AuctionPricingSection from '../components/AuctionPricingSection';
-import AuctionScheduleSection from '../components/AuctionScheduleSection';
-import AuctionShippingSection from '../components/AuctionShippingSection';
-import AuctionSidebar from '../components/AuctionSidebar';
-import AuctionFeedback from '../components/AuctionFeedback';
-import { useCreateAuction } from '../hooks/useCreateAuction';
+import { useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+import CreateAuctionDialog from '../components/CreateAuctionDialog';
+import SellerHubPage from '../../seller-hub/pages/SellerHubPage';
 import '../styles/create-auction.css';
 
+/**
+ * Legacy entry point for /seller/auctions/new.
+ *
+ * The form now lives in a dialog opened from the auction list. A direct visit — including the
+ * inventory page's /seller/auctions/new?productId=… link — renders the hub underneath with the
+ * dialog open and the product preselected.
+ */
 export default function CreateAuctionPage() {
-  const hub = useCreateAuction();
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
   return (
-    <main className="sca-page">
-      <div className="sca-container">
-        <AuctionHeader />
-        <form onSubmit={hub.submit} noValidate>
-          <div className="sca-layout">
-            <div className="sca-main">
-              <AuctionProductSection hub={hub} />
-              <AuctionPricingSection hub={hub} />
-              <AuctionScheduleSection hub={hub} />
-              <AuctionShippingSection hub={hub} />
-            </div>
-            <AuctionSidebar hub={hub} />
-          </div>
-          <AuctionFeedback hub={hub} />
-        </form>
-      </div>
-    </main>
+    <>
+      <SellerHubPage controlled onCreateAuction={() => { /* the dialog is already open here */ }} />
+      <CreateAuctionDialog
+        open
+        productId={params.get('productId')}
+        onClose={() => navigate('/seller-hub?tab=auctions', { replace: true })}
+        onCreated={auction => navigate(`/seller/auctions/${encodeURIComponent(auction.id)}/result`, { replace: true })}
+      />
+    </>
   );
 }

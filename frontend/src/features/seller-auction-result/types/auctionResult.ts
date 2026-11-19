@@ -19,6 +19,7 @@ export interface AuctionMetric {
 
 export interface AuctionResult {
   id: string;
+  orderId?: string;
   endedAt: string;
   title: string;
   subtitle: string;

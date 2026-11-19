@@ -15,8 +15,8 @@ export function AdminAuctionsView(model: ReturnType<typeof useAdminAuctions>) {
       <AdminAuctionsFilters {...model} />
 
       {/* Auctions Table */}
-      <div className="nx-card">
-        <div className="table-responsive">
+      <div className="nx-admin-card">
+        <div className="nx-table-container">
           <AdminAuctionsTable {...model} />
         </div>
       </div>

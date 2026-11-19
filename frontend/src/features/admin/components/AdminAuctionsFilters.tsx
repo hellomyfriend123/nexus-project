@@ -3,7 +3,7 @@ import type { useAdminAuctions } from '../hooks/useAdminAuctions';
 export function AdminAuctionsFilters(model: ReturnType<typeof useAdminAuctions>) {
   const { statusFilter, setStatusFilter } = model;
   return (
-    <div className="nx-card" style={{ marginBottom: '20px' }}>
+    <div style={{ marginBottom: '20px' }}>
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
         {[
           { key: 'ALL', label: 'Tất cả' },
@@ -19,6 +19,7 @@ export function AdminAuctionsFilters(model: ReturnType<typeof useAdminAuctions>)
               statusFilter === tab.key ? 'nx-btn-primary' : 'nx-btn-outline'
             }`}
             onClick={() => setStatusFilter(tab.key)}
+            aria-pressed={statusFilter === tab.key}
           >
             {tab.label}
           </button>

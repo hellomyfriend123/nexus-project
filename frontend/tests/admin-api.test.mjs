@@ -27,6 +27,7 @@ test('admin DTO transport and feature adapters use real contracts with mocked fe
   const reviews=await feature.adminCatalogApi.listReviews({status:'VISIBLE'});expectCall('/api/v1/admin/catalog/reviews?status=VISIBLE');assert.equal(reviews.content[0].rating,4);assert.equal(reviews.content[0].userId,'b');assert.equal(reviews.content[0].status,'VISIBLE');
   await api.adminCatalogApi.updateReviewStatus('r','HIDDEN');expectCall('/api/v1/admin/catalog/reviews/r/status','PATCH',{status:'HIDDEN'});
   payload=page({id:'o',itemCount:2,buyerId:'buyer',status:'CONFIRMED',totalAmount:200});const orders=await feature.adminCommerceApi.listOrders({status:'CONFIRMED'});expectCall('/api/v1/admin/commerce/orders?status=CONFIRMED');assert.equal(orders.content[0].itemsCount,2);assert.equal(orders.content[0].paymentStatus,undefined);
+  await feature.adminCommerceApi.listOrders({size:5,sort:'createdAt,desc'});expectCall('/api/v1/admin/commerce/orders?size=5&sort=createdAt%2Cdesc');
   await api.adminCommerceApi.updateOrderStatus('o','SHIPPING');expectCall('/api/v1/admin/commerce/orders/o/status','PATCH',{status:'SHIPPING'});
   await api.adminCommerceApi.cancelOrder('o');expectCall('/api/v1/admin/commerce/orders/o/cancel','POST');
   const campaign={name:'Sale',description:'Promo',startDate:'2026-01-01',endDate:'2026-02-01',status:'DRAFT'};payload={id:'campaign',...campaign};await api.adminCommerceApi.createCampaign(campaign);expectCall('/api/v1/admin/commerce/campaigns','POST',campaign);

@@ -15,7 +15,7 @@ export function AdminCatalogTable(model: ReturnType<typeof useAdminCatalog>) {
                   <tbody>
                     {categories.length === 0 ? (
                       <tr>
-                        <td colSpan={4} style={{ textAlign: 'center', padding: '32px', color: '#94a3b8' }}>
+                        <td colSpan={4} style={{ textAlign: 'center', padding: '32px', color: '#64748b' }}>
                           Không có danh mục nào phù hợp.
                         </td>
                       </tr>
@@ -28,7 +28,7 @@ export function AdminCatalogTable(model: ReturnType<typeof useAdminCatalog>) {
                               ID: <code>{cat.id.slice(0, 8)}...</code>
                             </div>
                           </td>
-                          <td>{cat.description || '—'}</td>
+                          <td>{cat.description || 'N/A'}</td>
                           <td>
                             <span
                               className={`nx-badge ${
@@ -48,7 +48,7 @@ export function AdminCatalogTable(model: ReturnType<typeof useAdminCatalog>) {
                                 type="button"
                                 className="nx-btn nx-btn-outline nx-btn-sm"
                                 onClick={() => handleOpenCategoryEdit(cat)}
-                                title="Cập nhật danh mục (PUT /api/v1/admin/catalog/categories/{id})"
+                                title="Cập nhật danh mục"
                               >
                                 <i className="bi bi-pencil"></i> Sửa
                               </button>
@@ -57,7 +57,7 @@ export function AdminCatalogTable(model: ReturnType<typeof useAdminCatalog>) {
                                   type="button"
                                   className="nx-btn nx-btn-danger nx-btn-sm"
                                   onClick={() => handleDeleteCategory(cat)}
-                                  title="Xoá mềm danh mục (DELETE /api/v1/admin/catalog/categories/{id})"
+                                  title="Xoá mềm danh mục"
                                 >
                                   <i className="bi bi-trash"></i> Xoá
                                 </button>

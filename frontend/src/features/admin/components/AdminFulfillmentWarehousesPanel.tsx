@@ -7,7 +7,7 @@ export function AdminFulfillmentWarehousesPanel(model: ReturnType<typeof useAdmi
           {activeTab === 'warehouses' && (
             <div className="nx-admin-card">
               <div className="nx-admin-card-header">
-                <h2 className="nx-admin-card-title">Danh sách Trung tâm Vận hành & Kho hàng (FR-55)</h2>
+                <h2 className="nx-admin-card-title">Danh sách Trung tâm Vận hành & Kho hàng</h2>
                 <button
                   type="button"
                   className="nx-btn nx-btn-primary nx-btn-sm"
@@ -30,7 +30,7 @@ export function AdminFulfillmentWarehousesPanel(model: ReturnType<typeof useAdmi
                   <tbody>
                     {warehouses.length === 0 ? (
                       <tr>
-                        <td colSpan={5} style={{ textAlign: 'center', padding: '32px', color: '#94a3b8' }}>
+                        <td colSpan={5} style={{ textAlign: 'center', padding: '32px', color: '#64748b' }}>
                           Chưa có kho hàng nào trong hệ thống.
                         </td>
                       </tr>
@@ -44,7 +44,7 @@ export function AdminFulfillmentWarehousesPanel(model: ReturnType<typeof useAdmi
                             <code style={{ color: '#315bf4' }}>{wh.code}</code>
                           </td>
                           <td>
-                            <div>{wh.address || '—'}</div>
+                            <div>{wh.address || 'N/A'}</div>
                           </td>
                           <td>
                             <span
@@ -56,7 +56,7 @@ export function AdminFulfillmentWarehousesPanel(model: ReturnType<typeof useAdmi
                             </span>
                           </td>
                           <td>
-                            {wh.createdAt ? new Date(wh.createdAt).toLocaleDateString('vi-VN') : '—'}
+                            {wh.createdAt ? new Date(wh.createdAt).toLocaleDateString('vi-VN') : 'N/A'}
                           </td>
                           <td style={{ textAlign: 'right' }}>
                             <div style={{ display: 'inline-flex', gap: '6px' }}>
@@ -64,7 +64,7 @@ export function AdminFulfillmentWarehousesPanel(model: ReturnType<typeof useAdmi
                                 type="button"
                                 className="nx-btn nx-btn-outline nx-btn-sm"
                                 onClick={() => handleOpenEditWarehouse(wh)}
-                                title="Sửa thông tin kho (PUT /api/v1/admin/fulfillment/warehouses/{id})"
+                                title="Sửa thông tin kho"
                               >
                                 <i className="bi bi-pencil"></i> Sửa
                               </button>
@@ -74,7 +74,7 @@ export function AdminFulfillmentWarehousesPanel(model: ReturnType<typeof useAdmi
                                   wh.status === 'ACTIVE' ? 'nx-btn-danger' : 'nx-btn-primary'
                                 }`}
                                 onClick={() => handleToggleWarehouseStatus(wh.id, wh.status)}
-                                title="Bật/Ngừng hoạt động kho (FR-55)"
+                                title="Bật/Ngừng hoạt động kho"
                               >
                                 {wh.status === 'ACTIVE' ? 'Tạm ngưng' : 'Kích hoạt'}
                               </button>

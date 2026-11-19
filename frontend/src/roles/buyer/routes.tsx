@@ -6,6 +6,12 @@ import ProductPage from '../../features/product/pages/ProductPage';
 import ProductDetailPage from '../../features/product/pages/ProductDetailPage';
 import CartPage from '../../features/cart/pages/CartPage';
 import BuyerHubPage from '../../features/buyer-hub/pages/BuyerHubPage';
+import { buyerAccountMenu } from '../../features/buyer-hub/constants/accountMenu';
+import AccountLayoutRoute from '../../features/account/layouts/AccountLayoutRoute';
+import ProfilePage from '../../features/account/pages/ProfilePage';
+import AddressPage from '../../features/account/pages/AddressPage';
+import PasswordPage from '../../features/account/pages/PasswordPage';
+import BuyerAuctionsPage from '../../features/account/pages/BuyerAuctionsPage';
 
 import BuyerAuctionResultPage from '../../features/auction-results/pages/BuyerAuctionResultPage';
 
@@ -21,8 +27,16 @@ const buyerRoutes: RouteObject[] = [
       { path: 'cart', element: <CartPage /> },
       { path: 'auctions/:auctionId/winner', element: <BuyerAuctionResultPage outcome="winner" /> },
       { path: 'auctions/:auctionId/loser', element: <BuyerAuctionResultPage outcome="loser" /> },
-      { path: 'buyer-hub', element: <BuyerHubPage /> },
-
+      {
+        element: <AccountLayoutRoute items={buyerAccountMenu} label="Tài khoản người mua" />,
+        children: [
+          { path: 'buyer-hub', element: <BuyerHubPage /> },
+          { path: 'buyer/profile', element: <ProfilePage role="BUYER" /> },
+          { path: 'buyer/address', element: <AddressPage role="BUYER" /> },
+          { path: 'buyer/password', element: <PasswordPage /> },
+          { path: 'buyer/auctions', element: <BuyerAuctionsPage /> },
+        ],
+      },
     ],
   },
 ];

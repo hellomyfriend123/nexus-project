@@ -13,7 +13,6 @@ export function useAdminCatalog() {
   const [activeTab, setActiveTab] = useState<'categories' | 'products' | 'reviews'>('categories');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [isUsingRealApi, setIsUsingRealApi] = useState(false);
 
   // Categories State (5 tasks)
   const [categories, setCategories] = useState<AdminCategory[]>([]);
@@ -49,7 +48,6 @@ export function useAdminCatalog() {
         if (!isCurrent()) return;
         if (res && Array.isArray(res.content)) {
           setCategories(res.content);
-          setIsUsingRealApi(true);
         } else {
           setCategories([]);
         }
@@ -62,7 +60,6 @@ export function useAdminCatalog() {
         if (!isCurrent()) return;
         if (res && Array.isArray(res.content)) {
           setProducts(res.content);
-          setIsUsingRealApi(true);
         } else {
           setProducts([]);
         }
@@ -71,7 +68,6 @@ export function useAdminCatalog() {
         if (!isCurrent()) return;
         if (res && Array.isArray(res.content)) {
           setReviews(res.content);
-          setIsUsingRealApi(true);
         } else {
           setReviews([]);
         }
@@ -79,7 +75,6 @@ export function useAdminCatalog() {
     } catch (error) {
       if (!isCurrent()) return;
       setError(error instanceof Error ? error.message : 'Không thể tải dữ liệu.');
-      setIsUsingRealApi(false);
       if (activeTab === 'categories') setCategories([]);
       else if (activeTab === 'products') setProducts([]);
       else if (activeTab === 'reviews') setReviews([]);
@@ -140,14 +135,14 @@ export function useAdminCatalog() {
           sortOrder: selectedCategory.sortOrder,
           parentId: selectedCategory.parentId ?? null,
         });
-        alert('Đã cập nhật danh mục thành công qua REST API!');
+        alert('Đã cập nhật danh mục thành công!');
       } else {
         await adminCatalogApi.createCategory({
           name: categoryForm.name.trim(),
           description: categoryForm.description.trim() || undefined,
           status: categoryForm.status,
         });
-        alert('Đã tạo danh mục mới thành công qua REST API!');
+        alert('Đã tạo danh mục mới thành công!');
       }
       setShowCategoryModal(false);
       loadData();
@@ -160,7 +155,7 @@ export function useAdminCatalog() {
   const handleDeleteCategory = async (cat: AdminCategory) => {
     if (
       confirm(
-        `Bạn có chắc chắn muốn xoá mềm danh mục "${cat.name}"?\n(Theo quy định nghiệp vụ Backend FR-09/54: Danh mục sẽ được chuyển sang trạng thái INACTIVE để đảm bảo toàn vẹn dữ liệu)`
+        `Bạn có chắc chắn muốn xoá mềm danh mục "${cat.name}"?\nDanh mục sẽ ngừng hiển thị; dữ liệu đã có vẫn được giữ lại.`
       )
     ) {
       try {
@@ -168,7 +163,7 @@ export function useAdminCatalog() {
         alert(`Đã xoá mềm danh mục "${cat.name}" thành công! Trạng thái đã chuyển sang INACTIVE.`);
         loadData();
       } catch (err: unknown) {
-        const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+        const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
         alert(`Không thể xoá danh mục:\n${errorMsg}`);
       }
     }
@@ -179,10 +174,10 @@ export function useAdminCatalog() {
     const nextStatus: ProductStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
     try {
       await adminCatalogApi.updateProductStatus(id, nextStatus);
-      alert(`Đã đổi trạng thái sản phẩm sang ${nextStatus} trên REST API!`);
+      alert(`Đã đổi trạng thái sản phẩm sang ${nextStatus}!`);
       loadData();
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+      const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
       alert(`Không thể đổi trạng thái sản phẩm:\n${errorMsg}`);
     }
   };
@@ -191,10 +186,10 @@ export function useAdminCatalog() {
     if (confirm('Bạn có chắc chắn muốn xoá mềm sản phẩm này?')) {
       try {
         await adminCatalogApi.deleteProduct(id);
-        alert('Đã xoá mềm sản phẩm qua REST API!');
+        alert('Đã xoá mềm sản phẩm!');
         loadData();
       } catch (err: unknown) {
-        const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+        const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
         alert(`Không thể xoá sản phẩm:\n${errorMsg}`);
       }
     }
@@ -204,21 +199,21 @@ export function useAdminCatalog() {
   const handleApproveReview = async (id: string) => {
     try {
       await adminCatalogApi.updateReviewStatus(id, 'VISIBLE');
-      alert('Đã phê duyệt đánh giá sản phẩm qua REST API!');
+      alert('Đã hiển thị lại đánh giá sản phẩm!');
       loadData();
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
-      alert(`Không thể phê duyệt đánh giá:\n${errorMsg}`);
+      const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
+      alert(`Không thể hiển thị lại đánh giá:\n${errorMsg}`);
     }
   };
 
   const handleRejectReview = async (id: string) => {
     try {
       await adminCatalogApi.updateReviewStatus(id, 'HIDDEN');
-      alert('Đã ẩn đánh giá sản phẩm qua REST API!');
+      alert('Đã ẩn đánh giá sản phẩm!');
       loadData();
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+      const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
       alert(`Không thể ẩn đánh giá:\n${errorMsg}`);
     }
   };
@@ -235,5 +230,5 @@ export function useAdminCatalog() {
   const formatCurrency = (val: number) =>
     new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
 
-  return { activeTab, setActiveTab, error, setError, loading, setLoading, isUsingRealApi, setIsUsingRealApi, categories, setCategories, categoryStatusFilter, setCategoryStatusFilter, selectedCategory, setSelectedCategory, showCategoryModal, setShowCategoryModal, categoryForm, setCategoryForm, products, setProducts, productKeyword, setProductKeyword, productCategoryFilter, setProductCategoryFilter, reviews, setReviews, loadData, handleOpenCategoryCreate, handleOpenCategoryEdit, handleSaveCategory, handleDeleteCategory, handleToggleProductStatus, handleDeleteProduct, handleApproveReview, handleRejectReview, filteredProducts, formatCurrency };
+  return { activeTab, setActiveTab, error, setError, loading, setLoading, categories, setCategories, categoryStatusFilter, setCategoryStatusFilter, selectedCategory, setSelectedCategory, showCategoryModal, setShowCategoryModal, categoryForm, setCategoryForm, products, setProducts, productKeyword, setProductKeyword, productCategoryFilter, setProductCategoryFilter, reviews, setReviews, loadData, handleOpenCategoryCreate, handleOpenCategoryEdit, handleSaveCategory, handleDeleteCategory, handleToggleProductStatus, handleDeleteProduct, handleApproveReview, handleRejectReview, filteredProducts, formatCurrency };
 }

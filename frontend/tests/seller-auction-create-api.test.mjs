@@ -1,4 +1,4 @@
-﻿import assert from 'node:assert/strict';
+import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createServer } from 'vite';
 import { readFile, readdir } from 'node:fs/promises';
@@ -35,9 +35,13 @@ test('create auction loads seller inventory, deduplicates products, and sends on
   assert.ok(mutation.url.endsWith('/api/v1/seller/auction/auctions'));
   assert.equal(mutation.options.method, 'POST');
   assert.deepEqual(JSON.parse(mutation.options.body), { productId: 'own', startingPrice: 100, startTime: now.toISOString(), endTime: '2027-01-04T00:00:00.000Z' });
+  await service.createAuction({ ...draft, startingPrice: '0.01' }, products, now);
+  assert.equal(JSON.parse(calls.at(-1).options.body).startingPrice, 0.01);
   const count = calls.length;
   await assert.rejects(service.createAuction({ ...draft, productId: 'other' }, products, now), /kho/);
   await assert.rejects(service.createAuction({ ...draft, startingPrice: 'Infinity' }, products, now), /hữu hạn/);
+  await assert.rejects(service.createAuction({ ...draft, startingPrice: '100.001' }, products, now), /2 chữ số thập phân/);
+  await assert.rejects(service.createAuction({ ...draft, startingPrice: '9999999999999999' }, products, now), /chính xác/);
   await assert.rejects(service.createAuction({ ...draft, duration: '0' }, products, now), /Thời lượng/);
   await assert.rejects(service.createAuction({ ...draft, startNow: false, startDate: '2020-01-01', startTime: '00:00' }, products, now), /tương lai/);
   assert.equal(calls.length, count);
@@ -50,13 +54,23 @@ test('create flow has loading, empty, error, duplicate-submit protection and rea
  const base = new URL('../src/features/seller-auction/', import.meta.url);
  assert.deepEqual(await readdir(new URL('services/', base)), ['auctionService.ts']);
  const hook = await readFile(new URL('hooks/useCreateAuction.ts', base), 'utf8');
- assert.match(hook, /lock.current \|\| created/); assert.match(hook, /const auction = await createAuction\(draft, products\); if \(current\(\)\) setCreated\(auction\)/);
+ assert.match(hook, /lock.current \|\| created/); assert.match(hook, /const auction = await createAuction\(draft, products\); if \(current\(\)\) \{ setCreated\(auction\); onSuccess.current\?\.\(auction\); \}/);
  assert.match(hook, /const current = \(\) => attempt === revision.current && key === sessionKey\(\)/); assert.doesNotMatch(hook, /saveMock|FileReader|localStorage/);
  const feedback = await readFile(new URL('components/AuctionFeedback.tsx', base), 'utf8');
- assert.match(feedback, /encodeURIComponent\(hub.created.id\)/); assert.match(feedback, /hub.created.status/);
+ assert.match(feedback, /encodeURIComponent\(hub.created.id\)/); assert.match(feedback, /hub.created/);
  const productSection = await readFile(new URL('components/AuctionProductSection.tsx', base), 'utf8');
- assert.match(productSection, /hub.loading/); assert.match(productSection, /hub.loadError/); assert.match(productSection, /!products.length/);
- const sidebar = await readFile(new URL('components/AuctionSidebar.tsx', base), 'utf8');
- assert.match(sidebar, /disabled title="API chưa hỗ trợ lưu bản nháp"/);
+ assert.match(productSection, /hub.loading/); assert.match(productSection, /hub.loadError/); assert.match(productSection, /!hub.products.length/);
+ // The form moved into a dialog; the legacy page now renders the hub behind it.
+ const dialog = await readFile(new URL('components/CreateAuctionDialog.tsx', base), 'utf8');
+ assert.doesNotMatch(dialog, /AuctionSidebar|AuctionShippingSection|AuctionFees/);
+ assert.match(dialog, /hub.uncertain \|\| hub.busy \|\| hub.loading/);
+ const page = await readFile(new URL('pages/CreateAuctionPage.tsx', base), 'utf8');
+ assert.doesNotMatch(page, /AuctionSidebar|AuctionShippingSection|AuctionFees/);
+ // A direct visit to the old URL must still preselect from ?productId and render the list behind.
+ assert.match(page, /params.get\('productId'\)/);
+ assert.match(page, /SellerHubPage/);
+ // The in-place entry point preselects from an inventory row instead of the URL.
+ assert.match(dialog, /initialProductId/);
+ assert.match(hook, /requestedProductId/);
 });
 

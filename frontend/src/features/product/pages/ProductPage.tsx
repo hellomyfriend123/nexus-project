@@ -22,14 +22,14 @@ function ProductPage() {
           ) : (
             '0 kết quả'
           )}
-          {query.trim() && (
+          {mode === 'buy-now' && query.trim() && (
             <>
               {' '}
               cho “<strong>{query.trim()}</strong>”
             </>
           )}
         </p>
-        <ProductSort sort={sort} setSort={selectSort} />
+        {mode === 'buy-now' ? <ProductSort sort={sort} setSort={selectSort} /> : <span>Sắp kết thúc trước</span>}
       </div>
       <div className="nx-category-layout">
         <ProductFilter
@@ -41,15 +41,15 @@ function ProductPage() {
           onReset={resetFilters}
         />
         <section aria-labelledby="product-results-title">
-          <label className="nx-results-search">
+          {mode === 'buy-now' && <label className="nx-results-search">
             <span>Tìm trong danh sách</span>
             <input
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder={mode === 'auction' ? 'Nhập UUID sản phẩm hoặc người bán…' : 'Nhập tên sản phẩm…'}
+              placeholder="Nhập tên sản phẩm…"
             />
-          </label>
+          </label>}
           {activeFilters.length > 0 && (
             <div className="nx-active-filters" aria-label="Bộ lọc đang áp dụng">
               {activeFilters.map((filter) => (
@@ -72,9 +72,9 @@ function ProductPage() {
             </div>
           )}
           <div className="nx-results-intro">
-            <h2 id="product-results-title">Kết quả</h2>
+            <h1 id="product-results-title">{mode === 'auction' ? 'Phiên đấu giá' : 'Sản phẩm'}</h1>
             <p>
-              {mode === 'auction' ? 'Phiên đấu giá đang hoạt động từ máy chủ.' : 'Danh sách sản phẩm mua trực tiếp từ máy chủ. Chọn Đấu giá để xem các phiên đang hoạt động.'}
+              {mode === 'auction' ? 'Theo dõi mức giá và tham gia các phiên đang diễn ra.' : 'Tìm sản phẩm phù hợp và thêm vào giỏ hàng.'}
             </p>
           </div>
           {loading ? <p role="status">Đang tải sản phẩm…</p> : error ? <div className="nx-empty" role="alert"><p>{error}</p><button className="nx-button nx-button-soft" onClick={() => setRetry(value => value + 1)}>Thử lại</button></div> : total ? (

@@ -14,7 +14,6 @@ export function useAdminUsers() {
   const [users, setUsers] = useState<DetailedAdminUser[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [isUsingRealApi, setIsUsingRealApi] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [roleFilter, setRoleFilter] = useState<string>('ALL');
@@ -99,14 +98,12 @@ export function useAdminUsers() {
 
         if (!isCurrent()) return;
         setUsers(finalUsers as DetailedAdminUser[]);
-        setIsUsingRealApi(true);
       } else {
         setUsers([]);
       }
     } catch (error) {
       if (!isCurrent()) return;
       setError(error instanceof Error ? error.message : 'Không thể tải dữ liệu.');
-      setIsUsingRealApi(false);
       setUsers([]);
     } finally {
       if (isCurrent()) setLoading(false);
@@ -162,12 +159,12 @@ export function useAdminUsers() {
       setShowStatusModal(false);
       fetchUsers();
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+      const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
       alert(`Không thể cập nhật trạng thái người dùng:\n${errorMsg}`);
     } finally {
       setActionLoading(false);
     }
   };
 
-  return { users, setUsers, error, setError, loading, setLoading, isUsingRealApi, setIsUsingRealApi, searchKeyword, setSearchKeyword, statusFilter, setStatusFilter, roleFilter, setRoleFilter, selectedUser, setSelectedUser, showStatusModal, setShowStatusModal, targetStatus, setTargetStatus, actionLoading, setActionLoading, isPhoneMatch, fetchUsers, handleViewDetails, handleOpenStatusModal, handleUpdateStatus };
+  return { users, setUsers, error, setError, loading, setLoading, searchKeyword, setSearchKeyword, statusFilter, setStatusFilter, roleFilter, setRoleFilter, selectedUser, setSelectedUser, showStatusModal, setShowStatusModal, targetStatus, setTargetStatus, actionLoading, setActionLoading, isPhoneMatch, fetchUsers, handleViewDetails, handleOpenStatusModal, handleUpdateStatus };
 }

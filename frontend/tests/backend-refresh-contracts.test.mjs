@@ -28,7 +28,7 @@ test('auction, bid and review GET adapters reject malformed wire data rather tha
 });
 test('public header categories are loaded before the authentication gate', () => {
  const source = readFileSync(new URL('../src/shared/components/Header/Header.tsx', import.meta.url), 'utf8');
- assert.ok(source.indexOf('headerApi.categories(signal)') < source.indexOf('if (!current)'));
+ assert.ok(source.indexOf('headerApi.categories(controller.signal)') < source.indexOf('if (!current)'));
  assert.ok(source.indexOf('me(signal)') > source.indexOf('if (!current)'));
 });
 test('cart DELETE URL encodes the supplied line identifier', async () => {
@@ -41,3 +41,4 @@ test('cart DELETE URL encodes the supplied line identifier', async () => {
   assert.equal(path, '/api/v1/buyer/commerce/cart/items/line%2Fone%3Fx');
  } finally { globalThis.fetch = previous; await server.close(); }
 });
+

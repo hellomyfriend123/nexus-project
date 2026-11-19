@@ -17,6 +17,6 @@ export default function SellerProtection({ result, onAction }: Props) { return (
         <p>{item.description}</p>
       </div>
     </div>)}
-    <button title="Chưa có API hỗ trợ thao tác này" disabled onClick={() => onAction('protection')}>Xem chính sách bảo vệ người bán</button>
+    <button title="Xem chính sách bảo vệ người bán chưa được hỗ trợ." disabled onClick={() => onAction('protection')}>Xem chính sách bảo vệ người bán</button>
   </section>
   ); }

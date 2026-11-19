@@ -26,7 +26,7 @@ export default function WinnerProfile({ result, onAction }: Props) {
             <span>({winner.reviews ?? 'Chưa có dữ liệu'} đánh giá)</span>
           </span>
         </div>
-        <button title="Chưa có API hỗ trợ thao tác này" disabled className="nx-ar-btn nx-ar-btn-soft" onClick={() => onAction('message')}>
+        <button title="Chat trực tiếp chưa được hỗ trợ." disabled className="nx-ar-btn nx-ar-btn-soft" onClick={() => onAction('message')}>
           <i className="bi bi-chat-dots" aria-hidden="true" /> Mở khung chat trực tiếp</button>
       </div>
       <div className="nx-ar-address">
@@ -41,7 +41,7 @@ export default function WinnerProfile({ result, onAction }: Props) {
       </div>
       <p className="nx-ar-privacy">
         <i className="bi bi-lock" aria-hidden="true" /> {result.privacyNotice}</p>
-      <button title="Chưa có API hỗ trợ thao tác này" disabled className="nx-ar-reminder" onClick={() => onAction('message')}>Gửi lời nhắc thanh toán (Bên mua)</button>
+      <button title="Gửi lời nhắc thanh toán chưa được hỗ trợ." disabled className="nx-ar-reminder" onClick={() => onAction('message')}>Gửi lời nhắc thanh toán (Bên mua)</button>
     </section>
   );
 }

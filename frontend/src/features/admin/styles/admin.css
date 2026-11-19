@@ -3,7 +3,7 @@
 .nx-admin-layout {
   --admin-sidebar-bg: #0f172a;
   --admin-sidebar-hover: #1e293b;
-  --admin-sidebar-active: #315bf4;
+  --admin-sidebar-active: var(--nx-primary, #315bf4);
   --admin-header-bg: #ffffff;
   --admin-content-bg: #f8fafc;
   --admin-card-bg: #ffffff;
@@ -52,7 +52,7 @@
 }
 
 .nx-admin-layout .nx-admin-brand .admin-badge {
-  background: linear-gradient(135deg, #315bf4, #6366f1);
+  background: linear-gradient(135deg, var(--nx-primary, #315bf4), #6366f1);
   color: #fff;
   font-size: 10px;
   font-weight: 700;
@@ -96,7 +96,7 @@
 }
 
 .nx-admin-layout .nx-admin-nav-item.active {
-  background-color: #315bf4;
+  background-color: var(--nx-primary, #315bf4);
   color: #ffffff;
   font-weight: 600;
   box-shadow: 0 4px 12px rgba(49, 91, 244, 0.35);
@@ -123,7 +123,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #315bf4;
+  background: var(--nx-primary, #315bf4);
   color: #fff;
   display: flex;
   align-items: center;
@@ -153,36 +153,6 @@
   position: sticky;
   top: 0;
   z-index: 50;
-}
-
-.nx-admin-layout .nx-admin-search {
-  position: relative;
-  width: 320px;
-}
-
-.nx-admin-layout .nx-admin-search input {
-  width: 100%;
-  padding: 8px 14px 8px 36px;
-  border-radius: 8px;
-  border: 1px solid var(--admin-border-color);
-  font-size: 13px;
-  outline: none;
-  background-color: #f8fafc;
-  transition: border-color 0.2s;
-}
-
-.nx-admin-layout .nx-admin-search input:focus {
-  border-color: #315bf4;
-  background-color: #fff;
-}
-
-.nx-admin-layout .nx-admin-search i {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #94a3b8;
-  font-size: 14px;
 }
 
 /* Page content wrapper */
@@ -389,7 +359,7 @@
 
 .nx-admin-layout .nx-filter-bar input:focus,
 .nx-admin-layout .nx-filter-bar select:focus {
-  border-color: #315bf4;
+  border-color: var(--nx-primary, #315bf4);
 }
 
 /* Action Buttons */
@@ -408,7 +378,7 @@
 }
 
 .nx-admin-layout .nx-btn-primary {
-  background-color: #315bf4;
+  background-color: var(--nx-primary, #315bf4);
   color: #ffffff;
 }
 
@@ -428,7 +398,7 @@
 }
 
 .nx-admin-layout .nx-btn-danger {
-  background-color: #c6002e;
+  background-color: var(--nx-danger, #c6002e);
   color: #ffffff;
 }
 
@@ -467,8 +437,8 @@
 }
 
 .nx-admin-layout .nx-tab-btn.active {
-  color: #315bf4;
-  border-bottom-color: #315bf4;
+  color: var(--nx-primary, #315bf4);
+  border-bottom-color: var(--nx-primary, #315bf4);
   font-weight: 600;
 }
 
@@ -530,3 +500,87 @@
   justify-content: flex-end;
   gap: 10px;
 }
+
+/* Shared visual rhythm, with navigation that remains usable on smaller screens. */
+.nx-admin-layout {
+  font-size: 14px;
+  line-height: 1.5;
+  --admin-content-bg: var(--nx-background, #f8fafc);
+}
+.nx-admin-layout *, .nx-admin-layout *::before, .nx-admin-layout *::after { box-sizing: border-box; }
+.nx-admin-layout .nx-admin-sidebar { width: 244px; }
+.nx-admin-layout .nx-admin-brand { gap: 12px; min-height: 76px; text-decoration: none; }
+.nx-admin-layout .nx-admin-wordmark { color: #f8fafc; font-size: 30px; font-weight: 800; letter-spacing: -1.5px; line-height: 1; }
+.nx-admin-layout .nx-admin-wordmark > span { color: #a5b4fc; }
+.nx-admin-layout .nx-admin-brand-label { color: #cbd5e1; font-size: 12px; }
+.nx-admin-layout .nx-admin-nav-item { gap: 10px; min-height: 44px; font-size: 14px; text-decoration: none; }
+.nx-admin-layout .nx-admin-nav-item.active { box-shadow: none; }
+.nx-admin-layout .nx-admin-sidebar-footer { margin-top: auto; }
+.nx-admin-layout .nx-admin-store-link { display: inline-flex; align-items: center; gap: 8px; color: #cbd5e1; text-decoration: none; font-size: 14px; }
+.nx-admin-layout .nx-admin-store-link:hover { color: white; }
+.nx-admin-layout .nx-admin-topbar { min-height: 68px; height: auto; gap: 20px; padding-block: 12px; }
+.nx-admin-layout .nx-admin-topbar-title { color: var(--admin-text-muted); font-size: 14px; font-weight: 500; }
+.nx-admin-layout .nx-admin-topbar-account { display: flex; align-items: center; gap: 16px; min-width: 0; }
+.nx-admin-layout .nx-admin-topbar-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; font-weight: 600; }
+.nx-admin-layout .nx-admin-content { width: 100%; max-width: 1440px; margin-inline: auto; padding: 32px; }
+.nx-admin-layout .nx-page-title { font-size: 28px; line-height: 1.25; letter-spacing: -.6px; }
+.nx-admin-layout .nx-page-subtitle { font-size: 14px; line-height: 1.6; margin-top: 8px; }
+.nx-admin-layout .nx-page-header > div { min-width: 0; }
+.nx-admin-layout .nx-admin-card-header { flex-wrap: wrap; gap: 12px; }
+.nx-admin-layout .nx-stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.nx-admin-layout .nx-stat-card { min-width: 0; padding: 24px; }
+.nx-admin-layout .nx-stat-card:hover { transform: none; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+.nx-admin-layout .nx-stat-val { font-size: 30px; letter-spacing: -.6px; margin-block: 6px 0; }
+.nx-admin-layout .nx-stat-label, .nx-admin-layout .nx-admin-stat-note { color: var(--admin-text-muted); font-size: 13px; }
+.nx-admin-layout .nx-admin-stat-note { margin-top: 6px; line-height: 1.5; }
+.nx-admin-layout .nx-stat-icon { width: 40px; height: 40px; flex-shrink: 0; font-size: 19px; }
+.nx-admin-layout .nx-admin-table { min-width: 600px; font-size: 14px; }
+.nx-admin-layout .nx-admin-table th { font-size: 12px; letter-spacing: .02em; }
+.nx-admin-layout .nx-admin-table td { overflow-wrap: anywhere; }
+.nx-admin-layout .nx-admin-table .nx-admin-empty { padding: 44px 24px; color: var(--admin-text-muted); text-align: center; }
+.nx-admin-layout .nx-admin-amount { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+.nx-admin-layout .nx-btn { min-height: 40px; border-radius: 8px; font-size: 14px; font-weight: 600; }
+.nx-admin-layout .nx-btn-sm { min-height: 34px; font-size: 13px; }
+.nx-admin-layout .nx-btn:disabled { opacity: .55; cursor: not-allowed; }
+.nx-admin-layout :is(button, a, input, select, textarea):focus-visible { outline: 2px solid var(--nx-primary, #315bf4); outline-offset: 3px; }
+.nx-admin-layout .nx-tabs { overflow-x: auto; max-width: 100%; }
+.nx-admin-layout .nx-tab { white-space: nowrap; }
+.nx-admin-layout :is(input, select, textarea) { max-width: 100%; }
+
+@media (max-width: 1100px) {
+  .nx-admin-layout .nx-admin-sidebar { width: 212px; }
+  .nx-admin-layout .nx-admin-content { padding: 24px; }
+  .nx-admin-layout .nx-stat-card { padding: 18px; }
+  .nx-admin-layout .nx-stat-icon { display: none; }
+}
+@media (max-width: 900px) {
+  .nx-admin-layout { flex-direction: column; }
+  .nx-admin-layout .nx-admin-sidebar { width: 100%; }
+  .nx-admin-layout .nx-admin-brand { min-height: 60px; padding: 16px 24px; justify-content: flex-start; }
+  .nx-admin-layout .nx-admin-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 8px 16px 16px; }
+  .nx-admin-layout .nx-admin-nav-item { margin: 0; padding: 10px; font-size: 13px; }
+  .nx-admin-layout .nx-admin-sidebar-footer { padding: 0 24px 16px; border-top: 0; }
+  .nx-admin-layout .nx-admin-topbar { position: static; padding-inline: 24px; }
+}
+@media (max-width: 600px) {
+  .nx-admin-layout .nx-admin-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-inline: 10px; }
+  .nx-admin-layout .nx-admin-brand { padding-inline: 16px; }
+  .nx-admin-layout .nx-admin-content { padding: 24px 16px; }
+  .nx-admin-layout .nx-admin-topbar { padding-inline: 16px; gap: 8px; }
+  .nx-admin-layout .nx-admin-topbar-account { gap: 8px; }
+  .nx-admin-layout .nx-admin-topbar-name { max-width: 130px; font-size: 13px; }
+  .nx-admin-layout .nx-admin-topbar-account button span { display: none; }
+  .nx-admin-layout .nx-page-title { font-size: 25px; }
+  .nx-admin-layout .nx-stat-grid { grid-template-columns: 1fr; gap: 12px; }
+  .nx-admin-layout .nx-stat-card { padding: 18px 20px; }
+  .nx-admin-layout .nx-stat-icon { display: flex; }
+  .nx-admin-layout .nx-stat-val { font-size: 28px; }
+  .nx-admin-layout .nx-admin-card-header { padding: 16px; }
+  .nx-admin-layout .nx-modal-overlay { padding: 12px; }
+  .nx-admin-layout .nx-modal-footer { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nx-admin-layout * { scroll-behavior: auto; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}
+.nx-admin-layout .nx-stat-icon { color: var(--nx-primary, #315bf4); background: #eef2ff; }
+.nx-admin-layout .nx-stat-val.nx-stat-val-unavailable { font-size: 18px; line-height: 1.5; letter-spacing: 0; color: var(--admin-text-muted); }

@@ -10,16 +10,27 @@ import PublicRoutes from './PublicRoutes';
 import AuthBackgroundLayout from './AuthBackgroundLayout';
 import NotFoundPage from '../../shared/pages/NotFoundPage';
 
+import ComingSoonPreviewPage from '../../shared/pages/preview';
+
 const routes: RouteObject[] = [
-  { element: <PublicRoutes />, children: [
-    { element: <AuthBackgroundLayout />, children: [
-      { path: '/oauth2/callback', element: <GoogleCallbackPage /> },
-      { path: '/login', element: <LoginPage /> },
-      { path: '/register', element: <RegisterPage /> },
-      { path: '*', element: <NotFoundPage /> },
-    ] },
-    ...buyerRoutes,
-  ] },
+
+  ...(import.meta.env.DEV
+    ? [{ path: '/preview', element: <ComingSoonPreviewPage /> }]
+    : []),
+
+  {
+    element: <PublicRoutes />, children: [
+      {
+        element: <AuthBackgroundLayout />, children: [
+          { path: '/oauth2/callback', element: <GoogleCallbackPage /> },
+          { path: '/login', element: <LoginPage /> },
+          { path: '/register', element: <RegisterPage /> },
+          { path: '*', element: <NotFoundPage /> },
+        ]
+      },
+      ...buyerRoutes,
+    ]
+  },
   ...sellerRoutes,
   ...administratorRoutes,
 ];

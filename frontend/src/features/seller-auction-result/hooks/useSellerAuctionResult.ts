@@ -33,5 +33,5 @@ export function useSellerAuctionResult() {
     catch (error) { if (!controller.signal.aborted) setBidError(apiErrorMessage(error)); } finally { if (!controller.signal.aborted) setBidLoading(false); }
   };
   return { result, error, loading, retry: () => setRetry(value => value + 1), action, checked, setChecked, openAction: setAction, closeDialog: () => setAction(null), openSupport: () => setAction('support'), bidLoading, bidError, loadMoreBids,
-    dialogContent: action ? { title: action === 'bids' ? 'Lịch sử trả giá hợp lệ' : 'Tính năng chưa được hỗ trợ', description: action === 'bids' ? 'Dữ liệu máy chủ, mới nhất trước.' : 'Chưa có API cho thao tác này trên trang kết quả. Không có yêu cầu hay thay đổi nào được gửi.' } : null };
+    dialogContent: action ? { title: action === 'bids' ? 'Lịch sử trả giá hợp lệ' : 'Tính năng chưa được hỗ trợ', description: action === 'bids' ? 'Dữ liệu máy chủ, mới nhất trước.' : `${{ shipping: 'Chuẩn bị hàng đóng gói', message: 'Nhắn tin cho người thắng', receipt: 'In biên bản chốt thầu (PDF)', support: 'Liên hệ Nexus', protection: 'Xem chính sách bảo vệ người bán' }[action]} chưa được hỗ trợ. Không có yêu cầu hay thay đổi nào được gửi.` } : null };
 }

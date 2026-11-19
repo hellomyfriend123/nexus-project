@@ -10,7 +10,7 @@ export function AdminCommerceCouponsPanel(model: ReturnType<typeof useAdminComme
                 <div>
                   <h2 className="nx-admin-card-title">Quản lý Voucher & Mã giảm giá (Discount Codes)</h2>
                   <p style={{ margin: '4px 0 0 0', fontSize: '12.5px', color: '#64748b' }}>
-                    Mã giảm giá cụ thể người mua nhập khi đặt hàng (FR-47, FR-58). Có thể trực thuộc một Chiến dịch hoặc áp dụng độc lập toàn sàn.
+                    Mã giảm giá cụ thể người mua nhập khi đặt hàng. Có thể trực thuộc một Chiến dịch hoặc áp dụng độc lập toàn sàn.
                   </p>
                 </div>
                 <button
@@ -137,7 +137,7 @@ export function AdminCommerceCouponsPanel(model: ReturnType<typeof useAdminComme
                                 type="button"
                                 className="nx-btn nx-btn-outline nx-btn-sm"
                                 onClick={() => handleOpenEditCoupon(c)}
-                                title="Chỉnh sửa mã giảm giá (PUT /api/v1/admin/commerce/discount-codes/{id})"
+                                title="Chỉnh sửa mã giảm giá"
                               >
                                 <i className="bi bi-pencil"></i> Sửa
                               </button>
@@ -145,7 +145,7 @@ export function AdminCommerceCouponsPanel(model: ReturnType<typeof useAdminComme
                                 type="button"
                                 className="nx-btn nx-btn-outline nx-btn-sm"
                                 onClick={() => handleToggleCoupon(c.id, c.status)}
-                                title="Bật/Tắt trạng thái (PATCH /api/v1/admin/commerce/discount-codes/{id}/status)"
+                                title="Bật/Tắt trạng thái"
                               >
                                 <i className="bi bi-toggle-on"></i> {c.status === 'ACTIVE' ? 'Tắt' : 'Bật'}
                               </button>

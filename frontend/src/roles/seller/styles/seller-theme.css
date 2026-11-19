@@ -1,141 +1,73 @@
-﻿/* Seller visual foundation. Values follow the approved Seller Listing screen.
-   Scoped to page content: shared Header/Footer and Buyer screens are untouched. */
-.nx-seller-layout {
+/* Shared seller tokens and controls. Header and footer retain their shared styling. */
+.nx-buyer-layout.nx-seller-layout {
+  min-width: 0;
   --seller-ui-primary: #074ada;
-  --seller-ui-primary-hover: #3665f3;
-  --seller-ui-primary-soft: #dce1ff;
-  --seller-ui-secondary: #ba081f;
-  --seller-ui-secondary-hover: #de2c34;
-  --seller-ui-secondary-soft: #ffdad7;
-  --seller-ui-tertiary: #7d4e00;
-  --seller-ui-tertiary-soft: #ffddb8;
-  --seller-ui-surface: #fcf9f8;
+  --seller-ui-primary-hover: #073db2;
+  --seller-ui-primary-soft: #e9efff;
+  --seller-ui-secondary: #b42336;
+  --seller-ui-secondary-hover: #8f1b2b;
+  --seller-ui-secondary-soft: #fff0f1;
+  --seller-ui-tertiary: #79500d;
+  --seller-ui-tertiary-soft: #fff3db;
+  --seller-ui-surface: #f7f8fa;
   --seller-ui-card: #fff;
-  --seller-ui-field: #f6f3f2;
-  --seller-ui-neutral: #f0eded;
-  --seller-ui-border: #eae7e7;
-  --seller-ui-text: #1c1b1b;
-  --seller-ui-muted: #434655;
-  --seller-ui-outline: #747686;
-  --seller-ui-card-radius: .75rem;
-  --seller-ui-field-radius: .5rem;
-  --seller-ui-pill-radius: 9999px;
-  --seller-ui-card-shadow: 0 1px 3px rgba(0, 0, 0, .06);
-  --seller-ui-button-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+  --seller-ui-field: #f7f8fa;
+  --seller-ui-neutral: #f0f2f6;
+  --seller-ui-border: #e2e6ed;
+  --seller-ui-text: #202938;
+  --seller-ui-muted: #586476;
+  --seller-ui-outline: #778396;
 }
-
-/* These two pages retain their existing grid/table geometry. */
-.nx-seller-layout :is(.nx-seller-page, .nx-stock-page) {
-  background: var(--seller-ui-surface);
-  color: var(--seller-ui-text);
-  padding-top: 24px;
-  padding-bottom: 54px;
+.nx-seller-layout :is(.nx-seller-page,.nx-stock-page,.nx-listing-page,.sca-page,.nx-auction-result,.nx-success-page) {
+  background: var(--seller-ui-surface); color: var(--seller-ui-text);
+  font: inherit; line-height: 1.5; padding: 32px 0 56px; min-width: 0;
 }
-.nx-seller-layout :is(.nx-seller-page, .nx-stock-page) :focus-visible {
-  outline: 2px solid var(--seller-ui-primary);
-  outline-offset: 1px;
+.nx-seller-layout :is(.nx-seller-page,.nx-stock-page,.nx-listing-page,.sca-page,.nx-auction-result,.nx-success-page) :focus-visible {
+  outline: 2px solid var(--seller-ui-primary); outline-offset: 3px;
 }
-.nx-seller-layout :is(.nx-seller-page, .nx-stock-page) button {
-  font-family: inherit;
-  cursor: pointer;
+.nx-seller-layout :is(.nx-seller-page,.nx-stock-page,.nx-listing-page,.sca-page,.nx-auction-result,.nx-success-page) button {
+  font: inherit; cursor: pointer;
 }
-.nx-seller-layout :is(.nx-seller-page, .nx-stock-page) button:disabled {
-  cursor: not-allowed;
-  opacity: .55;
+.nx-seller-layout button:disabled { cursor: not-allowed; }
+.nx-seller-layout .nx-seller-back { display: inline-block; margin-bottom: 12px; color: var(--seller-ui-muted); font-size: 14px; }
+.nx-seller-layout .nx-seller-back:hover { color: var(--seller-ui-primary); }
+.nx-seller-layout .nx-seller-muted { color: var(--seller-ui-muted); }
+.nx-seller-layout :is(.nx-seller-primary,.nx-seller-button,.nx-listing-btn--primary) {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px;
+  border: 1px solid transparent; border-radius: 8px; padding: 10px 18px;
+  background: var(--seller-ui-primary); color: white; font-size: 14px; font-weight: 600; text-decoration: none;
 }
-.nx-seller-layout :is(.nx-seller-heading, .nx-stock-heading) h1 {
-  font-size: 30px;
-  line-height: 38px;
-  font-weight: 700;
-  letter-spacing: -.015em;
+.nx-seller-layout :is(.nx-seller-primary,.nx-seller-button,.nx-listing-btn--primary):hover { background: var(--seller-ui-primary-hover); color: white; }
+.nx-seller-layout :is(.nx-seller-primary,.nx-seller-button,.nx-listing-btn--primary):disabled { opacity: .55; }
+.nx-seller-layout .nx-seller-secondary {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 44px;
+  padding: 10px 16px; background: white; border: 1px solid var(--seller-ui-border); border-radius: 8px;
+  color: var(--seller-ui-text); font-weight: 600;
 }
-.nx-seller-layout :is(.nx-seller-heading, .nx-stock-heading-copy) > p,
-.nx-seller-layout .nx-seller-heading-copy > p {
-  font-size: 14px;
-  line-height: 20px;
-  color: var(--seller-ui-muted);
-}
-.nx-seller-layout :is(.nx-seller-card, .nx-seller-kpi, .nx-seller-inventory,
-  .nx-seller-panel-kpi, .nx-seller-report-card, .nx-stock-kpi,
-  .nx-stock-table-card, .nx-stock-tip) {
-  background: var(--seller-ui-card);
-  border-radius: var(--seller-ui-card-radius);
-  box-shadow: var(--seller-ui-card-shadow);
-}
-.nx-seller-layout :is(.nx-seller-listing-head, .nx-seller-panel-heading,
-  .nx-seller-report-head) h2 {
-  font-size: 18px;
-  line-height: 24px;
-  font-weight: 600;
-}
-.nx-seller-layout :is(.nx-seller-button, .nx-stock-button) {
-  border-radius: var(--seller-ui-pill-radius);
-  padding: 10px 16px;
-  font-size: 13px !important;
-  line-height: 16px;
-  font-weight: 600 !important;
-  box-shadow: var(--seller-ui-button-shadow);
-  transition: background .2s, box-shadow .2s;
-}
-.nx-seller-layout .nx-seller-button {
-  background: var(--seller-ui-primary);
-  color: var(--seller-ui-card);
-}
-.nx-seller-layout .nx-seller-button:hover {
-  background: var(--seller-ui-primary-hover);
-  filter: none;
-}
-.nx-seller-layout .nx-seller-button--red,
-.nx-seller-layout .nx-stock-button--red {
-  background: var(--seller-ui-secondary);
-  color: var(--seller-ui-card);
-}
-.nx-seller-layout .nx-seller-button--red:hover,
-.nx-seller-layout .nx-stock-button--red:hover {
-  background: var(--seller-ui-secondary-hover);
-}
-.nx-seller-layout .nx-stock-button--soft-red {
-  background: var(--seller-ui-secondary-soft);
-  color: var(--seller-ui-secondary);
-}
-.nx-seller-layout :is(.nx-seller-tab, .nx-seller-chip, .nx-stock-tabs button) {
-  border-radius: var(--seller-ui-pill-radius);
-}
-.nx-seller-layout :is(.nx-seller-tab, .nx-seller-chip, .nx-stock-tabs button).is-active {
-  background: var(--seller-ui-primary);
-  color: var(--seller-ui-card);
-}
-.nx-seller-layout :is(.nx-seller-listing-fields input, .nx-seller-listing-fields select,
-  .nx-seller-toolbar select, .nx-stock-filter-row select, .nx-stock-search) {
-  background: var(--seller-ui-field);
-  border: 0;
-  border-radius: var(--seller-ui-field-radius);
-  color: var(--seller-ui-text);
-}
-.nx-seller-layout :is(.nx-seller-listing-fields input, .nx-seller-listing-fields select,
-  .nx-seller-toolbar select, .nx-stock-filter-row select) {
-  font-size: 14px;
-  line-height: 20px;
-}
-.nx-seller-layout :is(.nx-seller-search, .nx-stock-search):focus-within {
-  background: var(--seller-ui-card);
-  box-shadow: 0 0 0 2px var(--seller-ui-primary);
-}
-.nx-seller-layout .nx-stock-context {
-  font-size: 12px;
-  line-height: 16px;
-  color: var(--seller-ui-muted);
-  border-color: var(--seller-ui-border);
-}
-.nx-seller-layout :is(.nx-seller-table, .nx-stock-table) th {
-  background: var(--seller-ui-field);
-  color: var(--seller-ui-muted);
-}
-.nx-seller-layout :is(.nx-seller-table, .nx-stock-table) td {
-  border-color: var(--seller-ui-border);
-}
-.nx-seller-layout :is(.nx-seller-pro, .nx-stock-pro) {
-  background: var(--seller-ui-primary-soft);
-  color: var(--seller-ui-primary);
-  border-radius: var(--seller-ui-pill-radius);
+.nx-seller-layout .nx-seller-secondary:hover { background: var(--seller-ui-neutral); }
+.nx-seller-layout .nx-seller-danger { color: var(--seller-ui-secondary) !important; }
+.nx-seller-layout .nx-seller-alert { padding: 14px 18px; background: #fff1f2; border: 1px solid #f5cbd1; border-radius: 8px; color: #8a1c2a; }
+.nx-seller-layout .nx-seller-alert p { margin: 0; }
+.nx-seller-layout .nx-seller-alert button { margin-top: 10px; border: 1px solid currentColor; border-radius: 6px; padding: 6px 12px; background: transparent; color: inherit; }
+.nx-seller-layout .nx-seller-success { padding: 14px 18px; background: #ecf8f1; border: 1px solid #c5e5d1; border-radius: 8px; color: #23613b; }
+.nx-seller-layout .nx-seller-form-fields { display: flex; flex-direction: column; gap: 24px; border: 0; padding: 0; margin: 0; min-width: 0; }
+.nx-seller-layout .nx-seller-form-fields:disabled { opacity: .72; }
+.nx-seller-layout .nx-seller-form-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 24px; }
+.nx-seller-layout .nx-seller-form-actions > a { color: var(--seller-ui-muted); }
+.nx-seller-layout .nx-seller-form-actions > button:not(.nx-seller-primary):not(.nx-listing-btn--primary) { border: 0; background: transparent; color: var(--seller-ui-muted); padding: 10px 16px; }
+.nx-seller-layout .nx-seller-action-list { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 6px 14px; }
+.nx-seller-layout .nx-seller-action-list :is(a,button), .nx-seller-layout .nx-seller-text-button { border: 0; padding: 5px 0; background: transparent; color: var(--seller-ui-primary); font-size: 13px; text-align: left; white-space: nowrap; }
+.nx-seller-layout .nx-seller-action-list :is(a,button):hover { text-decoration: underline; }
+.nx-seller-layout .nx-seller-dialog { width: min(600px,calc(100% - 32px)); padding: 28px; border: 1px solid var(--seller-ui-border); border-radius: 14px; color: var(--seller-ui-text); max-height: calc(100dvh - 48px); overflow-y: auto; box-shadow: 0 24px 80px #13213d33; }
+.nx-seller-layout .nx-seller-dialog::backdrop { background: #17223966; }
+.nx-seller-layout .nx-seller-dialog-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.nx-seller-layout .nx-seller-dialog h2 { margin: 0; font-size: 22px; }
+.nx-seller-layout .nx-seller-dialog-heading button { border: 0; background: transparent; font-size: 28px; width: 40px; height: 40px; }
+.nx-seller-layout .nx-seller-dialog label { display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 600; }
+.nx-seller-layout .nx-seller-dialog :is(input,select,textarea) { width: 100%; padding: 11px 12px; border: 1px solid var(--seller-ui-border); border-radius: 8px; background: white; font: inherit; font-weight: 400; }
+@media(max-width:767px) {
+  .nx-seller-layout :is(.nx-seller-page,.nx-stock-page,.nx-listing-page,.sca-page,.nx-auction-result,.nx-success-page) { padding-top: 24px; padding-bottom: 40px; }
+  .nx-seller-layout .nx-seller-form-actions { flex-wrap: wrap; }
+  .nx-seller-layout .nx-seller-form-actions > :last-child { margin-left: auto; }
+  .nx-seller-layout .nx-seller-dialog { padding: 20px; }
 }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getSession } from '../../../services/api/auth';
 import { notify } from '../../../shared/components/Toast';
 import { sellerApi, productImagesForUpdate, loadSellerInventory, loadSellerOrders, flatCategories, messageOf, loadSellerAuctions, mutateAuction, cancelAuction } from '../../../services/api/seller';
@@ -9,7 +9,10 @@ import type { PendingProductCreation } from '../../../shared/utils/productCreati
 import type { ListingDraft, ProductStatus, SellerTabId, SellerProduct, SellerOrder, SellerAuction } from '../types/sellerHub';
 export function useSellerHub() {
  const navigate=useNavigate();const [auctions,setAuctions]=useState<SellerAuction[]>([]);
- const [activeTab,setActiveTab]=useState<SellerTabId>('products');
+ const [params,setParams]=useSearchParams();
+ const activeTab: SellerTabId = params.get('tab')==='orders'?'orders':params.get('tab')==='auctions'?'auctions':'products';
+ const setActiveTab = (tab: SellerTabId) => { const next = new URLSearchParams(params); next.set('tab', tab); setParams(next); };
+ const [auctionLoading,setAuctionLoading]=useState(true);const [auctionError,setAuctionError]=useState('');
  const [products,setProducts]=useState<SellerProduct[]>([]);
  const [apiOrders,setApiOrders]=useState<Order[]>([]);
  const [categories,setCategories]=useState<Category[]>([]);
@@ -25,9 +28,9 @@ export function useSellerHub() {
  setApiOrders(orders);setCategories(flatCategories(cats).filter(c=>c.status==='ACTIVE'));
  setProducts(data.inventories.map(row=>{const p=data.products.get(row.productId)!;return {id:row.id,productId:p.id,description:p.description??'',images:p.images,primaryImageUrl:p.primaryImageUrl,name:p.name,sku:row.skuCode,category:p.categoryName,image:p.primaryImageUrl??p.images[0]??'',stock:row.availableQuantity,status:row.availableQuantity===0||row.status==='LOW_STOCK'?'low':'ready',price:Number(p.basePrice),note:p.status};}));
  }).catch(e=>{if(!controller.signal.aborted){setError(messageOf(e));notify.warning(messageOf(e));}}).finally(()=>{if(!controller.signal.aborted)setLoading(false);});return()=>controller.abort();},[]);
- const mockAction=(label:string)=>label.includes('Tạo phiên')?void auctionAction(label):notify.info(label+' — chưa có API hỗ trợ trong màn hình này.');
+ const mockAction=(label:string)=>label.includes('Tạo phiên')?void auctionAction(label):notify.info(label+' chưa được hỗ trợ.');
  const visibleProducts=useMemo(()=>{const q=search.trim().toLocaleLowerCase('vi');const rows=products.filter(p=>(p.name+' '+p.sku).toLocaleLowerCase('vi').includes(q)&&(status==='all'||p.status===status as ProductStatus));if(sort!=='default')rows.sort((a,b)=>sort==='stock-desc'?b.stock-a.stock:a.stock-b.stock);return rows;},[products,search,status,sort]);
- useEffect(()=>{const c=new AbortController();const userId=getSession()?.userId;if(!userId)return;loadSellerAuctions(userId,c.signal).then(async rows=>{const mapped=await Promise.all(rows.map(async a=>{const p=await sellerApi.product(a.productId,c.signal);return{id:a.id,productId:a.productId,startTime:a.startTime,endTime:a.endTime,backendStatus:a.status,roomCode:a.id,product:p.name,sku:'—',image:p.primaryImageUrl??p.images[0]??'',currentBid:Number(a.currentPrice),startPrice:Number(a.startingPrice),bids:a.acceptedBidCount??0,watchers:'Chưa có API',endsIn:new Date(a.endTime).toLocaleString('vi-VN'),state:a.status==='ACTIVE'?'live' as const:a.status as SellerAuction['state'],topBidder:a.highestBidderId??'—'};}));setAuctions(mapped);}).catch(e=>{if(!c.signal.aborted)notify.warning(messageOf(e));});return()=>c.abort();},[]);
+ useEffect(()=>{const c=new AbortController();const userId=getSession()?.userId;if(!userId){setAuctionLoading(false);return;}loadSellerAuctions(userId,c.signal).then(async rows=>{const mapped=await Promise.all(rows.map(async a=>{const p=await sellerApi.product(a.productId,c.signal);return{id:a.id,productId:a.productId,startTime:a.startTime,endTime:a.endTime,backendStatus:a.status,roomCode:a.id,product:p.name,sku:'N/A',image:p.primaryImageUrl??p.images[0]??'',currentBid:Number(a.currentPrice),startPrice:Number(a.startingPrice),bids:a.acceptedBidCount??0,watchers:'Thống kê người theo dõi chưa được hỗ trợ.',endsIn:new Date(a.endTime).toLocaleString('vi-VN'),state:a.status==='ACTIVE'?'live' as const:a.status as SellerAuction['state'],topBidder:a.highestBidderId??'N/A'};}));setAuctions(mapped);}).catch(e=>{if(!c.signal.aborted){setAuctionError(messageOf(e));notify.warning(messageOf(e));}}).finally(()=>{if(!c.signal.aborted)setAuctionLoading(false);});return()=>c.abort();},[]);
  const visibleAuctions=auctions.filter(a=>auctionFilter==='all'||a.state===auctionFilter);
  async function auctionAction(label:string,id?:string){if(!id&&label.includes('Tạo phiên')){navigate('/seller/auctions/new');return;}if(mutationLock.current)return;const row=auctions.find(a=>a.id===id);if(label==='Sàn bid'&&id){navigate('/products/'+row?.productId+'?auctionId='+encodeURIComponent(id));return;}mutationLock.current=true;try{if(label==='Hủy phiên'&&id){if(!window.confirm('Hủy phiên đấu giá này?'))return;await cancelAuction(id);setAuctions(old=>old.map(a=>a.id===id?{...a,state:'CANCELLED',backendStatus:'CANCELLED'}:a));notify.success('Đã hủy phiên.');return;}
  if(label==='Chỉnh sửa phiên'&&row?.backendStatus!=='SCHEDULED'){notify.info('Chỉ được sửa phiên SCHEDULED.');return;}
@@ -38,7 +41,7 @@ export function useSellerHub() {
  }catch(e){notify.warning(messageOf(e));}finally{mutationLock.current=false;}}
 
  const statusMap:Record<string,SellerOrder['status']>={PENDING:'pending',CONFIRMED:'packing',SHIPPING:'shipping',COMPLETED:'done',CANCELLED:'cancelled'};
- const orders:SellerOrder[]=apiOrders.map(o=>({id:o.id,code:o.orderNumber,buyer:o.receiverName??'Xem chi tiết đơn',contact:o.receiverPhone??'—',items:o.items?.map(i=>i.productNameSnapshot).join(', ')??'Xem chi tiết đơn',itemCount:String(o.itemCount??o.items?.length??'—'),total:Number(o.totalAmount),method:'Xem chi tiết vận chuyển',express:false,status:statusMap[o.status]??'pending',placedAt:new Date(o.createdAt).toLocaleString('vi-VN'),deadline:'—'}));
+ const orders:SellerOrder[]=apiOrders.map(o=>({id:o.id,code:o.orderNumber,buyer:o.receiverName??'Xem chi tiết đơn',contact:o.receiverPhone??'N/A',items:o.items?.map(i=>i.productNameSnapshot).join(', ')??'Xem chi tiết đơn',itemCount:String(o.itemCount??o.items?.length??'N/A'),total:Number(o.totalAmount),method:'Xem chi tiết vận chuyển',express:false,status:statusMap[o.status]??'pending',placedAt:new Date(o.createdAt).toLocaleString('vi-VN'),deadline:'N/A'}));
  const visibleOrders=orders.filter(o=>orderFilter==='all'||o.status===orderFilter);const pendingOrders=orders.filter(o=>o.status==='pending').length;
  const orderCounts=Object.fromEntries(['all','pending','packing','shipping','done','cancelled'].map(s=>[s,s==='all'?orders.length:orders.filter(o=>o.status===s).length]));
  function updateDraft<K extends keyof ListingDraft>(key:K,value:ListingDraft[K]){setDraft(p=>({...p,[key]:value}));}
@@ -49,7 +52,7 @@ export function useSellerHub() {
  if(mutationLock.current)return;
  const price=Number(draft.price),quantity=Number(draft.stock);
  if(!draft.name.trim()||!Number.isFinite(price)||price<=0||!draft.stock||!Number.isInteger(quantity)||quantity<0||!categories.some(c=>c.id===draft.category)){notify.warning('Nhập tên, danh mục, giá và tồn kho hợp lệ.');return;}
- if(draft.makeOffer||!draft.buyNow){notify.warning('Chỉ hỗ trợ mua ngay. Backend chưa có cấu hình trả giá trong sản phẩm.');return;}
+ if(draft.makeOffer||!draft.buyNow){notify.warning('Cấu hình trả giá chưa được hỗ trợ. Vui lòng chọn mua ngay.');return;}
  const skuCode=window.prompt('Nhập mã SKU cho sản phẩm (bắt buộc, tối đa 100 ký tự):')?.trim();if(!skuCode)return;if(skuCode.length>100){notify.warning('Mã SKU tối đa 100 ký tự.');return;}
  mutationLock.current=true;setBusy(true);
  try{
@@ -75,6 +78,6 @@ export function useSellerHub() {
  mockAction(label);
  }catch(e){notify.warning(messageOf(e));}finally{mutationLock.current=false;setBusy(false);}}
  function focusListing(){setCollapsed(false);requestAnimationFrame(()=>nameRef.current?.focus());}
- return {auctionAction,page,setPage,totalPages:Math.max(1,Math.ceil(visibleProducts.length/10)),orderPage,setOrderPage,orderPages:Math.max(1,Math.ceil(visibleOrders.length/10)),productAction,loading,error,busy,categories,activeTab,setActiveTab,draft,updateDraft,search,setSearch,status,setStatus,sort,setSort,selected,toggleSelected,toggleAll,collapsed,setCollapsed,imageNames,setImageNames,nameRef,visibleProducts:visibleProducts.slice((Math.min(page,Math.max(1,Math.ceil(visibleProducts.length/10)))-1)*10,Math.min(page,Math.max(1,Math.ceil(visibleProducts.length/10)))*10),changeStock,submitListing,focusListing,mockAction,auctionFilter,setAuctionFilter,visibleAuctions,orderFilter,setOrderFilter,visibleOrders:visibleOrders.slice((Math.min(orderPage,Math.max(1,Math.ceil(visibleOrders.length/10)))-1)*10,Math.min(orderPage,Math.max(1,Math.ceil(visibleOrders.length/10)))*10),pendingOrders,orderCounts,reportRange,setReportRange};
+ return {auctionLoading,auctionError,inventoryCount:products.length,lowStockCount:products.filter(p=>p.stock<=5).length,auctionAction,page,setPage,totalPages:Math.max(1,Math.ceil(visibleProducts.length/10)),orderPage,setOrderPage,orderPages:Math.max(1,Math.ceil(visibleOrders.length/10)),productAction,loading,error,busy,categories,activeTab,setActiveTab,draft,updateDraft,search,setSearch,status,setStatus,sort,setSort,selected,toggleSelected,toggleAll,collapsed,setCollapsed,imageNames,setImageNames,nameRef,visibleProducts:visibleProducts.slice((Math.min(page,Math.max(1,Math.ceil(visibleProducts.length/10)))-1)*10,Math.min(page,Math.max(1,Math.ceil(visibleProducts.length/10)))*10),changeStock,submitListing,focusListing,mockAction,auctionFilter,setAuctionFilter,visibleAuctions,orderFilter,setOrderFilter,visibleOrders:visibleOrders.slice((Math.min(orderPage,Math.max(1,Math.ceil(visibleOrders.length/10)))-1)*10,Math.min(orderPage,Math.max(1,Math.ceil(visibleOrders.length/10)))*10),pendingOrders,orderCounts,reportRange,setReportRange};
 }
 export type SellerHubState=ReturnType<typeof useSellerHub>;

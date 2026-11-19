@@ -1,4 +1,4 @@
-﻿import assert from 'node:assert/strict';
+import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -37,15 +37,15 @@ test('live listing starts with empty commercial fields while preserved design fi
   assert.equal(hook.draft.quantity, 1);
   assert.equal(hook.category, ''); assert.deepEqual(hook.categories, []); assert.deepEqual(hook.media, []);
   assert.deepEqual(hook.saleModes, ['fixed']);
-  assert.equal(hook.draft.brand, fixtures.initialListingDraft.brand);
-  assert.deepEqual(hook.accessories, fixtures.listingAccessories);
+  for (const field of ['brand','shutter','warranty','origin','weight','length','width','height']) assert.equal(hook.draft[field], '', field);
+  assert.deepEqual(hook.accessories, []);
   assert.equal(constants.listingSaleModes.find(mode => mode.id === 'auction').enabled, false);
   hook.toggleSaleMode('offer'); hook = render(); await hook.submitListing(); hook = render();
   assert.ok(hook.errors.some(message => message.includes('chỉ hỗ trợ mua ngay')), 'offer must not be silently persisted as supported');
   const source = readSource('features/seller-listing/hooks/useCreateListing.ts');
   const input = source.slice(source.indexOf('const input='), source.indexOf('assertProductRetryMatches(pendingProduct'));
   assert.match(input, /name:draft.title.trim\(\)/); assert.match(input, /description:draft.description.trim\(\)/);
-  assert.match(input, /basePrice:draft.dealPrice/); assert.match(input, /categoryId:category/);
+  assert.match(input, /basePrice:draft.price/); assert.match(input, /categoryId:category/);
   assert.doesNotMatch(input, /accessories|shipping|condition|warranty|serviceFee|minOffer|listingWallet/);
   const cart = await server.ssrLoadModule('/src/features/cart/constants/cart.constants.ts');
   assert.deepEqual(cart.shippingMethods, []);

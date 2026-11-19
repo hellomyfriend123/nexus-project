@@ -24,14 +24,13 @@ export function useAdminCommerce() {
   const [activeTab, setActiveTab] = useState<'orders' | 'campaigns' | 'coupons'>('orders');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [isUsingRealApi, setIsUsingRealApi] = useState(false);
 
   // Orders State (4 tasks)
   const [orders, setOrders] = useState<DetailedAdminOrder[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<DetailedAdminOrder | null>(null);
   const [orderStatusFilter, setOrderStatusFilter] = useState('ALL');
 
-  // Campaigns State (FR-46, FR-58)
+  // Campaigns State
   const [campaigns, setCampaigns] = useState<DetailedAdminCampaign[]>([]);
   const [selectedCampaign, setSelectedCampaign] = useState<DetailedAdminCampaign | null>(null);
   const [showCampaignModal, setShowCampaignModal] = useState(false);
@@ -44,7 +43,7 @@ export function useAdminCommerce() {
     status: 'ACTIVE' as CampaignStatus,
   });
 
-  // Coupons State (FR-47, FR-58)
+  // Coupons State
   const [coupons, setCoupons] = useState<DetailedAdminCoupon[]>([]);
   const [selectedCoupon, setSelectedCoupon] = useState<DetailedAdminCoupon | null>(null);
   const [showCouponModal, setShowCouponModal] = useState(false);
@@ -77,7 +76,6 @@ export function useAdminCommerce() {
         if (!isCurrent()) return;
         if (res && Array.isArray(res.content)) {
           setOrders(res.content as DetailedAdminOrder[]);
-          setIsUsingRealApi(true);
         } else {
           setOrders([]);
         }
@@ -86,7 +84,6 @@ export function useAdminCommerce() {
         if (!isCurrent()) return;
         if (res && Array.isArray(res.content)) {
           setCampaigns(res.content as any);
-          setIsUsingRealApi(true);
         } else {
           setCampaigns([]);
         }
@@ -101,7 +98,6 @@ export function useAdminCommerce() {
         if (campRes.status === 'rejected') throw campRes.reason;
         if (couponRes.status === 'fulfilled' && Array.isArray(couponRes.value?.content)) {
           setCoupons(couponRes.value.content as any);
-          setIsUsingRealApi(true);
         } else {
           setCoupons([]);
         }
@@ -112,7 +108,6 @@ export function useAdminCommerce() {
     } catch (error) {
       if (!isCurrent()) return;
       setError(error instanceof Error ? error.message : 'Không thể tải dữ liệu.');
-      setIsUsingRealApi(false);
       if (activeTab === 'orders') setOrders([]);
       else if (activeTab === 'campaigns') setCampaigns([]);
       else if (activeTab === 'coupons') setCoupons([]);
@@ -156,7 +151,7 @@ export function useAdminCommerce() {
         setSelectedOrder((prev) => (prev ? { ...prev, status: newStatus } : null));
       }
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+      const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
       alert(`Không thể đổi trạng thái đơn hàng:\n${errorMsg}`);
     }
   };
@@ -165,19 +160,19 @@ export function useAdminCommerce() {
     if (confirm('Xác nhận huỷ đơn hàng này? Hệ thống sẽ hoàn tiền cho người mua.')) {
       try {
         await adminCommerceApi.cancelOrder(id);
-        alert(`Đã huỷ đơn hàng #${id} qua REST API!`);
+        alert(`Đã huỷ đơn hàng #${id}!`);
         loadData();
         if (selectedOrder && selectedOrder.id === id) {
           setSelectedOrder((prev) => (prev ? { ...prev, status: 'CANCELLED' } : null));
         }
       } catch (err: unknown) {
-        const errorMsg = err instanceof Error ? err.message : 'Lỗi huỷ đơn hàng từ Backend';
+        const errorMsg = err instanceof Error ? err.message : 'Lỗi huỷ đơn hàng';
         alert(`Không thể huỷ đơn hàng:\n${errorMsg}`);
       }
     }
   };
 
-  // CAMPAIGN HANDLERS (FR-46, FR-58)
+  // CAMPAIGN HANDLERS
   const handleOpenCreateCampaign = () => {
     detailRevision.current += 1;
     setSelectedCampaign(null);
@@ -225,10 +220,10 @@ export function useAdminCommerce() {
     if (confirm('Bạn muốn kết thúc chiến dịch khuyến mãi này? Trạng thái sẽ chuyển thành ENDED.')) {
       try {
         await adminCommerceApi.endCampaign(id);
-        alert('Đã kết thúc chiến dịch khuyến mãi qua REST API!');
+        alert('Đã kết thúc chiến dịch khuyến mãi!');
         loadData();
       } catch (err: unknown) {
-        const errorMsg = err instanceof Error ? err.message : 'Lỗi kết thúc chiến dịch từ Backend';
+        const errorMsg = err instanceof Error ? err.message : 'Lỗi kết thúc chiến dịch';
         alert(`Không thể kết thúc chiến dịch:\n${errorMsg}`);
       }
     }
@@ -250,20 +245,20 @@ export function useAdminCommerce() {
 
       if (selectedCampaign) {
         await adminCommerceApi.updateCampaign(selectedCampaign.id, payload);
-        alert('Đã cập nhật chiến dịch khuyến mãi thành công qua REST API!');
+        alert('Đã cập nhật chiến dịch khuyến mãi thành công!');
       } else {
         await adminCommerceApi.createCampaign(payload);
-        alert('Đã tạo chiến dịch khuyến mãi mới qua REST API!');
+        alert('Đã tạo chiến dịch khuyến mãi mới!');
       }
       setShowCampaignModal(false);
       loadData();
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+      const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
       alert(`Không thể lưu chiến dịch:\n${errorMsg}`);
     }
   };
 
-  // COUPON HANDLERS (FR-47, FR-58)
+  // COUPON HANDLERS
   const handleOpenCreateCoupon = () => {
     detailRevision.current += 1;
     setSelectedCoupon(null);
@@ -326,10 +321,10 @@ export function useAdminCommerce() {
     const nextStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
     try {
       await adminCommerceApi.updateDiscountCodeStatus(id, nextStatus as 'ACTIVE' | 'INACTIVE');
-      alert(`Đã chuyển trạng thái mã giảm giá sang ${nextStatus} qua REST API!`);
+      alert(`Đã chuyển trạng thái mã giảm giá sang ${nextStatus}!`);
       loadData();
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Lỗi cập nhật mã giảm giá từ Backend';
+      const errorMsg = err instanceof Error ? err.message : 'Lỗi cập nhật mã giảm giá';
       alert(`Không thể đổi trạng thái mã giảm giá:\n${errorMsg}`);
     }
   };
@@ -355,15 +350,15 @@ export function useAdminCommerce() {
 
       if (selectedCoupon) {
         await adminCommerceApi.updateDiscountCode(selectedCoupon.id, payload);
-        alert('Đã cập nhật mã giảm giá thành công qua REST API!');
+        alert('Đã cập nhật mã giảm giá thành công!');
       } else {
         await adminCommerceApi.createDiscountCode(payload);
-        alert('Đã tạo mã giảm giá mới qua REST API!');
+        alert('Đã tạo mã giảm giá mới!');
       }
       setShowCouponModal(false);
       loadData();
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+      const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
       alert(`Không thể lưu mã giảm giá:\n${errorMsg}`);
     }
   };
@@ -381,5 +376,5 @@ export function useAdminCommerce() {
     orderStatusFilter === 'ALL' ? true : o.status === orderStatusFilter,
   );
 
-  return { activeTab, setActiveTab, error, setError, loading, setLoading, isUsingRealApi, setIsUsingRealApi, orders, setOrders, selectedOrder, setSelectedOrder, orderStatusFilter, setOrderStatusFilter, campaigns, setCampaigns, selectedCampaign, setSelectedCampaign, showCampaignModal, setShowCampaignModal, campaignStatusFilter, setCampaignStatusFilter, campaignForm, setCampaignForm, coupons, setCoupons, selectedCoupon, setSelectedCoupon, showCouponModal, setShowCouponModal, couponStatusFilter, setCouponStatusFilter, couponCampaignFilter, setCouponCampaignFilter, couponForm, setCouponForm, loadData, handleViewOrderDetails, handleUpdateOrderStatus, handleCancelOrder, handleOpenCreateCampaign, handleOpenEditCampaign, handleEndCampaign, handleSaveCampaign, handleOpenCreateCoupon, handleOpenEditCoupon, handleToggleCoupon, handleSaveCoupon, getCampaignName, formatCurrency, filteredOrders };
+  return { activeTab, setActiveTab, error, setError, loading, setLoading, orders, setOrders, selectedOrder, setSelectedOrder, orderStatusFilter, setOrderStatusFilter, campaigns, setCampaigns, selectedCampaign, setSelectedCampaign, showCampaignModal, setShowCampaignModal, campaignStatusFilter, setCampaignStatusFilter, campaignForm, setCampaignForm, coupons, setCoupons, selectedCoupon, setSelectedCoupon, showCouponModal, setShowCouponModal, couponStatusFilter, setCouponStatusFilter, couponCampaignFilter, setCouponCampaignFilter, couponForm, setCouponForm, loadData, handleViewOrderDetails, handleUpdateOrderStatus, handleCancelOrder, handleOpenCreateCampaign, handleOpenEditCampaign, handleEndCampaign, handleSaveCampaign, handleOpenCreateCoupon, handleOpenEditCoupon, handleToggleCoupon, handleSaveCoupon, getCampaignName, formatCurrency, filteredOrders };
 }

@@ -20,8 +20,8 @@ test('editor and detail use the same scoped formatting and sanitizer', () => {
   assert.match(content, /serializeRichTextHtml\(value\)/);
   assert.match(content, /dangerouslySetInnerHTML=\{\{ __html: safeHtml \}\}/);
   assert.equal((detail.match(/<RichTextContent /g) || []).length, 1);
-  assert.equal((purchase.match(/<RichTextContent /g) || []).length, 1);
-  for (const source of [detail, purchase]) assert.match(source, /<RichTextContent[^>]*value=\{product.description\}/);
+  assert.equal((purchase.match(/<RichTextContent /g) || []).length, 0);
+  assert.match(detail, /<RichTextContent[^>]*value=\{product.description\}/);
   assert.doesNotMatch(detail, /<p[^>]*>\{product\.description/);
   assert.match(css, /\.nx-rich-text ul \{ list-style-type: disc/);
   assert.match(css, /\.nx-rich-text ol \{ list-style-type: decimal/);
@@ -44,8 +44,8 @@ test('description renders empty/plain text safely without a browser DOM and pres
     const { ProductDetail } = await server.ssrLoadModule('/src/features/product/pages/ProductDetailPage.tsx');
     const product = { id: 'p1', name: 'Máy ảnh', description: '<strong>Máy tốt</strong>', basePrice: 100, status: 'ACTIVE', sellerId: 'seller', categoryId: 'c1', categoryName: 'Máy ảnh', images: [], createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' };
     const detail = renderToStaticMarkup(createElement(MemoryRouter, null, createElement(ProductDetail, { product })));
-    assert.match(detail, /class="nx-rich-text nx-rich-text-display nx-muted"/);
+    assert.doesNotMatch(detail, /class="nx-rich-text nx-rich-text-display nx-muted"/);
     assert.match(detail, /class="nx-rich-text nx-rich-text-display nx-description-content"/);
-    for (const section of ['nx-detail-grid', 'nx-detail-bottom', 'nx-description-highlights', 'nx-purchase']) assert.ok(detail.includes(section));
+    for (const section of ['nx-detail-grid', 'nx-detail-bottom', 'nx-description', 'nx-purchase']) assert.ok(detail.includes(section));
   } finally { await server.close(); }
 });

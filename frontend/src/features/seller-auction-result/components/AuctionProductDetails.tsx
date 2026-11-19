@@ -42,7 +42,7 @@ export default function AuctionProductDetails({ result, checked, onCheck, onActi
             <i className="bi bi-clock" aria-hidden="true" /> Giao hàng trước
             <strong>{result.deadline}</strong>
           </div>
-          <button title="Chưa có API hỗ trợ thao tác này" disabled className="nx-ar-btn nx-ar-btn-primary"  onClick={() => onAction('shipping')}>
+          <button title="Xác nhận và giao hàng chưa được hỗ trợ." disabled className="nx-ar-btn nx-ar-btn-primary"  onClick={() => onAction('shipping')}>
             <i className="bi bi-truck" aria-hidden="true" /> Xác nhận & giao hàng</button>
         </div>
       </section>

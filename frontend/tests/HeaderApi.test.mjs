@@ -18,5 +18,20 @@ test('header notification/category contracts use backend ids and methods', async
     await headerApi.read('id/one'); assert.ok(last.url.endsWith('/notification/notifications/id%2Fone/read')); assert.equal(last.options.method, 'PATCH');
     await headerApi.readAll(); assert.ok(last.url.endsWith('/notification/notifications/read-all')); assert.equal(last.options.method, 'PATCH');
     await headerApi.cart(); assert.ok(last.url.endsWith('/buyer/commerce/cart'));
+    const calls = [];
+    const controller = new AbortController();
+    globalThis.fetch = async (url, options) => {
+      calls.push({ url, options });
+      return Response.json({ id: 'cart', subtotal: 500, itemCount: 2, items: [
+        { id: 'line-1', productId: 'p1', sellerId: 's1', quantity: 2, unitPrice: 100, lineTotal: 200 },
+        { id: 'line-2', productId: 'p2', sellerId: 's2', quantity: 3, unitPrice: 100, lineTotal: 300 },
+      ] });
+    };
+    assert.equal(await headerApi.cartCount(controller.signal), 5);
+    assert.equal(calls.length, 1, 'cart badge must not fetch individual products');
+    assert.ok(calls[0].url.endsWith('/buyer/commerce/cart'));
+    assert.equal(calls[0].options.signal, controller.signal);
+    globalThis.fetch = async () => Response.json({ id: 'cart', subtotal: 0, itemCount: 0, items: [] });
+    assert.equal(await headerApi.cartCount(), 0);
   } finally { globalThis.fetch = original; await server.close(); }
 });

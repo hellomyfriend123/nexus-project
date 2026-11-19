@@ -10,7 +10,7 @@ function shortWarranty(value: string) {
 export default function ListingPreviewCard({ hub }: { hub: CreateListingState }) {
   const { draft } = hub;
   const cover = hub.media[0];
-  const hasOffer = hub.saleModes.includes('offer');
+
 
   return (
     <section className="nx-listing-card nx-listing-aside-card">
@@ -30,9 +30,6 @@ export default function ListingPreviewCard({ hub }: { hub: CreateListingState })
           <img src={cover?.image} alt="Ảnh xem trước sản phẩm" />
           <div className="nx-listing-preview-badges">
             <span className="nx-listing-preview-tag is-blue">Like New 99%</span>
-            {hub.discountPercent > 0 && (
-              <span className="nx-listing-preview-tag is-red">-{hub.discountPercent}% OFF</span>
-            )}
           </div>
           <button type="button" className="nx-listing-preview-heart" onClick={() => hub.mockAction('Yêu thích')}>
             <i className="bi bi-heart" aria-hidden="true" />
@@ -42,7 +39,7 @@ export default function ListingPreviewCard({ hub }: { hub: CreateListingState })
               <i className="bi bi-patch-check-fill" aria-hidden="true" />
               Chưa xác minh seri
             </span>
-            <span className="nx-listing-preview-city">—</span>
+            <span className="nx-listing-preview-city">N/A</span>
           </div>
         </div>
         <div className="nx-listing-preview-body">
@@ -53,18 +50,18 @@ export default function ListingPreviewCard({ hub }: { hub: CreateListingState })
             <span>{shortWarranty(draft.warranty)}</span>
           </p>
           <p className="nx-listing-preview-price">
-            <strong>{hub.formatted.dealPrice}</strong>
-            <s>{hub.formatted.price}</s>
+            <strong>{hub.formatted.price}</strong>
+
           </p>
           <div className="nx-listing-preview-meta">
             <span>
               <i className="bi bi-image" aria-hidden="true" />
               Nexus Escrow 100%
             </span>
-            {hasOffer && <em>Có trả giá</em>}
+
           </div>
           <div className="nx-listing-preview-actions">
-            <button type="button" onClick={() => hub.mockAction('Trả giá')}>Trả giá</button>
+
             <button type="button" className="is-primary" onClick={() => hub.mockAction('Mua ngay')}>
               Mua ngay
             </button>

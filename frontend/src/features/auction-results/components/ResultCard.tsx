@@ -1,4 +1,6 @@
-﻿import type { AuctionProduct, AuctionSummary, Outcome } from '../types/auctionResult';
-export default function ResultCard({ product, summary, outcome, onAction }: { product: AuctionProduct; summary: AuctionSummary; outcome: Outcome; onAction: (label: string) => void }) {
- return <section className="ar-panel ar-product-card" aria-label="Sản phẩm đấu giá"><div className="ar-product-photo">{product.image ? <img src={product.image} alt={product.title} /> : <span>Chưa có ảnh sản phẩm</span>}</div><div className="ar-product-info"><div className="ar-section-meta"><span>{outcome === 'winner' ? 'MÃ PHIÊN' : 'THÔNG TIN SẢN PHẨM ĐÃ ĐẤU'}: {summary.auctionId}</span><span>Đã kết thúc ({summary.bidCount} giá hợp lệ)</span></div><h2>{product.title}</h2><p>{product.condition} · {product.location}</p><p>{product.shipping}</p><div className="ar-seller"><span className="ar-avatar">—</span><div><b>Người bán: {product.seller}</b><small>Chưa có hồ sơ và thống kê người bán</small></div><button className="ar-text-button" onClick={() => onAction('Hồ sơ shop')}>Hồ sơ shop ↗</button></div></div></section>;
+import { Link } from 'react-router-dom';
+import type { AuctionProduct, AuctionSummary, Outcome } from '../types/auctionResult';
+export default function ResultCard({ product, summary }: { product: AuctionProduct; summary: AuctionSummary; outcome: Outcome }) {
+  return <section className="ar-panel ar-product-card" aria-label="Sản phẩm đấu giá"><div className="ar-product-photo">{product.image ? <img src={product.image} alt={product.title} /> : <span>Chưa có ảnh sản phẩm</span>}</div><div className="ar-product-info"><p className="ar-eyebrow">SẢN PHẨM ĐẤU GIÁ</p><h2>{product.title}</h2><Link to={'/products/' + product.id + '?auctionId=' + summary.auctionId}>Xem thông tin sản phẩm →</Link></div></section>;
 }
+

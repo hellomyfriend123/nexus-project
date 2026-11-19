@@ -41,7 +41,7 @@ export function AdminCatalogProductsPanel(model: ReturnType<typeof useAdminCatal
                   <tbody>
                     {filteredProducts.length === 0 ? (
                       <tr>
-                        <td colSpan={5} style={{ textAlign: 'center', padding: '32px', color: '#94a3b8' }}>
+                        <td colSpan={5} style={{ textAlign: 'center', padding: '32px', color: '#64748b' }}>
                           Không có sản phẩm nào phù hợp.
                         </td>
                       </tr>
@@ -81,7 +81,7 @@ export function AdminCatalogProductsPanel(model: ReturnType<typeof useAdminCatal
                                   type="button"
                                   className="nx-btn nx-btn-outline nx-btn-sm"
                                   onClick={() => handleToggleProductStatus(p.id, p.status)}
-                                  title="Đổi trạng thái ACTIVE/INACTIVE (PATCH /api/v1/admin/catalog/products/{id}/status)"
+                                  title="Đổi trạng thái ACTIVE/INACTIVE"
                                 >
                                   <i className="bi bi-arrow-repeat"></i> Trạng thái
                                 </button>
@@ -89,7 +89,7 @@ export function AdminCatalogProductsPanel(model: ReturnType<typeof useAdminCatal
                                   type="button"
                                   className="nx-btn nx-btn-danger nx-btn-sm"
                                   onClick={() => handleDeleteProduct(p.id)}
-                                  title="Xoá mềm sản phẩm (DELETE /api/v1/admin/catalog/products/{id})"
+                                  title="Xoá mềm sản phẩm"
                                 >
                                   <i className="bi bi-trash"></i>
                                 </button>

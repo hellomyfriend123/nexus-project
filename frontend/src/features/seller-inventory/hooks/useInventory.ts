@@ -1,41 +1,84 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loadSellerInventory, productImagesForUpdate, messageOf, sellerApi } from '../../../services/api/seller';
 import type { InventoryProduct } from '../types/inventory';
-
 import { notify } from '../../../shared/components/Toast';
+type Editor = { kind:'product'|'stock'; row:InventoryProduct; name:string; description:string; price:string; operation:string; quantity:string };
 export function useInventory() {
   const navigate = useNavigate();
-  const [products,setProducts]=useState<InventoryProduct[]>([]);
-  const [loading,setLoading]=useState(true); const [error,setError]=useState('');
-  useEffect(()=>{const c=new AbortController();loadSellerInventory(c.signal).then(data=>setProducts(data.inventories.map(row=>{const p=data.products.get(row.productId)!;return {id:row.id,productId:p.id,description:p.description??'',images:p.images,primaryImageUrl:p.primaryImageUrl,name:p.name,sku:row.skuCode,category:p.categoryName,categoryId:p.categoryId,image:p.primaryImageUrl??p.images[0]??'',condition:'Chưa có dữ liệu',conditionId:'',photoLabel:'',price:Number(p.basePrice),priceNote:p.status,stock:String(row.availableQuantity),sold:'—',views:'—',engagement:'Chưa có API thống kê',status:row.availableQuantity===0?'out':'listed',visible:p.status==='ACTIVE'};}))).catch(e=>{if(!c.signal.aborted){setError(messageOf(e));notify.warning(messageOf(e));}}).finally(()=>{if(!c.signal.aborted)setLoading(false);});return()=>c.abort();},[]);
-  const [tab, setTab] = useState('all');
-  const [query, setQuery] = useState('');
-  const [category, setCategory] = useState('all');
-  const [condition, setCondition] = useState('all');
-  const [sort, setSort] = useState('updated');
-  const [pageSize, setPageSize] = useState('10');const [page,setPage]=useState(1);
-  const [selected, setSelected] = useState<string[]>([]);
-  const action = async (label:string,_id?:string) => {if(label.includes('Đăng bán sản phẩm mới')){navigate('/seller/products/new');return;}const row=products.find(p=>p.id===_id);if(row?.productId){
- try{if(label==='Xem sản phẩm'){navigate('/products/'+row.productId);return;}
- if(label==='Chỉnh sửa'){const name=window.prompt('Tên sản phẩm:',row.name);if(name===null)return;const description=window.prompt('Mô tả:',row.description??'');if(description===null)return;const amount=window.prompt('Giá bán:',String(row.price));if(amount===null)return;const basePrice=Number(amount);if(!name.trim()||!Number.isFinite(basePrice)||basePrice<=0){notify.warning('Tên và giá bán không hợp lệ.');return;}const p=await sellerApi.updateProduct(row.productId,{name:name.trim(),description,basePrice,images:productImagesForUpdate(row)});setProducts(old=>old.map(v=>v.productId===p.id?{...v,name:p.name,description:p.description??'',price:Number(p.basePrice)}:v));notify.success('Đã cập nhật sản phẩm.');return;}
- if(label==='Xóa sản phẩm'){if(!window.confirm('Xóa sản phẩm này?'))return;await sellerApi.deleteProduct(row.productId);setProducts(old=>old.filter(p=>p.productId!==row.productId));notify.success('Đã xóa sản phẩm.');return;}
- if(label==='Nhập thêm'){const input=window.prompt('Số lượng nhập thêm:');if(input===null)return;const quantity=Number(input);if(!Number.isInteger(quantity)||quantity<=0){notify.warning('Nhập số nguyên dương.');return;}const inv=await sellerApi.updateInventory(row.id,'INCREASE',quantity);setProducts(old=>old.map(v=>v.id===row.id?{...v,stock:String(inv.availableQuantity),status:inv.availableQuantity?'listed':'out'}:v));notify.success('Đã cập nhật tồn kho.');return;}
- }catch(e){notify.warning(messageOf(e));return;}}
- notify.info(label+' — chưa có API hỗ trợ trong màn hình này.');};
-  const rows = useMemo(() => {
-    const text = query.trim().toLocaleLowerCase('vi');
-    const filtered = products.filter(p => (tab === 'all' || p.status === tab) && (category === 'all' || p.categoryId === category) && (condition === 'all' || p.conditionId === condition) && `${p.name} ${p.sku} ${p.verified ?? ''}`.toLocaleLowerCase('vi').includes(text));
-    if (sort === 'price-desc') filtered.sort((a,b) => b.price - a.price);
-    if (sort === 'price-asc') filtered.sort((a,b) => a.price - b.price);
-    if (sort === 'views') { const views = (s: string) => Number.parseFloat(s) * (s.includes('k') ? 1000 : 1) || 0; filtered.sort((a,b) => views(b.views) - views(a.views)); }
-    if (sort === 'stock') filtered.sort((a,b) => (Number(a.stock.match(/\d+/)?.[0]) || 0) - (Number(b.stock.match(/\d+/)?.[0]) || 0));
-    return filtered;
-  }, [products, tab, query, category, condition, sort]);
-  const totalRows=rows.length;const totalPages=Math.max(1,Math.ceil(totalRows/Number(pageSize)));const currentPage=Math.min(page,totalPages);const pagedRows=rows.slice((currentPage-1)*Number(pageSize),currentPage*Number(pageSize));
-  function toggle(id: string) { setSelected(previous => previous.includes(id) ? previous.filter(key => key !== id) : [...previous, id]); }
-  function toggleAll() { const ids = rows.map(row => row.id); setSelected(previous => ids.every(id => previous.includes(id)) ? previous.filter(id => !ids.includes(id)) : [...new Set([...previous, ...ids])]); }
-  function toggleVisibility(_id:string) { notify.info('Backend chưa có API ẩn/hiện sản phẩm; trạng thái không thay đổi.'); }
-  return { page:currentPage, setPage, totalPages, totalRows, products, loading, error, tab, setTab, query, setQuery, category, setCategory, condition, setCondition, sort, setSort, pageSize, setPageSize, selected, toggle, toggleAll, rows:pagedRows, toggleVisibility, action };
+  const [products,setProducts] = useState<InventoryProduct[]>([]);
+  const [loading,setLoading] = useState(true);
+  const [error,setError] = useState('');
+  const [reload,setReload] = useState(0);
+  const [busy,setBusy] = useState(false);
+  const [editor,setEditor] = useState<Editor|null>(null);
+  const [editorError,setEditorError] = useState('');
+  const lock = useRef(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    setLoading(true); setError('');
+    loadSellerInventory(controller.signal).then(data => {
+      if (controller.signal.aborted) return;
+      setProducts(data.inventories.map(row => {
+        const product = data.products.get(row.productId)!;
+        return { id:row.id, productId:product.id, description:product.description??'', images:product.images, primaryImageUrl:product.primaryImageUrl, name:product.name, sku:row.skuCode, category:product.categoryName, categoryId:product.categoryId, image:product.primaryImageUrl??product.images[0]??'', condition:'',conditionId:'',photoLabel:'',price:Number(product.basePrice),priceNote:product.status,stock:String(row.availableQuantity),sold:'',views:'',engagement:'',status:row.availableQuantity===0?'out':'listed',visible:product.status==='ACTIVE' };
+      }));
+    }).catch(error => { if (!controller.signal.aborted) setError(messageOf(error)); }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
+  },[reload]);
+  const [tab,setTab] = useState('all');
+  const [query,setQuery] = useState('');
+  const [category,setCategory] = useState('all');
+  const [sort,setSort] = useState('name');
+  const [pageSize,setPageSize] = useState('10');
+  const [page,setPage] = useState(1);
+  useEffect(() => { setPage(1); },[tab,query,category,sort,pageSize]);
+  const filteredRows = useMemo(() => {
+    const search = query.trim().toLocaleLowerCase('vi');
+    const rows = products.filter(row => (tab==='all'||row.status===tab) && (category==='all'||row.categoryId===category) && (row.name+' '+row.sku).toLocaleLowerCase('vi').includes(search));
+    if (sort==='price-desc') rows.sort((a,b)=>b.price-a.price);
+    else if (sort==='price-asc') rows.sort((a,b)=>a.price-b.price);
+    else if (sort==='stock') rows.sort((a,b)=>Number(a.stock)-Number(b.stock));
+    else rows.sort((a,b)=>a.name.localeCompare(b.name,'vi'));
+    return rows;
+  },[products,tab,query,category,sort]);
+  const totalRows = filteredRows.length;
+  const totalPages = Math.max(1,Math.ceil(totalRows/Number(pageSize)));
+  const currentPage = Math.min(page,totalPages);
+  async function action(label:string,id?:string) {
+    if (label==='Đăng bán sản phẩm mới') { navigate('/seller/products/new'); return; }
+    const row = products.find(item=>item.id===id);
+    if (!row?.productId || lock.current) return;
+    if (label==='Xem sản phẩm') { navigate('/products/'+row.productId); return; }
+    if (label==='Mở đấu giá') { navigate('/seller/auctions/new?productId='+encodeURIComponent(row.productId)); return; }
+    if (label==='Chỉnh sửa'||label==='Điều chỉnh tồn kho') {
+      setEditorError('');setEditor({kind:label==='Chỉnh sửa'?'product':'stock',row,name:row.name,description:row.description??'',price:String(row.price),operation:'INCREASE',quantity:''});return;
+    }
+    if (label==='Xóa sản phẩm' && window.confirm('Xóa sản phẩm “'+row.name+'”?')) {
+      lock.current=true;setBusy(true);
+      try { await sellerApi.deleteProduct(row.productId);setProducts(old=>old.filter(item=>item.productId!==row.productId));notify.success('Đã xóa sản phẩm.'); }
+      catch (error) { notify.warning(messageOf(error)); }
+      finally { lock.current=false;setBusy(false); }
+    }
+  }
+  async function saveEditor() {
+    if (!editor||lock.current) return;
+    const price=Number(editor.price),quantity=Number(editor.quantity);
+    if (editor.kind==='product' && (!editor.name.trim()||editor.name.length>200||editor.description.length>5000||!editor.price.trim()||!Number.isFinite(price)||price<=0||!Number.isSafeInteger(Math.round(price*100))||!/^\d+(\.\d{1,2})?$/.test(editor.price))) { setEditorError('Tên tối đa 200 ký tự, mô tả tối đa 5000 ký tự; giá bán lớn hơn 0 và tối đa 2 chữ số thập phân.');return; }
+    if (editor.kind==='stock' && (!editor.quantity.trim()||!Number.isSafeInteger(quantity)||quantity<0||quantity>2147483647||(editor.operation!=='SET_AVAILABLE'&&quantity===0))) { setEditorError('Số lượng phải là số nguyên không vượt quá 2.147.483.647. Chỉ đặt tồn kho mới được dùng số 0.');return; }
+    lock.current=true;setBusy(true);setEditorError('');
+    try {
+      if (editor.kind==='product') {
+        const product=await sellerApi.updateProduct(editor.row.productId!,{name:editor.name.trim(),description:editor.description,basePrice:price,images:productImagesForUpdate(editor.row)});
+        setProducts(old=>old.map(row=>row.productId===product.id?{...row,name:product.name,description:product.description??'',price:Number(product.basePrice)}:row));
+      } else {
+        const inventory=await sellerApi.updateInventory(editor.row.id,editor.operation,quantity);
+        setProducts(old=>old.map(row=>row.id===inventory.id?{...row,stock:String(inventory.availableQuantity),status:inventory.availableQuantity===0?'out':'listed'}:row));
+      }
+      setEditor(null);notify.success(editor.kind==='product'?'Đã cập nhật sản phẩm.':'Đã cập nhật tồn kho.');
+    } catch (error) { setEditorError(messageOf(error)); }
+    finally { lock.current=false;setBusy(false); }
+  }
+  return { products,loading,error,busy,editor,setEditor,editorError,saveEditor,closeEditor:()=>{if(!lock.current)setEditor(null);},retry:()=>setReload(value=>value+1),tab,setTab,query,setQuery,category,setCategory,sort,setSort,pageSize,setPageSize,page:currentPage,setPage,totalRows,totalPages,rows:filteredRows.slice((currentPage-1)*Number(pageSize),currentPage*Number(pageSize)),action };
 }
 export type InventoryState = ReturnType<typeof useInventory>;

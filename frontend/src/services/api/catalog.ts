@@ -1,4 +1,4 @@
-﻿import { api, ApiError, type PageResponse } from './client';
+import { api, ApiError, type PageResponse } from './client';
 export type ProductStatus = 'DRAFT' | 'ACTIVE' | 'INACTIVE';
 export interface CatalogProduct {
   id: string; name: string; basePrice: number; status: ProductStatus;
@@ -75,6 +75,43 @@ export async function listCatalogProducts(query: CatalogQuery, signal?: AbortSig
 export async function getCatalogProduct(id: string, signal?: AbortSignal): Promise<CatalogProductDetail> {
   return adaptProductDetail(await api(`/api/v1/catalog/products/${encodeURIComponent(id)}`, { signal }));
 }
+
+/**
+ * Image lookup for historical order/auction rows, which carry only `productId`.
+ *
+ * Order and auction DTOs have no image field, so the only source is the public catalog. Two
+ * things keep that from turning into a request storm:
+ *  - one in-flight/settled promise per productId, so N rows sharing a product make one call;
+ *  - the promise is cached for PRODUCT_IMAGE_TTL_MS, so remounting a page does not refetch.
+ *
+ * The value is the CURRENT catalog image, not a snapshot taken at purchase time. A missing or
+ * deleted product resolves to null rather than rejecting: a dead image must not break the row.
+ */
+const PRODUCT_IMAGE_TTL_MS = 5 * 60 * 1000;
+const productImageCache = new Map<string, { at: number; value: Promise<string | null> }>();
+
+export function resolveProductImage(productId: string): Promise<string | null> {
+  const now = Date.now();
+  const hit = productImageCache.get(productId);
+  if (hit && now - hit.at < PRODUCT_IMAGE_TTL_MS) return hit.value;
+  const value = getCatalogProduct(productId)
+    .then(product => product.primaryImageUrl ?? product.images[0] ?? null)
+    .catch(() => null);
+  productImageCache.set(productId, { at: now, value });
+  return value;
+}
+
+/** Drop cached lookups (session change, or a product edit that changed its cover image). */
+export function clearProductImageCache(): void {
+  productImageCache.clear();
+}
+
+/** Loads images for a page of rows at once, preserving order and never rejecting. */
+export async function resolveProductImages(productIds: string[]): Promise<Map<string, string | null>> {
+  const unique = [...new Set(productIds.filter(Boolean))];
+  const values = await Promise.all(unique.map(id => resolveProductImage(id)));
+  return new Map(unique.map((id, index) => [id, values[index] ?? null]));
+}
 export async function getCatalogCategories(signal?: AbortSignal): Promise<CatalogCategory[]> {
   const tree = await api<unknown>('/api/v1/catalog/categories', { signal });
   if (!Array.isArray(tree)) return invalid();
@@ -117,7 +154,7 @@ export function adaptApiPage<T>(value: unknown, adapt: (item: unknown) => T): Pa
 export async function listAuctionSummaries(query: URLSearchParams, signal?: AbortSignal): Promise<PageResponse<Auction>> {
  const keyword = query.get('keyword')?.trim();
  if (keyword && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(keyword)) {
-   throw new ApiError(400, 'Tìm kiếm đấu giá chỉ hỗ trợ UUID sản phẩm hoặc người bán; chưa hỗ trợ tìm theo tên.');
+   throw new ApiError(400, 'Tìm kiếm đấu giá theo tên chưa được hỗ trợ. Vui lòng nhập UUID sản phẩm hoặc người bán.');
  }
  return adaptApiPage(await api('/api/v1/auction/auctions?' + query, { signal }), adaptAuction);
 }

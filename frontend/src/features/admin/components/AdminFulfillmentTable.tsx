@@ -30,7 +30,7 @@ export function AdminFulfillmentTable(model: ReturnType<typeof useAdminFulfillme
                         <td style={{ fontWeight: 700, color: '#059669' }}>
                           {item.quantityAvailable ?? (item as any).availableQuantity ?? 0}
                         </td>
-                        <td style={{ color: '#64748b' }}>{item.reorderLevel ?? '—'}</td>
+                        <td style={{ color: '#64748b' }}>{item.reorderLevel ?? 'N/A'}</td>
                         <td>
                           <span
                             className={`nx-badge ${

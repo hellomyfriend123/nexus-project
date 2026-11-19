@@ -9,6 +9,7 @@ interface Props {
   value: string;
   onChange: (html: string) => void;
   placeholder: string;
+  disabled?: boolean;
 }
 const tools: { command: FormatCommand; title: string; icon: string }[] = [
   { command: 'bold', title: 'In đậm (Ctrl+B)', icon: 'type-bold' },
@@ -17,7 +18,7 @@ const tools: { command: FormatCommand; title: string; icon: string }[] = [
   { command: 'insertOrderedList', title: 'Danh sách đánh số', icon: 'list-ol' },
 ];
 
-export default function ListingDescriptionEditor({ id, value, onChange, placeholder }: Props) {
+export default function ListingDescriptionEditor({ id, value, onChange, placeholder, disabled = false }: Props) {
   const editorRef = useRef<HTMLDivElement>(null);
   const selectionRef = useRef<Range | null>(null);
   const lastValue = useRef<string | null>(null);
@@ -95,6 +96,7 @@ export default function ListingDescriptionEditor({ id, value, onChange, placehol
           <button
             key={tool.command}
             type="button"
+            disabled={disabled}
             title={tool.title}
             aria-label={tool.title}
             aria-pressed={Boolean(active[tool.command])}
@@ -114,7 +116,8 @@ export default function ListingDescriptionEditor({ id, value, onChange, placehol
         aria-label="Mô tả chi tiết sản phẩm"
         aria-multiline="true"
         aria-placeholder={placeholder}
-        contentEditable
+        contentEditable={!disabled}
+        aria-disabled={disabled}
         suppressContentEditableWarning
         data-placeholder={placeholder}
         onInput={syncValue}

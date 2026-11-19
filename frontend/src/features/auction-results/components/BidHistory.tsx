@@ -1,10 +1,8 @@
-import { useState } from 'react';
-import type { Bid, Outcome } from '../types/auctionResult';
+import type { Bid } from '../types/auctionResult';
 import { formatMoney } from '../services/auctionResultService';
-export default function BidHistory({ bids, outcome, onAction }: { bids: Bid[]; outcome: Outcome; onAction: (label: string) => void }) {
-  const [view, setView] = useState<'table' | 'list'>('table');
-  return <section className="ar-panel ar-history"><div className="ar-section-heading"><div><h2><i className="bi bi-clock-history ar-blue" /> {outcome === 'winner' ? 'Lịch Sử Đặt Giá Minh Bạch (Bid Audit Trail - FR-31)' : 'Biên bản đấu giá minh bạch (Audit Trail)'}</h2><p>Lượt giá hợp lệ, mới nhất trước</p></div>{outcome === 'winner' && <div className="ar-view-toggle"><button aria-pressed={view === 'table'} onClick={() => setView('table')}>☷ Bảng giá</button><button aria-pressed={view === 'list'} onClick={() => setView('list')}>☷ Lịch sử</button></div>}</div>
-    {outcome === 'winner' && view === 'table' ? <div className="ar-table-wrap"><table><thead><tr><th>NGƯỜI ĐẤU GIÁ</th><th>MỨC GIÁ ĐẶT</th><th>THỜI GIAN GHI NHẬN</th><th>TRẠNG THÁI LƯỢT BID</th></tr></thead><tbody>{bids.map(bid => <tr key={bid.id} className={bid.winner ? 'ar-winning-row' : ''}><td>{bid.winner && <i className="bi bi-trophy" />} {bid.bidder}{bid.winner && <small>Mức giá thắng đã xác nhận</small>}</td><td><b>{formatMoney(bid.amount)}</b></td><td>{bid.time}</td><td><span className={bid.winner ? 'ar-winning-tag' : 'ar-tag'}>{bid.winner ? '✓ Thắng Thầu Chung Cuộc' : bid.own ? 'Lượt giá của bạn' : 'Đã nhận (Verified)'}</span></td></tr>)}</tbody></table></div> : <ol className="ar-bid-list">{bids.map(bid => <li key={bid.id} className={bid.winner ? 'ar-bid-winner' : bid.own ? 'ar-bid-own' : ''}><span className="ar-bid-dot"><i className="bi bi-person-fill" /></span><div><b>{bid.bidder}</b><small>{bid.time}</small></div><strong>{formatMoney(bid.amount)}</strong></li>)}</ol>}
-    <div className="ar-history-footer"><span><i className="bi bi-lock" /> Chỉ hiển thị lượt giá ACCEPTED từ máy chủ</span><button className="ar-text-button" onClick={() => onAction('Tải biên bản xác nhận PDF')}>Tải biên bản xác nhận (.PDF)</button></div>
+export default function BidHistory({ bids }: { bids: Bid[] }) {
+  return <section className="ar-panel ar-history"><div className="ar-section-heading"><div><h2>Lịch sử đặt giá</h2><p>Các lượt giá được chấp nhận, mới nhất trước.</p></div></div>
+    <div className="ar-table-wrap"><table><thead><tr><th scope="col">Người đặt giá</th><th scope="col">Mức giá</th><th scope="col">Thời gian</th><th scope="col">Kết quả</th></tr></thead><tbody>{bids.map(bid => <tr key={bid.id} className={bid.winner ? 'ar-winning-row' : ''}><td>{bid.own ? 'Bạn' : 'Người mua · ' + bid.bidder.slice(0, 8)}</td><td><b>{formatMoney(bid.amount)}</b></td><td>{bid.time}</td><td>{bid.winner ? 'Giá thắng thầu' : 'Đã chấp nhận'}</td></tr>)}</tbody></table></div>
   </section>;
 }
+

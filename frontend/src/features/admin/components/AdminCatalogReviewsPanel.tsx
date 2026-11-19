@@ -7,7 +7,7 @@ export function AdminCatalogReviewsPanel(model: ReturnType<typeof useAdminCatalo
           {activeTab === 'reviews' && (
             <div className="nx-admin-card">
               <div className="nx-admin-card-header">
-                <h2 className="nx-admin-card-title">Kiểm duyệt đánh giá sản phẩm (FR-45, FR-59)</h2>
+                <h2 className="nx-admin-card-title">Quản lý đánh giá sản phẩm</h2>
               </div>
               <div className="nx-table-container">
                 <table className="nx-admin-table">
@@ -55,7 +55,7 @@ export function AdminCatalogReviewsPanel(model: ReturnType<typeof useAdminCatalo
                                 className="nx-btn nx-btn-primary nx-btn-sm"
                                 onClick={() => handleApproveReview(r.id)}
                               >
-                                <i className="bi bi-check-lg"></i> Duyệt
+                                <i className="bi bi-check-lg"></i> Hiển thị lại
                               </button>
                             )}
                             {r.status !== 'HIDDEN' && (

@@ -3,7 +3,7 @@ import type { useAdminAuctions } from '../hooks/useAdminAuctions';
 export function AdminAuctionsTable(model: ReturnType<typeof useAdminAuctions>) {
   const { setSelectedAuction, handleCancelAuction, formatCurrency, filteredAuctions } = model;
   return (
-    <table className="nx-table">
+    <table className="nx-admin-table">
                 <thead>
                   <tr>
                     <th>Phiên đấu giá</th>
@@ -19,7 +19,7 @@ export function AdminAuctionsTable(model: ReturnType<typeof useAdminAuctions>) {
                 <tbody>
                   {filteredAuctions.length === 0 && (
                     <tr>
-                      <td colSpan={8} style={{ textAlign: 'center', padding: '32px', color: '#94a3b8' }}>
+                      <td colSpan={8} style={{ textAlign: 'center', padding: '32px', color: '#64748b' }}>
                         Không có phiên đấu giá nào phù hợp.
                       </td>
                     </tr>
@@ -68,7 +68,7 @@ export function AdminAuctionsTable(model: ReturnType<typeof useAdminAuctions>) {
                             type="button"
                             className="nx-btn nx-btn-outline nx-btn-sm"
                             onClick={() => setSelectedAuction(auc)}
-                            title="Xem chi tiết & lịch sử trả giá (FR-57)"
+                            title="Xem chi tiết & lịch sử trả giá"
                           >
                             <i className="bi bi-clock-history"></i> Bids
                           </button>
@@ -77,7 +77,7 @@ export function AdminAuctionsTable(model: ReturnType<typeof useAdminAuctions>) {
                               type="button"
                               className="nx-btn nx-btn-danger nx-btn-sm"
                               onClick={() => handleCancelAuction(auc.id, auc.title)}
-                              title="Hủy phiên đấu giá khẩn cấp (POST /api/v1/admin/auction/auctions/{id}/cancel)"
+                              title="Hủy phiên đấu giá"
                             >
                               <i className="bi bi-x-circle"></i> Hủy phiên
                             </button>

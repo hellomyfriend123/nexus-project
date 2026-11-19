@@ -1,120 +1,160 @@
-import { apiErrorMessage } from '../../../services/api/client';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { notify } from '../../../shared/components/Toast';
-import { commerceApi, type CommerceOrder } from '../../../services/api/commerce';
+import { apiErrorMessage } from '../../../services/api/client';
+import { commerceApi, type CommerceOrder, type CommerceOrderSummary } from '../../../services/api/commerce';
+import { resolveProductImages } from '../../../services/api/catalog';
 import { buyerApi, type BuyerProfileResponse } from '../../../services/api/buyer';
-import type { AuctionFilterId, BidStatus, BuyerBid, BuyerHubTabId, BuyerOrder, BuyerProfile, C2cDraft, OrderFilterId, SavedItem } from '../types/buyerHub';
-const initialDraft: C2cDraft = { name: '', category: '', duration: '', startPrice: '', stepPrice: '', escrow: false };
-// TODO backend: personal auction list, saved items, C2C, wallet and support APIs are not exposed.
-const unavailable = () => notify.info('Backend chưa cung cấp chức năng này. Không có thay đổi nào được thực hiện.');
-const report = (error: unknown) => notify.error(apiErrorMessage(error));
+import { getSession } from '../../../services/api/auth';
+import { notify } from '../../../shared/components/Toast';
 
+export const orderStatusLabels: Record<string, string> = {
+  PENDING: 'Chờ xác nhận', CONFIRMED: 'Đã xác nhận', SHIPPING: 'Đang giao', COMPLETED: 'Hoàn thành', CANCELLED: 'Đã hủy',
+};
 export function useBuyerHub() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [activeTab, setActiveTab] = useState<BuyerHubTabId>(() => { const tab = searchParams.get('tab'); return tab === 'saved' || tab === 'cart' ? 'cart' : tab === 'auctions' || tab === 'c2c' ? tab : 'orders'; });
-  const [auctionFilter, setAuctionFilter] = useState<AuctionFilterId>('all');
-  const [orderFilter, setOrderFilter] = useState<OrderFilterId>('all');
-  const [auctionSearch, setAuctionSearch] = useState('');
-  const [orders, setOrders] = useState<CommerceOrder[]>([]);
+  const [sessionToken, setSessionToken] = useState(() => getSession()?.accessToken ?? null);
+  const tokenRef = useRef(sessionToken);
+  const mounted = useRef(true);
   const [profile, setProfile] = useState<BuyerProfileResponse | null>(null);
+  const [profileError, setProfileError] = useState('');
+  const [orders, setOrders] = useState<CommerceOrderSummary[]>([]);
+  const [status, setStatus] = useState('');
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
-  const [c2cDraft, setC2cDraft] = useState<C2cDraft>(initialDraft);
-  const refreshOrders = async () => {
-    const first = await commerceApi.orders();
-    // Bound concurrent requests: the existing UI displays all orders without pagination.
-    const summaries = [...first.content];
-    for (let page = 1; page < first.totalPages; page++) summaries.push(...(await commerceApi.orders(page)).content);
-    const details: CommerceOrder[] = [];
-    for (let index = 0; index < summaries.length; index += 5) {
-      details.push(...await Promise.all(summaries.slice(index, index + 5).map(order => commerceApi.order(order.id))));
-    }
-    setOrders(details);
-  };
-  useEffect(() => {
-    let active = true;
-    const onError = (error: unknown) => { if (active) { setLoadError(apiErrorMessage(error)); report(error); } };
-    // Load independently so unavailable profile data does not discard real orders.
-    Promise.all([refreshOrders().catch(onError), buyerApi.profile().then(value => { if (active) setProfile(value); }).catch(onError)])
-      .finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
-  }, []);
-  const buyerProfile: BuyerProfile = { name: profile?.fullName ?? profile?.username ?? '—', initial: (profile?.fullName ?? profile?.username ?? '?').slice(0, 1),
-    verified: false, memberTier: '—', memberId: profile?.id ?? '—', rating: '—', reviewCount: null, winPaymentRate: '—',
-    joinedAt: profile ? new Date(profile.createdAt).toLocaleDateString('vi-VN') : '—', walletBalance: null, voucherCount: null };
-  const bids: BuyerBid[] = [];
-  const items: SavedItem[] = [];
-  const visibleOrders = useMemo<BuyerOrder[]>(() => orders.filter(order => orderFilter === 'all' || order.status.toLowerCase() === orderFilter)
-    .map(order => ({ id: order.id, code: order.orderNumber, tag: { text: order.orderType, tone: 'primary' },
-      placedNote: new Date(order.createdAt).toLocaleString('vi-VN'), status: { text: order.status, icon: 'bi-box-seam', tone: 'primary' },
-      state: order.status.toLowerCase() as BuyerOrder['state'], title: order.items.map(item => item.productNameSnapshot || item.productId).join(', '),
-      meta: `${order.items.reduce((sum, item) => sum + item.quantity, 0)} sản phẩm · ${order.shippingAddress}`,
-      price: Number(order.totalAmount), thumbIcon: 'bi-box-seam', thumbTone: 'primary' })), [orders, orderFilter]);
-  const findOrder = (code: string) => orders.find(order => order.orderNumber === code);
-  const handleTrackShipment = async (code: string) => {
-    const order = findOrder(code); if (!order) return;
-    try { const shipments = await buyerApi.shipments(order.id); notify.info(shipments.length ? shipments.map(s => `${s.trackingNumber ?? 'Chưa có mã vận đơn'}: ${s.status}`).join('\n') : 'Đơn hàng chưa có vận đơn.'); } catch (error) { report(error); }
-  };
+  const [revision, setRevision] = useState(0);
   const [busy, setBusy] = useState(false);
-  const handleCancelOrder = async (code: string) => {
-    const order = findOrder(code); if (!order || busy) return;
-    if (['COMPLETED', 'CANCELLED'].includes(order.status)) { notify.warning('Đơn hàng đã kết thúc, không thể hủy.'); return; }
-    if (!window.confirm(`Hủy đơn ${code}?`)) return;
-    setBusy(true);
-    try {
+  const actionLock = useRef(false);
+  const [selectedId, setSelectedId] = useState<string | null>(() => searchParams.get('orderId'));
+  const [orderDetail, setOrderDetail] = useState<CommerceOrder | null>(null);
+  const [detailError, setDetailError] = useState('');
+  const [detailLoading, setDetailLoading] = useState(false);
+  // productId -> catalog image URL (or null when the product is gone / has no image).
+  const [detailImages, setDetailImages] = useState<Map<string, string | null>>(new Map());
+  const [shipments, setShipments] = useState<Awaited<ReturnType<typeof buyerApi.shipments>>>([]);
+  const [shipmentError, setShipmentError] = useState('');
+  const [reviewOrder, setReviewOrder] = useState<CommerceOrderSummary | null>(null);
+  const [reviewError, setReviewError] = useState('');
+  const [reviewedIds, setReviewedIds] = useState<Set<string>>(() => new Set());
+  const queryOrderId = searchParams.get('orderId');
+  useEffect(() => { setSelectedId(queryOrderId); }, [queryOrderId]);
+  useEffect(() => {
+    mounted.current = true;
+    const syncSession = () => {
+      const token = getSession()?.accessToken ?? null;
+      if (token === tokenRef.current) return;
+      tokenRef.current = token;
+      setSessionToken(token);
+      setProfile(null); setProfileError(''); setOrders([]); setTotal(0); setTotalPages(0);
+      setPage(0); setStatus(''); setLoading(Boolean(token)); setLoadError('');
+      setSelectedId(null); setOrderDetail(null); setDetailError(''); setDetailLoading(false); setDetailImages(new Map());
+      setShipments([]); setShipmentError(''); setReviewOrder(null); setReviewError(''); setReviewedIds(new Set());
+      actionLock.current = false; setBusy(false);
+    };
+    window.addEventListener('nexus:session-changed', syncSession);
+    window.addEventListener('storage', syncSession);
+    syncSession();
+    return () => {
+      mounted.current = false;
+      window.removeEventListener('nexus:session-changed', syncSession);
+      window.removeEventListener('storage', syncSession);
+    };
+  }, []);
+  const isCurrentSession = useCallback(() => mounted.current && Boolean(sessionToken) && getSession()?.accessToken === sessionToken, [sessionToken]);
+  useEffect(() => {
+    if (!sessionToken) return;
+    let active = true;
+    buyerApi.profile().then(value => { if (active && isCurrentSession()) setProfile(value); }).catch(error => { if (active && isCurrentSession()) setProfileError(apiErrorMessage(error)); });
+    return () => { active = false; };
+  }, [sessionToken, isCurrentSession]);
+  useEffect(() => {
+    if (!sessionToken) return;
+    let active = true;
+    setLoading(true); setLoadError('');
+    commerceApi.orders(page, status || undefined).then(result => {
+      if (!active || !isCurrentSession()) return;
+      if (page > 0 && page >= result.totalPages) { setPage(Math.max(0, result.totalPages - 1)); return; }
+      setOrders(result.content); setTotal(result.totalElements); setTotalPages(result.totalPages);
+    }).catch(error => { if (active && isCurrentSession()) setLoadError(apiErrorMessage(error)); }).finally(() => { if (active && isCurrentSession()) setLoading(false); });
+    return () => { active = false; };
+  }, [page, status, revision, sessionToken, isCurrentSession]);
+  useEffect(() => {
+    if (!selectedId || !sessionToken) return;
+    let active = true;
+    setOrderDetail(null); setDetailError(''); setDetailLoading(true); setShipments([]); setShipmentError(''); setDetailImages(new Map());
+    Promise.all([
+      commerceApi.order(selectedId).then(async value => {
+        if (!active || !isCurrentSession()) return;
+        setOrderDetail(value);
+        // Order DTOs carry no image; the only source is the public catalog, keyed by productId and
+        // cached per product so repeated items or a reopened order do not refetch.
+        const images = await resolveProductImages(value.items.map(item => item.productId));
+        if (active && isCurrentSession()) setDetailImages(images);
+      }).catch(error => { if (active && isCurrentSession()) setDetailError(apiErrorMessage(error)); }),
+      buyerApi.shipments(selectedId).then(value => { if (active && isCurrentSession()) setShipments(value); }).catch(error => { if (active && isCurrentSession()) setShipmentError(apiErrorMessage(error)); }),
+    ]).finally(() => { if (active && isCurrentSession()) setDetailLoading(false); });
+    return () => { active = false; };
+  }, [selectedId, sessionToken, isCurrentSession]);
+  const run = async (action: () => Promise<void>) => {
+    if (actionLock.current || !isCurrentSession()) return;
+    actionLock.current = true; setBusy(true);
+    try { await action(); } catch (error) { if (isCurrentSession()) notify.error(apiErrorMessage(error)); }
+    finally { if (isCurrentSession()) { actionLock.current = false; setBusy(false); } }
+  };
+  const cancelOrder = (order: CommerceOrderSummary) => {
+    if (['COMPLETED', 'CANCELLED'].includes(order.status) || actionLock.current) return;
+    if (!window.confirm('Hủy đơn ' + order.orderNumber + '?')) return;
+    void run(async () => {
       const cancelled = await commerceApi.cancel(order.id);
-      setOrders(current => current.map(entry => entry.id === cancelled.id ? cancelled : entry));
-      notify.success('Đã hủy đơn hàng.');
-      try { await refreshOrders(); }
-      catch { notify.warning('Đơn hàng đã được hủy trên máy chủ, nhưng chưa thể tải lại danh sách. Vui lòng tải lại trang; không cần hủy lại.'); }
-    } catch (error) { report(error); } finally { setBusy(false); }
+      if (!isCurrentSession()) return;
+      setOrders(current => current.map(item => item.id === cancelled.id ? { ...item, status: cancelled.status } : item));
+      setOrderDetail(current => current?.id === cancelled.id ? cancelled : current);
+      setRevision(value => value + 1); notify.success('Đã hủy đơn hàng.');
+    });
   };
-  const handleReviewOrder = async (code: string) => {
-    const order = findOrder(code); if (!order || busy) return;
-    if (order.status !== 'COMPLETED') { notify.warning('Chỉ có thể đánh giá đơn đã hoàn tất.'); return; }
-    if (!window.confirm(`Gửi đánh giá 5 sao cho người bán của đơn ${code}?`)) return;
-    setBusy(true);
-    try { await commerceApi.rateSeller(order.id, order.sellerId, 5); notify.success('Đã gửi đánh giá người bán.'); } catch (error) { report(error); } finally { setBusy(false); }
-  };
-  const handleRebuy = async (code: string) => {
-    const order = findOrder(code); if (!order || busy) return;
-    setBusy(true);
+  const rebuy = (summary: CommerceOrderSummary) => void run(async () => {
+    const order = await commerceApi.order(summary.id);
+    if (!isCurrentSession()) return;
     let added = 0;
     try {
-      // Fetch current catalog prices rather than reusing a historical order price.
       for (const item of order.items) {
-        if (item.skuId) throw new Error("Mua lại biến thể chưa được hỗ trợ. Vui lòng mở sản phẩm và chọn lại biến thể theo giá hiện tại.");
+        if (item.skuId) throw new Error('Vui lòng mở sản phẩm để chọn lại biến thể theo giá hiện tại.');
         const product = await buyerApi.product(item.productId);
-        if (product.status !== 'ACTIVE' || product.basePrice <= 0) throw new Error('Sản phẩm không còn được bán hoặc chưa có giá mua hợp lệ.');
+        if (!isCurrentSession()) return;
+        if (product.status !== 'ACTIVE' || product.basePrice <= 0) throw new Error('Sản phẩm không còn được bán.');
         await commerceApi.add({ productId: product.id, sellerId: product.sellerId, productName: product.name, unitPrice: Number(product.basePrice), quantity: item.quantity });
+        if (!isCurrentSession()) return;
         added++;
       }
-      window.dispatchEvent(new Event('nexus:cart-changed'));
-      notify.success('Đã thêm sản phẩm vào giỏ hàng theo giá hiện tại.'); navigate('/cart');
-    } catch (error) { if (added) window.dispatchEvent(new Event('nexus:cart-changed')); if (added) notify.info(`${added} sản phẩm đã được thêm. Các mục còn lại chưa được thêm.`); report(error); } finally { setBusy(false); }
+      if (added) { notify.success('Đã thêm sản phẩm vào giỏ theo giá hiện tại.'); navigate('/cart'); }
+    } catch (error) {
+      if (added && isCurrentSession()) notify.info(added + ' sản phẩm đã được thêm; các sản phẩm còn lại chưa được thêm.');
+      throw error;
+    } finally { if (added && isCurrentSession()) window.dispatchEvent(new Event('nexus:cart-changed')); }
+  });
+  const submitReview = async (score: number, comment: string) => {
+    if (!reviewOrder || reviewOrder.status !== 'COMPLETED' || actionLock.current || !isCurrentSession()) return;
+    if (!Number.isInteger(score) || score < 1 || score > 5 || comment.length > 2000) { setReviewError('Chọn từ 1 đến 5 sao và nhận xét tối đa 2.000 ký tự.'); return; }
+    actionLock.current = true; setBusy(true); setReviewError('');
+    try {
+      await commerceApi.rateSeller(reviewOrder.id, reviewOrder.sellerId, score, comment);
+      if (!isCurrentSession()) return;
+      setReviewedIds(current => new Set([...current, reviewOrder.id]));
+      setReviewOrder(null); notify.success('Đã gửi đánh giá người bán.');
+    } catch (error) { if (isCurrentSession()) setReviewError(apiErrorMessage(error)); }
+    finally { if (isCurrentSession()) { actionLock.current = false; setBusy(false); } }
   };
-  const handleOpenC2c = () => { setActiveTab('c2c'); window.scrollTo({ top: 400, behavior: 'smooth' }); };
-  const handleC2cDraftChange = <K extends keyof C2cDraft>(field: K, value: C2cDraft[K]) => setC2cDraft(current => ({ ...current, [field]: value }));
   return {
-    loading, loadError, buyerProfile, orderCounts: Object.fromEntries(["all", "shipping", "completed", "cancelled"].map(status => [status, status === "all" ? orders.length : orders.filter(order => order.status.toLowerCase() === status).length])), orderCount: orders.length, savedCount: 0, activeTab, setActiveTab, auctionFilter, orderFilter,
-    auctionSearch, setAuctionSearch, bids, visibleBids: bids, visibleOrders, winRemaining: 0, items, selectedItemCount: 0, savedSubtotal: 0, c2cDraft,
-    handleOpenC2c, handleBidAction: (_bid: BuyerBid) => unavailable(), handleBidHistory: (_label: string) => unavailable(),
-    handleSelectAuctionFilter: setAuctionFilter, handleSelectOrderFilter: setOrderFilter,
-    handlePayment: unavailable, handleWinDetail: unavailable, handleTrackShipment, handleCancelOrder, handleReviewOrder, handleRebuy,
-    handleToggleItem: (_id: string) => unavailable(), handleSelectAllItems: unavailable, handleQuantityChange: (_id: string, _quantity: number) => unavailable(),
-    handleRemoveItem: (_id: string) => unavailable(), handleMoveToCart: (_id: string) => unavailable(), handleCheckoutSelected: unavailable,
-    handleC2cViewBidders: (_count: number) => unavailable(), handleC2cEndEarly: unavailable, handleC2cDraftChange,
-    handleC2cReset: () => setC2cDraft(initialDraft), handleC2cSubmit: unavailable, handleLiveFeedAction: unavailable,
-    handleGuaranteeLink: unavailable, handleComplaint: unavailable, handleSupportChat: unavailable,
+    signedIn: Boolean(sessionToken), profile, profileError, orders, status, page, totalPages, total, loading, loadError, busy,
+    setPage, selectStatus: (value: string) => { setPage(0); setStatus(value); }, retry: () => setRevision(value => value + 1),
+    selectedId, orderDetail, detailError, detailLoading, detailImages, shipments, shipmentError, openDetail: setSelectedId, closeDetail: () => setSelectedId(null),
+    cancelOrder, rebuy, reviewOrder, reviewError, reviewedIds, submitReview,
+    openReview: (order: CommerceOrderSummary) => { setReviewError(''); setReviewOrder(order); },
+    closeReview: () => { if (!actionLock.current) setReviewOrder(null); },
   };
 }
 export type UseBuyerHub = ReturnType<typeof useBuyerHub>;
-export function resolveBidStatusLabel(status: BidStatus): string {
-  if (status === 'outbid') return 'Bị vượt giá';
-  if (status === 'leading') return 'Bạn đang dẫn đầu';
-  if (status === 'won') return 'Thắng thầu';
-  return 'Đã kết thúc (Thua thầu)';
-}
-export function matchesAuctionFilter(status: BidStatus, filter: AuctionFilterId): boolean { return filter === 'all' || status === filter; }
+

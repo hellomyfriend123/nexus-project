@@ -2141,3 +2141,51 @@
     animation: none;
   }
 }
+
+/* Orders workspace: only backed account and order actions. */
+.nx-hub-orders-page { font-size: 15px; }
+.nx-hub-orders-page > .nx-container { max-width: 1120px; }
+.nx-hub-heading { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.nx-hub-heading h1 { font-size: clamp(25px, 3vw, 34px); margin: 4px 0 8px; letter-spacing: -.6px; }
+.nx-hub-heading p { margin: 0; color: var(--nx-muted, #526079); }
+.nx-hub-eyebrow { font-size: 12px; letter-spacing: 1.2px; font-weight: 700; }
+.nx-hub-account { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; padding: 20px 24px; border: 1px solid var(--nx-border, #e2e8f0); background: #fff; border-radius: 14px; }
+.nx-hub-account-avatar { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: #eef2ff; color: #315bf4; font-weight: 700; font-size: 20px; }
+.nx-hub-account p { margin: 3px 0 0; color: #526079; overflow-wrap: anywhere; }
+.nx-hub-account > span:last-child { margin-left: auto; font-size: 14px; color: #526079; }
+.nx-hub-orders { background: #fff; border: 1px solid var(--nx-border, #e2e8f0); border-radius: 14px; overflow: hidden; }
+.nx-hub-order-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 20px 24px; border-bottom: 1px solid #e2e8f0; }
+.nx-hub-order-toolbar label { display: flex; align-items: center; gap: 12px; font-weight: 600; }
+.nx-hub-order-toolbar select { border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 34px 10px 12px; font: inherit; background: white; }
+.nx-hub-order-toolbar > span { color: #526079; }
+.nx-hub-order-summary { padding: 24px; border-bottom: 1px solid #e2e8f0; display: grid; gap: 18px; }
+.nx-hub-order-summary:last-child { border-bottom: 0; }
+.nx-hub-order-summary-main { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+/* Thumbnail sits first in the row; the text block takes the free space so long order numbers
+   wrap instead of pushing the status pill off the card. */
+.nx-hub-order-summary-main > .nx-hub-order-summary-copy { flex: 1; min-width: 0; }
+.nx-hub-order-summary-main p { margin: 6px 0 0; color: #526079; font-size: 14px; }
+.nx-hub-order-summary-main > strong { font-size: 18px; }
+.nx-hub-status { display: inline-block; flex-shrink: 0; padding: 5px 10px; border-radius: 6px; background: #eef2ff; color: #2945a1; font-size: 13px; font-weight: 600; }
+.nx-hub-status-completed { background: #e9f7ef; color: #176f42; }
+.nx-hub-status-cancelled { background: #f1f3f5; color: #526079; }
+.nx-hub-order-summary-actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+.nx-hub-link { border: 0; background: none; padding: 10px 2px; color: #315bf4; font: inherit; }
+.nx-hub-link:disabled { opacity: .55; cursor: default; }
+.nx-hub-pagination { display: flex; justify-content: center; align-items: center; gap: 20px; padding: 20px; border-top: 1px solid #e2e8f0; }
+.nx-buyer-order-detail { font-size: 15px; line-height: 1.6; overflow-wrap: anywhere; }
+.nx-buyer-order-detail h3 { font-size: 17px; margin-top: 24px; }
+.nx-buyer-order-detail ul { list-style: none; margin: 20px 0; padding: 0; }
+.nx-buyer-order-detail li { display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #e2e8f0; padding: 12px 0; }
+.nx-buyer-order-detail li a { flex: 1; min-width: 0; }
+.nx-buyer-order-detail li span { white-space: nowrap; }
+@media (max-width: 640px) {
+  .nx-hub-heading { flex-direction: column; align-items: stretch; gap: 18px; }
+  .nx-hub-heading > a { align-self: flex-start; }
+  .nx-hub-account { padding: 18px; gap: 12px; }
+  .nx-hub-account > span:last-child { margin-left: 56px; }
+  .nx-hub-order-toolbar, .nx-hub-order-summary { padding: 18px; }
+  .nx-hub-order-summary-main:first-child { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .nx-buyer-order-detail li { flex-direction: column; gap: 4px; }
+}
+

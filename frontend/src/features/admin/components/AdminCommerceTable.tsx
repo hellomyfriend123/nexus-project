@@ -61,7 +61,7 @@ export function AdminCommerceTable(model: ReturnType<typeof useAdminCommerce>) {
                                 {ord.sellerId.slice(0, 8)}...
                               </span>
                             ) : (
-                              <span style={{ color: '#94a3b8' }}>-</span>
+                              <span style={{ color: '#64748b' }}>-</span>
                             )}
                           </td>
                           <td>
@@ -97,7 +97,7 @@ export function AdminCommerceTable(model: ReturnType<typeof useAdminCommerce>) {
                                 type="button"
                                 className="nx-btn nx-btn-outline nx-btn-sm"
                                 onClick={() => handleViewOrderDetails(ord)}
-                                title="Xem chi tiết đơn hàng (GET /api/v1/admin/commerce/orders/{id})"
+                                title="Xem chi tiết đơn hàng"
                               >
                                 <i className="bi bi-eye"></i> Xem
                               </button>
@@ -106,7 +106,7 @@ export function AdminCommerceTable(model: ReturnType<typeof useAdminCommerce>) {
                                   type="button"
                                   className="nx-btn nx-btn-danger nx-btn-sm"
                                   onClick={() => handleCancelOrder(ord.id)}
-                                  title="Huỷ đơn hàng (POST /api/v1/admin/commerce/orders/{id}/cancel)"
+                                  title="Huỷ đơn hàng"
                                 >
                                   <i className="bi bi-x-circle"></i> Huỷ
                                 </button>

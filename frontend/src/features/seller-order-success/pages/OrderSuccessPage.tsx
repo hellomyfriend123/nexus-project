@@ -3,14 +3,7 @@ import { useOrderSuccess } from '../hooks/useOrderSuccess';
 import OrderSuccessHero from '../components/OrderSuccessHero';
 import OrderSuccessDetails from '../components/OrderSuccessDetails';
 import '../styles/order-success.css';
-export default function OrderSuccessPage(){
- const state=useOrderSuccess();
- const {order,loading,error}=state;
- return <main className="nx-success-page"><div className="nx-container">
- <nav className="nx-success-topbar" aria-label="Điều hướng đơn hàng"><Link to="/seller-hub">← Seller Hub</Link><span className="nx-success-status">Đơn hàng người bán</span></nav>
- {!order?<section className="nx-success-hero"><div className="nx-success-hero-inner"><div className="nx-success-hero-text"><h1>{loading?'Đang tải đơn hàng…':'Không thể hiển thị đơn hàng'}</h1><p role={error?'alert':'status'}>{error}</p><Link className="nx-success-btn is-primary" to="/seller-hub">Về Seller Hub</Link></div></div></section>:<>
- <OrderSuccessHero {...state} order={order}/>
- <OrderSuccessDetails {...state} order={order}/>
- </>}
- </div></main>;
+export default function OrderSuccessPage() {
+  const state=useOrderSuccess();
+  return <main className="nx-success-page"><div className="nx-container"><Link className="nx-seller-back" to="/seller-hub?tab=orders">← Đơn hàng</Link>{state.loading?<p role="status">Đang tải đơn hàng…</p>:state.error||!state.order?<section className="nx-seller-alert" role="alert"><p>{state.error||'Không tìm thấy đơn hàng.'}</p><Link to="/seller-hub?tab=orders">Về danh sách đơn hàng</Link></section>:<><OrderSuccessHero {...state} order={state.order} /><OrderSuccessDetails {...state} order={state.order} /></>}</div></main>;
 }

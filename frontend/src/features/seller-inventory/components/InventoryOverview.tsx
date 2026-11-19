@@ -1,7 +1,9 @@
-import { inventoryKpis as templates } from '../services/inventoryOverview.mock';
-export default function InventoryOverview({ onAction }: { onAction: (label: string) => void }) {
-  const inventoryKpis=templates.map(k=>({...k,value:'—',left:'Chưa có API thống kê',right:''}));
-  return <><div className="nx-stock-context"><p><span className="nx-stock-blue">●</span> Dữ liệu từ API <span>•</span> Đồng bộ kho: <strong>Chưa có thời điểm đồng bộ</strong></p></div>
-  <header className="nx-stock-heading"><div className="nx-stock-heading-copy"><div className="nx-stock-title-row"><h1>Quản lý Sản phẩm &<br />Kho hàng Niêm Yết</h1><span className="nx-stock-pro"><i className="bi bi-patch-check-fill" aria-hidden="true" /> KÊNH NGƯỜI BÁN PRO</span><span className="nx-stock-warehouse">Kho:<br /><strong>Theo tồn kho API</strong></span></div><p>Kiểm soát SKU sản phẩm từ hệ thống, theo dõi biến động giá đấu trực tiếp và tối ưu hóa chuyển đổi tồn kho.</p></div><div className="nx-stock-header-actions">{[{ label: 'Xuất CSV', icon: 'download' }, { label: 'Tải lên hàng loạt', icon: 'cloud-upload' }, { label: 'Mở đấu giá nhanh', icon: 'lightning-charge', tone: 'soft-red' }, { label: '+ Đăng bán sản phẩm mới', icon: 'plus-circle', tone: 'red' }].map(button => <button key={button.label} className={`nx-stock-button ${button.tone ? `nx-stock-button--${button.tone}` : ''}`} onClick={() => onAction(button.label)}><i className={`bi bi-${button.icon}`} aria-hidden="true" />{button.label}</button>)}</div></header>
-  <section className="nx-stock-kpis" aria-label="Thống kê kho hàng">{inventoryKpis.map(kpi => <article className={`nx-stock-kpi nx-stock-tone-${kpi.tone}`} key={kpi.label}><div className="nx-stock-kpi-top"><div><h2>{kpi.label}</h2><p><strong>{kpi.value}</strong> {kpi.unit}</p></div><span className="nx-stock-kpi-icon"><i className={`bi bi-${kpi.icon}`} aria-hidden="true" /></span></div><div className="nx-stock-kpi-bottom"><span>{kpi.left}</span><span>{kpi.right}</span></div></article>)}</section></>;
+import { Link } from 'react-router-dom';
+
+export interface InventoryOverviewProps {
+  onAddProduct?: () => void;
+}
+
+export default function InventoryOverview({ onAddProduct }: InventoryOverviewProps) {
+  return <header className="nx-stock-heading"><div className="nx-stock-heading-copy"><Link className="nx-seller-back" to="/seller-hub">← Kênh người bán</Link><h1>Sản phẩm & tồn kho</h1><p>Cập nhật sản phẩm, giá niêm yết và số lượng có thể bán.</p></div>{onAddProduct ? <button type="button" className="nx-stock-button nx-seller-primary" onClick={onAddProduct}><i className="bi bi-plus-lg" aria-hidden="true" />Thêm sản phẩm</button> : <Link className="nx-stock-button nx-seller-primary" to="/seller/products/new"><i className="bi bi-plus-lg" aria-hidden="true" />Thêm sản phẩm</Link>}</header>;
 }

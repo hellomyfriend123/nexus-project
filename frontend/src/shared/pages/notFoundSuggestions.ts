@@ -1,4 +1,4 @@
-﻿// Only implemented, publicly reachable destinations belong in the recovery list.
+// Implemented static destinations only. Protected pages retain their existing route guards.
 export const recoveryRoutes = [
   { path: '/', label: 'Trang chủ' },
   { path: '/login', label: 'Đăng nhập' },
@@ -11,6 +11,13 @@ export const recoveryRoutes = [
   { path: '/seller/products', label: 'Quản lý sản phẩm & Tồn kho' },
   { path: '/seller/products/new', label: 'Đăng bán sản phẩm mới' },
   { path: '/seller/orders/success', label: 'Đơn bán hàng — cần chọn đơn' },
+  { path: '/seller/auctions/new', label: 'Tạo phiên đấu giá mới' },
+  { path: '/admin', label: 'Tổng quan quản trị — cần quyền Admin' },
+  { path: '/admin/users', label: 'Quản lý người dùng — cần quyền Admin' },
+  { path: '/admin/catalog', label: 'Quản lý danh mục & Sản phẩm — cần quyền Admin' },
+  { path: '/admin/commerce', label: 'Quản lý đơn hàng & Khuyến mãi — cần quyền Admin' },
+  { path: '/admin/fulfillment', label: 'Quản lý kho & Tồn kho — cần quyền Admin' },
+  { path: '/admin/auctions', label: 'Quản lý đấu giá — cần quyền Admin' },
 ] as const;
 
 export function editDistance(left: string, right: string): number {

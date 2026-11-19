@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { type Listing } from '../../../services/api/catalog';
 import { getSession } from '../../../services/api/auth';
@@ -21,7 +21,7 @@ export function useProductListing() {
   const mode =
     requestedMode === 'auction' || requestedMode === 'buy-now'
       ? requestedMode
-      : 'all';
+      : 'buy-now';
   const query = params.get('q') ?? '';
   function setQuery(value: string) {
     const next = new URLSearchParams(params);
@@ -41,7 +41,7 @@ export function useProductListing() {
     const next = new URLSearchParams(params); next.delete('q'); next.delete('mode');
     setParams(next); setSort('featured'); setBudget('all');
   }
-  const resultKey = JSON.stringify([categoryId, mode, query, budget, sort]);
+  const resultKey = JSON.stringify(mode === 'auction' ? [mode] : [categoryId, mode, query, budget, sort]);
   const page = pagination.key === resultKey ? pagination.page : 1;
   const [products, setProducts] = useState<Listing[]>([]);
   const [total, setTotal] = useState(0);
@@ -63,7 +63,7 @@ export function useProductListing() {
       const current = new AbortController(); controller = current;
       const sortValue = sort === 'price-low' ? 'basePrice,asc' : sort === 'price-high' ? 'basePrice,desc' : 'createdAt,desc';
       try {
-        const result = await listDiscoveryProducts({ mode, keyword: query.trim(), categoryId: categoryId === 'all' ? undefined : categoryId,
+        const result = await listDiscoveryProducts(mode === 'auction' ? { mode, page: page - 1, size: PAGE_SIZE } : { mode, keyword: query.trim(), categoryId: categoryId === 'all' ? undefined : categoryId,
           status: 'ACTIVE', page: page - 1, size: PAGE_SIZE, sort: sortValue,
           minPrice: budget === '5to20' ? 5000000 : budget === 'over20' ? 20000001 : undefined,
           maxPrice: budget === 'under5' ? 4999999 : budget === '5to20' ? 20000000 : undefined }, current.signal);
@@ -79,25 +79,17 @@ export function useProductListing() {
     }
     void load();
     const refresh = () => { if (document.visibilityState !== 'hidden') void load(true); };
-    const autoRefresh = mode !== 'buy-now' && Boolean(sessionKey);
+    const autoRefresh = mode === 'auction' && Boolean(sessionKey);
     const timer = autoRefresh ? window.setInterval(refresh, AUCTION_REFRESH_MS) : undefined;
     if (autoRefresh) window.addEventListener('focus', refresh);
     return () => { disposed = true; controller?.abort(); if (timer !== undefined) window.clearInterval(timer); window.removeEventListener('focus', refresh); };
   }, [categoryId, mode, query, budget, sort, page, retry, sessionKey]);
   const start = (page - 1) * PAGE_SIZE;
   const pageProducts = products;
-  const selectSort = (value: string) => { if (value === 'rating') { notify.error('API chưa hỗ trợ sắp xếp theo đánh giá.'); return; } setSort(value); };
+  const selectSort = setSort;
 
-  const activeFilters = [
+  const activeFilters = mode === 'auction' ? [] : [
     ...(query ? [{ label: `Tìm: ${query}`, clear: () => setQuery('') }] : []),
-    ...(mode !== 'all'
-      ? [
-          {
-            label: mode === 'auction' ? 'Đấu giá trực tiếp' : 'Mua ngay',
-            clear: () => setMode('all'),
-          },
-        ]
-      : []),
     ...(budget !== 'all'
       ? [{ label: budgetLabels[budget], clear: () => setBudget('all') }]
       : []),

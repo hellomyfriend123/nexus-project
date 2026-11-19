@@ -282,7 +282,7 @@ export function AdminCommerceOrderDetailsModal(model: ReturnType<typeof useAdmin
               >
                 <i className="bi bi-info-circle-fill me-1"></i>
                 Đơn hàng đã ở trạng thái kết thúc (<code>{selectedOrder.status}</code>).
-                Theo quy định nghiệp vụ Backend (FR-24/25), không thể chuyển sang trạng thái khác.
+                Không thể chuyển sang trạng thái khác.
               </div>
             ) : (
               <div style={{ display: 'flex', gap: '8px', marginTop: '6px', flexWrap: 'wrap' }}>

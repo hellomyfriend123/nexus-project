@@ -1,4 +1,5 @@
 ﻿import { api, ApiError, apiErrorMessage } from './client';
+import { adaptUserProfile, type UpdateProfileInput } from './buyer';
 const rawGet = <T>(path: string, signal?: AbortSignal) => api<T>('/api/v1' + path, { method: 'GET', signal });
 const rawRequest = <T>(path: string, options: RequestInit) => api<T>('/api/v1' + path, options);
 export interface Page<T> { content: T[]; page: number; size: number; totalElements: number; totalPages: number; first: boolean; last: boolean }
@@ -39,6 +40,8 @@ export const sellerApi = {
     order: (id: string, signal?: AbortSignal) => apiGet<Order>(orderPath + '/' + encodeURIComponent(id), signal),
     updateOrder: (id: string, status: string) => apiRequest<Order>(orderPath + '/' + encodeURIComponent(id) + '/status', json('PATCH', { status })),
     cancelOrder: (id: string) => apiRequest<Order>(orderPath + '/' + encodeURIComponent(id) + '/cancel', json('POST')),
+    profile: (signal?: AbortSignal) => api<unknown>('/api/v1/seller/profile', { signal }).then(adaptUserProfile),
+    updateProfile: (input: UpdateProfileInput) => api<unknown>('/api/v1/seller/profile', json('PUT', input)).then(adaptUserProfile),
 };
 export const messageOf = apiErrorMessage;
 export function flatCategories(rows: Category[]): Category[] { return rows.flatMap(row => [row, ...flatCategories(row.children ?? [])]); }

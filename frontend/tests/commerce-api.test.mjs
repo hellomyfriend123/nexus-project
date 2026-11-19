@@ -18,7 +18,8 @@ test('commerce services use exact authenticated Java controller contracts and pr
     const summary = { id: 'order', orderNumber: 'ORD-001', sellerId: 'seller', orderType: 'DIRECT', status: 'PENDING', totalAmount: 20000, itemCount: 1, createdAt: timestamp };
     const order = { ...summary, items: [{ id: 'order-item', productId: 'product', skuId: null, sellerId: 'seller', productNameSnapshot: 'Actual name', quantity: 2, unitPrice: 10000 }], shippingAddress: 'Actual address', receiverName: 'Actual buyer', receiverPhone: '+84901234567' };
     const product = { id: 'product', sellerId: 'seller', name: 'Actual name', basePrice: 10000, categoryId: null, categoryName: null, status: 'ACTIVE', primaryImageUrl: null, createdAt: timestamp, description: null, images: [], updatedAt: timestamp };
-    const profile = { id: 'buyer', email: 'buyer@example.test', username: 'buyer', fullName: 'Buyer', phone: null, address: null, createdAt: timestamp };
+    // Full backend ProfileResponse shape (nexus-user dto/buyer/ProfileResponse.java).
+    const profile = { id: 'buyer', email: 'buyer@example.test', username: 'buyer', fullName: 'Buyer', phone: null, address: null, dateOfBirth: null, gender: null, status: null, createdAt: timestamp, updatedAt: null };
     const rating = { id: 'rating', orderId: 'order', sellerId: 'seller', buyerId: 'buyer', score: 5, comment: null, status: 'ACTIVE', createdAt: timestamp };
     const shipments = [{ trackingNumber: 'TRACK-001', status: 'SHIPPING' }];
     const responses = [
@@ -56,10 +57,10 @@ test('commerce services use exact authenticated Java controller contracts and pr
     await expect(() => commerceApi.discount('CODE', 30000), `${base}/checkout/apply-discount`, 'POST', { code: 'CODE', orderAmount: 30000, orderType: 'DIRECT' });
     const input = { receiverName: 'Actual buyer', receiverPhone: '+84901234567', shippingAddress: 'Actual address', paymentMethod: 'COD', discountCode: 'CODE' };
     await expect(() => commerceApi.checkout(input), `${base}/checkout`, 'POST', input);
-    await expect(() => commerceApi.orders(2), `${base}/orders?page=2&size=100&sort=createdAt,desc`);
+    await expect(() => commerceApi.orders(2, 'SHIPPING'), `${base}/orders?page=2&size=20&sort=createdAt,desc&status=SHIPPING`);
     await expect(() => commerceApi.order('order'), `${base}/orders/order`);
     await expect(() => commerceApi.cancel('order'), `${base}/orders/order/cancel`, 'POST');
-    await expect(() => commerceApi.rateSeller('order', 'seller', 5), `${base}/seller-ratings`, 'POST', { orderId: 'order', sellerId: 'seller', score: 5 });
+    await expect(() => commerceApi.rateSeller('order', 'seller', 3, '  Giao đúng mô tả  '), `${base}/seller-ratings`, 'POST', { orderId: 'order', sellerId: 'seller', score: 3, comment: 'Giao đúng mô tả' });
     await expect(() => buyerApi.profile(), '/api/v1/buyer/profile');
     await expect(() => buyerApi.product('product'), '/api/v1/catalog/products/product');
     await expect(() => buyerApi.shipments('order id'), '/api/v1/buyer/fulfillment/shipments?orderId=order%20id');

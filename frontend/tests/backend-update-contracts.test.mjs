@@ -1,4 +1,4 @@
-﻿import assert from 'node:assert/strict';
+import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { createElement } from 'react';
@@ -67,12 +67,13 @@ test('missing catalog enrichment does not hide valid inventory or header cart', 
 test('buyer order actions follow all five backend statuses', async () => {
   const server = await createServer({ server: { middlewareMode: true, hmr: false, ws: false }, appType: 'custom' });
   try {
-    const { default: Row } = await server.ssrLoadModule('/src/features/buyer-hub/components/OrderRow.tsx');
-    for (const state of ['pending', 'confirmed', 'shipping', 'completed', 'cancelled']) {
-      const order = { state, code: 'ORDER', tag: { tone: 'primary', text: 'DIRECT' }, status: { tone: 'primary', icon: 'bi-box', text: state }, price: 100 };
-      const html = renderToStaticMarkup(createElement(Row, { order, onTrack() {}, onCancel() {}, onReview() {}, onRebuy() {} }));
-      assert.equal(html.includes('Hủy đơn hàng'), ['pending', 'confirmed', 'shipping'].includes(state), state);
-      assert.equal(html.includes('Đánh giá 5 sao'), state === 'completed', state);
+    const { default: Row } = await server.ssrLoadModule('/src/features/buyer-hub/components/BuyerOrderCard.tsx');
+    for (const status of ['PENDING', 'CONFIRMED', 'SHIPPING', 'COMPLETED', 'CANCELLED']) {
+      const order = { id: 'order', status, orderNumber: 'ORD-001', orderType: 'DIRECT', totalAmount: 100, itemCount: 1, createdAt: '2026-01-01T00:00:00Z' };
+      const html = renderToStaticMarkup(createElement(Row, { order, busy: false, reviewed: false, onDetail() {}, onCancel() {}, onReview() {}, onRebuy() {} }));
+      assert.equal(html.includes('Hủy đơn'), ['PENDING', 'CONFIRMED', 'SHIPPING'].includes(status), status);
+      assert.equal(html.includes('Đánh giá người bán'), status === 'COMPLETED', status);
+      assert.match(html, /Xem chi tiết/);
     }
   } finally { await server.close(); }
 });
@@ -91,12 +92,15 @@ test('checkout detects financial drift and validates backend address limits', as
     for (const change of [{ receiverName: 'a'.repeat(151) }, { receiverPhone: 'abc' }, { shippingAddress: 'a'.repeat(501) }]) assert.ok(validateCheckoutAddress({ ...address, ...change }));
     const source = readFileSync(new URL('../src/features/cart/hooks/useCart.ts', import.meta.url), 'utf8');
     const handler = source.slice(source.indexOf('  const handleApplyVoucher'), source.indexOf('  const handleClearVoucher'));
-    assert.ok(handler.indexOf('queue.settle()') < handler.indexOf('commerceApi.cart()'));
+    assert.match(source, /cart: scope\.bind\(commerceApi\.cart\)/);
+    assert.ok(handler.indexOf('queue.settle()') >= 0);
+    assert.ok(handler.indexOf('queue.settle()') < handler.indexOf('api.cart()'));
     assert.match(handler, /Number\(latest.subtotal\)/);
     assert.match(handler, /revision !== cartRevision.current/);
     assert.match(source, /notify.success\('Đã xóa sản phẩm khỏi giỏ hàng.'\); await refreshAfterMutation\(\)/);
     const header = readFileSync(new URL('../src/shared/components/Header/Header.tsx', import.meta.url), 'utf8');
-    assert.match(header, /setSelectedCategory\(cat.id\)/);
+    assert.match(header, /categories\/\$\{category.id\}/);
     assert.doesNotMatch(header, /key=\{cat.name\}|item.name === selectedCategory|cat\.icon/);
   } finally { await server.close(); }
 });
+

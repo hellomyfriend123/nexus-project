@@ -1,0 +1,120 @@
+/* Shared dialog shell. Every selector is scoped to .nx-modal so Bootstrap's own .modal
+   markup stays untouched. Tokens come from variables.css (:root), which also resolves
+   inside seller routes. */
+
+.nx-modal {
+  width: min(600px, calc(100% - 32px));
+  max-width: 100%;
+  max-height: calc(100dvh - 48px);
+  /* A centered dialog must not inherit the UA's auto margins once it goes full-screen. */
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--nx-border);
+  border-radius: var(--nx-radius);
+  background: var(--nx-surface);
+  color: var(--nx-text);
+  box-shadow: 0 24px 80px #13213d33;
+  font: 14px/1.6 'Segoe UI', Arial, sans-serif;
+  overflow: hidden;
+}
+
+.nx-modal--lg { width: min(900px, calc(100% - 32px)); }
+
+.nx-modal::backdrop { background: #17223966; }
+
+.nx-modal .nx-modal__surface {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 48px);
+  min-height: 0;
+}
+
+.nx-modal .nx-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--nx-border);
+}
+
+.nx-modal .nx-modal__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 650;
+  line-height: 1.3;
+  letter-spacing: -0.2px;
+}
+
+.nx-modal .nx-modal__close {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--nx-muted);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.nx-modal .nx-modal__close:hover:not(:disabled) { background: var(--nx-background); color: var(--nx-text); }
+.nx-modal .nx-modal__close:disabled { cursor: not-allowed; opacity: .5; }
+
+.nx-modal .nx-modal__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px;
+  overscroll-behavior: contain;
+}
+
+.nx-modal .nx-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--nx-border);
+  min-width: 0;
+}
+
+/* A long discard prompt takes its own row instead of squeezing the actions off-screen. */
+.nx-modal .nx-modal__footer > p { flex: 1 1 100%; margin: 0; }
+
+.nx-modal :is(input, select, textarea, button, a):focus-visible {
+  outline: 2px solid var(--nx-primary);
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  /* The size modifiers sit after the base rule, so they must be out-specified here or
+     .nx-modal--lg would keep its 900px width on a phone and push the page sideways. */
+  .nx-modal.nx-modal {
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+  }
+  .nx-modal .nx-modal__surface { height: 100%; max-height: 100dvh; }
+  .nx-modal .nx-modal__header,
+  .nx-modal .nx-modal__footer { padding-left: 16px; padding-right: 16px; }
+  .nx-modal .nx-modal__body { padding: 16px; }
+  /* Keep the primary action reachable above the mobile keyboard. */
+  .nx-modal .nx-modal__footer {
+    position: sticky;
+    bottom: 0;
+    background: var(--nx-surface);
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  .nx-modal .nx-modal__footer > :is(button, a) { flex: 0 0 auto; }
+}

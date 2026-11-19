@@ -18,7 +18,7 @@ export function AdminUsersTable(model: ReturnType<typeof useAdminUsers>) {
                 <tbody>
                   {users.length === 0 ? (
                     <tr>
-                      <td colSpan={7} style={{ textAlign: 'center', padding: '32px', color: '#94a3b8' }}>
+                      <td colSpan={7} style={{ textAlign: 'center', padding: '32px', color: '#64748b' }}>
                         {loading
                           ? 'Đang tải dữ liệu từ máy chủ...'
                           : searchKeyword
@@ -40,7 +40,7 @@ export function AdminUsersTable(model: ReturnType<typeof useAdminUsers>) {
                               {user.phone || user.phoneNumber}
                             </span>
                           ) : (
-                            <span style={{ color: '#94a3b8', fontStyle: 'italic', fontSize: '12px' }}>
+                            <span style={{ color: '#64748b', fontStyle: 'italic', fontSize: '12px' }}>
                               Chưa cập nhật
                             </span>
                           )}
@@ -76,7 +76,7 @@ export function AdminUsersTable(model: ReturnType<typeof useAdminUsers>) {
                               {user.role}
                             </span>
                           ) : (
-                            <span style={{ color: '#94a3b8' }}>—</span>
+                            <span style={{ color: '#64748b' }}>N/A</span>
                           )}
                         </td>
                         <td>
@@ -99,7 +99,7 @@ export function AdminUsersTable(model: ReturnType<typeof useAdminUsers>) {
                               type="button"
                               className="nx-btn nx-btn-outline nx-btn-sm"
                               onClick={() => handleViewDetails(user)}
-                              title="Xem chi tiết (GET /api/v1/admin/users/{id})"
+                              title="Xem chi tiết"
                             >
                               <i className="bi bi-eye"></i> Xem
                             </button>
@@ -107,7 +107,7 @@ export function AdminUsersTable(model: ReturnType<typeof useAdminUsers>) {
                               type="button"
                               className="nx-btn nx-btn-primary nx-btn-sm"
                               onClick={() => handleOpenStatusModal(user)}
-                              title="Đổi trạng thái (PATCH /api/v1/admin/users/{id}/status)"
+                              title="Đổi trạng thái"
                             >
                               <i className="bi bi-shield-lock"></i> Đổi trạng thái
                             </button>

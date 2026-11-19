@@ -33,12 +33,11 @@ test('catalog cards and detail keep main UI structures with no fabricated data o
   const { ProductDetail } = await server.ssrLoadModule('/src/features/product/pages/ProductDetailPage.tsx');
   const wrap = component => renderToStaticMarkup(createElement(MemoryRouter, null, component));
   const card = wrap(createElement(Card, { product })); assert.match(card, /product-id/); assert.match(card, /Thêm giỏ/); assert.doesNotMatch(card, /★★★★★|Miễn phí|Trả góp/);
-  for (const slot of ['nx-save', 'u049-product-image', 'nx-old-price', 'nx-shipping']) assert.ok(card.includes(slot), slot);
+  assert.match(card, /u049-product-image/);
+  assert.doesNotMatch(card, /nx-save|nx-old-price|N\/A|chưa được hỗ trợ/);
   const html = wrap(createElement(ProductDetail, { product: { ...product, images: [], description: 'Mô tả thật', updatedAt: product.createdAt } }));
-  for (const name of ['nx-detail-grid','nx-gallery','nx-thumbnails','nx-purchase','nx-seller','nx-detail-bottom','nx-specs','nx-reviews']) assert.ok(html.includes(name), name);
-  assert.equal((html.match(/class="nx-rating-bar"/g) || []).length, 3);
-  assert.match(html, /Thân vỏ: Chưa có dữ liệu <span>Vòng xoay: Chưa có dữ liệu/);
-  assert.match(html, /Lá khẩu: Chưa có dữ liệu <span>Ngoại hình: Chưa có dữ liệu/);
+  for (const name of ['nx-detail-grid','nx-gallery','nx-thumbnails','nx-purchase','nx-detail-bottom','nx-reviews']) assert.ok(html.includes(name), name);
+  assert.doesNotMatch(html, /nx-rating-bar|nx-specs|nx-condition|Watchlist|Nhắn tin|Thông tin mô phỏng/);
   const auctionHtml = wrap(createElement(ProductDetail, { product: { ...product, images: [], updatedAt: product.createdAt }, initialAuction: { id: 'sale', productId: product.id, currentPrice: 1200000, startingPrice: 1000000, status: 'ACTIVE', startTime: '2026-01-01T00:00:00Z', endTime: '2099-01-01T00:00:00Z' } }));
   assert.ok(!auctionHtml.includes('u051-detail-cart')); assert.match(auctionHtml, /<small>giờ<\/small>/);
   assert.ok(html.includes('nx-purchase-button')); assert.ok(!html.includes('nx-detail-buy-actions'));

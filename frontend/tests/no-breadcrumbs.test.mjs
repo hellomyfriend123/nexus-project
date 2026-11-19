@@ -7,7 +7,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { createServer } from 'vite';
 
 test('breadcrumbs stay scoped to the existing seller auction header and styles', () => {
-  const allowed = new Set(['features/seller-auction/components/AuctionHeader.tsx', 'features/seller-auction/styles/create-auction.css']);
+  const allowed = new Set(['features/seller-auction/components/AuctionHeader.tsx']);
   const found = new Set();
   const root = new URL('../src/', import.meta.url);
   function inspect(directory) {
@@ -29,7 +29,7 @@ test('breadcrumbs stay scoped to the existing seller auction header and styles',
   assert.deepEqual([...found].sort(), [...allowed].sort());
 });
 
-test('affected pages omit breadcrumbs while existing auction navigation and checkout steps are preserved', async () => {
+test('affected pages omit breadcrumbs while auction and cart navigation remain available', async () => {
   const server = await createServer({ server: { middlewareMode: true, hmr: false, ws: false }, appType: 'custom' });
   try {
     const { default: AppRoutes } = await server.ssrLoadModule('/src/app/routes/AppRoutes.tsx');
@@ -39,16 +39,16 @@ test('affected pages omit breadcrumbs while existing auction navigation and chec
       assert.doesNotMatch(html, /breadcrumb|nx-[\w-]*crumb|aria-label="Đường dẫn"/i, path);
       assert.match(html, /nexus-header/); assert.match(html, /nexus-footer/);
     }
-    const { default: AuctionHeader } = await server.ssrLoadModule('/src/features/seller-auction/components/AuctionHeader.tsx');
-    const header = renderToStaticMarkup(createElement(MemoryRouter, null, createElement(AuctionHeader)));
-    assert.match(header, /class="sca-breadcrumb" aria-label="Đường dẫn"/);
-    assert.match(header, /href="\/"/); assert.match(header, /href="\/seller-hub"/);
-    assert.match(header, /Tạo Phiên Đấu Giá Mới/); assert.match(header, /sca-stepper/);
+    const auction = renderRoute('/seller/auctions/new');
+    assert.match(auction, /href="\/seller-hub\?tab=auctions"/);
+    assert.match(auction, /Tạo phiên đấu giá/);
+    assert.doesNotMatch(auction, /sca-breadcrumb|sca-stepper|Anti-Sniping/);
     const cart = renderRoute('/cart');
-    assert.match(cart, /nx-cart-stepper/);
-    assert.equal((cart.match(/class="nx-cart-step-item"/g) || []).length, 3);
+    assert.match(cart, /Giỏ hàng của bạn/);
+    assert.match(cart, /href="\/products"[^>]*>Tiếp tục mua sắm/);
+    assert.doesNotMatch(cart, /nx-cart-stepper/);
     const inventory = renderRoute('/seller/products');
-    assert.match(inventory, /Đồng bộ kho/); assert.match(inventory, /nx-stock-heading/);
-    assert.match(renderRoute('/seller/orders/success'), /Điều hướng đơn hàng/);
+    assert.match(inventory, /Sản phẩm &amp; tồn kho/); assert.match(inventory, /nx-stock-heading/);
+    assert.match(renderRoute('/seller/orders/success'), /href="\/seller-hub\?tab=orders"/);
   } finally { await server.close(); }
 });

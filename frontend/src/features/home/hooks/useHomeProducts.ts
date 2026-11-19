@@ -1,5 +1,6 @@
-﻿import { useEffect, useState } from 'react';
-import { listCatalogProducts, listAuctions, type Listing } from '../../../services/api/catalog';
+import { useEffect, useState } from 'react';
+import type { Listing } from '../../../services/api/catalog';
+import { loadHomeProducts } from '../services/homeProducts';
 import { AUCTION_REFRESH_MS } from '../../../services/api/discovery';
 import { apiErrorMessage } from '../../../services/api/client';
 import { getSession } from '../../../services/api/auth';
@@ -17,8 +18,10 @@ export function useHomeProducts(auction = false) {
    if (disposed || (background && controller && !controller.signal.aborted)) return;
    const current = new AbortController(); controller = current;
    try {
-    const page = auction ? await listAuctions(new URLSearchParams({ status: 'ACTIVE', page: '0', size: '12', sort: 'endTime,asc' }), current.signal) : await listCatalogProducts({ status: 'ACTIVE', size: 12, page: 0, sort: 'createdAt,desc' }, current.signal);
-    if (!disposed && !current.signal.aborted) { setProducts(page.content); setError(''); }
+    const result = await loadHomeProducts(auction, current.signal);
+    if (!disposed && !current.signal.aborted) {
+     setProducts(result); setError('');
+    }
    } catch (error) { if (!disposed && !current.signal.aborted) { setError(apiErrorMessage(error)); if (!background) notify.error(apiErrorMessage(error)); } }
    finally { if (!disposed && !current.signal.aborted) setLoading(false); if (controller === current) controller = undefined; }
   }
@@ -28,5 +31,5 @@ export function useHomeProducts(auction = false) {
   if (auction) window.addEventListener('focus', refresh);
   return () => { disposed = true; controller?.abort(); if (timer !== undefined) window.clearInterval(timer); window.removeEventListener('focus', refresh); };
  }, [auction, sessionKey]);
- return { products, loading, error };
+ return { products, loading, error, requiresLogin: auction && !sessionKey };
 }

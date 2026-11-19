@@ -1,35 +1,35 @@
-﻿import assert from 'node:assert/strict';
+import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
 import { createServer } from 'vite';
 
-test('buyer hub renders real-data loading shell and honest unsupported tabs, without fixture records', async () => {
+test('buyer hub waits for actual orders and removes unsupported workspace tabs', async () => {
   const server = await createServer({ server: { middlewareMode: true, hmr: false, ws: false }, appType: 'custom' });
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'sessionStorage');
+  let session = null;
+  Object.defineProperty(globalThis, 'sessionStorage', { configurable: true, value: { getItem: () => session, removeItem() {} } });
   try {
     const { default: BuyerHubPage } = await server.ssrLoadModule('/src/features/buyer-hub/pages/BuyerHubPage.tsx');
     const render = path => renderToStaticMarkup(createElement(MemoryRouter, { initialEntries: [path] }, createElement(BuyerHubPage)));
-    const html = render('/buyer-hub');
-    assert.match(html, /nx-hub-page/);
-    assert.match(html, /Đang tải dữ liệu/);
-    assert.match(html, /id="hub-panel-orders"/);
-    assert.match(html, /Chưa hỗ trợ/);
-    assert.match(html, /class="nx-hub-win"/);
-    assert.match(html, /Backend chưa cung cấp danh sách phiên thắng/);
-    assert.match(html, /disabled=""[^>]*>Thanh toán chưa khả dụng/);
-    assert.doesNotMatch(html, /Chúc mừng! Bạn đã thắng phiên đấu giá/);
-    assert.doesNotMatch(html, /Alex Nguyen|Đơn hàng DEMO|#AUC-|Nexus Gold Verified/);
-    for (const tab of ['auctions', 'orders', 'cart', 'c2c']) assert.match(html, new RegExp(`id="hub-tab-${tab}"`));
-    const saved = render('/buyer-hub?tab=saved');
-    assert.match(saved, /id="hub-panel-cart"/);
-    assert.match(saved, /Backend chưa hỗ trợ danh sách lưu sau/);
-    const c2c = render('/buyer-hub?tab=c2c');
-    assert.match(c2c, /Backend chưa hỗ trợ phiên C2C/);
-    assert.doesNotMatch(c2c, /#AUC-|MacBook|Kashtira/);
-    const { matchesAuctionFilter } = await server.ssrLoadModule('/src/features/buyer-hub/hooks/useBuyerHub.ts');
-    assert.equal(matchesAuctionFilter('lost', 'won'), false);
-    assert.equal(matchesAuctionFilter('won', 'won'), true);
-    assert.equal(matchesAuctionFilter('lost', 'all'), true);
-  } finally { await server.close(); }
+    const guest = render('/buyer-hub');
+    assert.match(guest, /Đăng nhập để theo dõi/);
+    assert.match(guest, /href="\/login"/);
+    assert.doesNotMatch(guest, /buyer-order-status|Đang tải đơn hàng/);
+    session = JSON.stringify({ userId: 'buyer', email: 'buyer@example.test', fullName: 'Buyer', roles: ['BUYER'], accessToken: 'test-token', tokenType: 'Bearer', expiresAt: '2099-01-01T00:00:00Z' });
+    for (const path of ['/buyer-hub', '/buyer-hub?tab=saved', '/buyer-hub?tab=c2c']) {
+      const html = render(path);
+      assert.match(html, /Đơn hàng của tôi/);
+      assert.match(html, /Đang tải đơn hàng/);
+      assert.match(html, /buyer-order-status/);
+      assert.match(html, /Chờ xác nhận/);
+      assert.match(html, /Đã xác nhận/);
+      assert.doesNotMatch(html, /hub-tab-c2c|hub-panel-cart|Ví Nexus|Nexus Gold|Alex Nguyen|#AUC-|chưa được hỗ trợ|N\/A/);
+      assert.doesNotMatch(html, /Chưa có đơn hàng/);
+    }
+  } finally {
+    if (descriptor) Object.defineProperty(globalThis, 'sessionStorage', descriptor); else delete globalThis.sessionStorage;
+    await server.close();
+  }
 });

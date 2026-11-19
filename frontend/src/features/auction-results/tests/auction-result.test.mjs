@@ -40,7 +40,7 @@ test('result uses real contracts, all bid pages, server identity and unavailable
   assert.throws(()=>adaptSettlement({status:'WON'}));
   const {default:WinnerHero}=await server.ssrLoadModule('/src/features/auction-results/components/WinnerHero.tsx');
   const html=renderToStaticMarkup(createElement(WinnerHero,{summary:win.summary,settlement:win.settlement,seconds:0,onAction:()=>{}}));
-  assert.match(html,/CHÚC MỪNG/);assert.match(html,/Thanh toán chưa khả dụng/);assert.match(html,/disabled/);assert.doesNotMatch(html,/23:59:51|45M|14%/);
+  assert.match(html,/Chúc mừng/);assert.match(html,/Đơn hàng chưa được liên kết/);assert.doesNotMatch(html,/chưa được hỗ trợ|disabled|23:59:51|45M|14%/);
  } finally {
   globalThis.fetch=originalFetch;
   if(oldLocal)Object.defineProperty(globalThis,'localStorage',oldLocal);else delete globalThis.localStorage;

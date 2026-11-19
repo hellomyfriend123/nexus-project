@@ -22,7 +22,7 @@ export function AdminUsersFilters(model: ReturnType<typeof useAdminUsers>) {
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              color: '#94a3b8',
+              color: '#64748b',
               padding: 0,
               fontSize: '14px',
               display: 'flex',

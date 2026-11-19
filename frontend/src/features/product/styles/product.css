@@ -125,7 +125,7 @@
 }
 .nx-detail-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.95fr) minmax(0, 0.66fr);
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   gap: 24px;
   align-items: start;
 }
@@ -507,3 +507,43 @@
 .nx-reviews > .nx-button {
   width: 100%;
 }
+
+/* Readable product presentation, without unsupported capability panels. */
+.nx-detail-page { padding-top: 24px; padding-bottom: 48px; }
+.nx-detail-page .nx-detail-actions button { font-size: 14px; padding: 9px 14px; border-radius: 8px; background: #eef2f7; }
+.nx-detail-page .nx-purchase h1 { font-size: clamp(25px, 3vw, 34px); line-height: 1.25; }
+.nx-detail-page .nx-purchase > .nx-eyebrow { font-size: 13px; letter-spacing: .4px; }
+.nx-detail-page .nx-detail-price small { font-size: 14px; color: #526079; }
+.nx-detail-page .nx-detail-price strong { font-size: clamp(27px, 3vw, 36px); }
+.nx-detail-page .nx-purchase-button { font-size: 16px; border-radius: 9px; }
+.nx-detail-page .nx-description-content, .nx-detail-page .nx-reviews { font-size: 15px; line-height: 1.7; }
+.nx-detail-page .nx-review small { font-size: 13px; color: #526079; }
+.nx-detail-page .nx-detail-bottom { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+.nx-detail-page .nx-gallery-main { min-height: 360px; display: flex; flex-direction: column; }
+.nx-detail-page .nx-gallery-main > div:nth-child(2) { flex: 1; display: grid; place-items: center; }
+.nx-detail-page .nx-gallery-main img { max-height: 440px; }
+.nx-detail-page .nx-thumbnails { flex-wrap: wrap; }
+.nx-detail-page .nx-history { overflow-wrap: anywhere; font-size: 14px; }
+.nx-product-results .nx-results-intro h1 { font-size: clamp(24px, 3vw, 30px); margin: 0 0 8px; }
+.nx-product-card .nx-card-actions > :only-child { width: 100%; }
+@media (max-width: 820px) {
+ .nx-detail-page .nx-detail-grid, .nx-detail-page .nx-detail-bottom { grid-template-columns: minmax(0, 1fr); }
+ .nx-detail-page .nx-gallery-main { min-height: 280px; }
+}
+@media (max-width: 480px) {
+ .nx-detail-page .nx-panel { padding: 18px; }
+ .nx-detail-page .nx-detail-actions { flex-wrap: wrap; justify-content: flex-start; gap: 8px; }
+}
+
+
+.nx-detail-page .nx-detail-price > div:only-child { text-align: left; }
+.nx-detail-page .nx-bid-label { font-size: 14px; color: #526079; }
+.nx-detail-page .nx-auction-clock { font-size: 13px; }
+.nx-detail-page .nx-auction-clock > p { font-size: 12px; }
+.nx-detail-page .nx-bid-increments button { font-size: 13px; min-height: 36px; }
+@media (max-width: 480px) {
+ .nx-detail-page .nx-detail-price { flex-direction: column; }
+ .nx-detail-page .nx-detail-price > div:last-child { text-align: left; }
+ .nx-detail-page .nx-auction-clock > span { float: none; display: block; margin-top: 8px; }
+}
+

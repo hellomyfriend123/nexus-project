@@ -14,9 +14,8 @@ export function useProductDetail(product: CatalogProductDetail, initialAuction: 
  const [reviewPage, setReviewPage] = useState(0); const [reviews, setReviews] = useState<PageResponse<Review> | null>(null); const [reviewError, setReviewError] = useState('');
  const [bidPage, setBidPage] = useState(0); const [bids, setBids] = useState<PageResponse<Bid> | null>(null); const [bidError, setBidError] = useState(''); const [refresh, setRefresh] = useState(0);
  const [clock, setClock] = useState(() => Date.now());
- const unsupported = (feature: string) => notify.error(feature + ' chưa được máy chủ hỗ trợ.');
  const images = product.images.length ? product.images : product.primaryImageUrl ? [product.primaryImageUrl] : [];
- useEffect(() => { const timer = window.setInterval(() => setClock(Date.now()), 1000); return () => window.clearInterval(timer); }, []);
+ useEffect(() => { if (!initialAuction) return; const timer = window.setInterval(() => setClock(Date.now()), 1000); return () => window.clearInterval(timer); }, [initialAuction]);
  useEffect(() => { const controller = new AbortController(); setReviewError(''); setReviews(null);
   getReviews(product.id, reviewPage, controller.signal).then(setReviews).catch(error => { if (!controller.signal.aborted) { setReviewError(apiErrorMessage(error)); notify.error(apiErrorMessage(error)); } }); return () => controller.abort();
  }, [product.id, reviewPage]);
@@ -39,5 +38,5 @@ export function useProductDetail(product: CatalogProductDetail, initialAuction: 
  async function share() { try { await navigator.clipboard.writeText(window.location.href); notify.success('Đã sao chép liên kết sản phẩm.'); } catch { notify.error('Không thể sao chép liên kết.'); } }
  const remaining = auction ? Math.max(0, new Date(auction.endTime).getTime() - clock) : 0;
  const active = auction?.status === 'ACTIVE' && clock >= new Date(auction.startTime).getTime() && remaining > 0;
- return { navigate, auction, quantity, setQuantity, image, setImage, bid, setBid, pending, bidRefreshFailed, notice, added, stageRef, imageRef, cartRef, badgeRef, addToCart, reviewPage, setReviewPage, reviews, reviewError, bidPage, setBidPage, bids, bidError, unsupported, images, submitBid, share, remaining, active };
+ return { navigate, auction, quantity, setQuantity, image, setImage, bid, setBid, pending, bidRefreshFailed, notice, added, stageRef, imageRef, cartRef, badgeRef, addToCart, reviewPage, setReviewPage, reviews, reviewError, bidPage, setBidPage, bids, bidError, images, submitBid, share, remaining, active };
 }

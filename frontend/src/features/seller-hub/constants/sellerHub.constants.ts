@@ -1,9 +1,9 @@
 // UI configuration preserved from the original consumers.
 import type { SellerTab } from '../types/sellerHub';
 export const sellerTabs: SellerTab[] = [
-  { id: 'products', icon: 'box-seam', label: 'Quản lý Sản phẩm & Tồn kho (CRUD)', badge: '48' },
-  { id: 'auctions', icon: 'hammer', label: 'Phiên Đấu Giá (Active Auctions)', badge: '5 Live' },
-  { id: 'orders', icon: 'truck', label: 'Đơn Hàng & Vận Chuyển (Fulfillment)', badge: '8' },
+  { id: 'products', icon: 'box-seam', label: 'Quản lý Sản phẩm & Tồn kho', badge: '48' },
+  { id: 'auctions', icon: 'hammer', label: 'Phiên Đấu Giá', badge: '5 Live' },
+  { id: 'orders', icon: 'truck', label: 'Đơn Hàng & Vận Chuyển', badge: '8' },
   { id: 'reports', icon: 'graph-up-arrow', label: 'Báo cáo & Đánh giá shop', badge: '' },
 ];
 

@@ -1,0 +1,35 @@
+/* Product thumbnail. Size lives in a custom property so every list can share one ratio and
+   radius while each list keeps its own rhythm. */
+
+.nx-thumb {
+  --nx-thumb-size: 64px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 var(--nx-thumb-size);
+  width: var(--nx-thumb-size);
+  height: var(--nx-thumb-size);
+  overflow: hidden;
+  border: 1px solid var(--nx-border);
+  border-radius: 8px;
+  background: var(--nx-background);
+}
+
+.nx-thumb .nx-thumb__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.nx-thumb .nx-thumb__placeholder {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: var(--nx-muted);
+  font-size: 22px;
+}
+
+@media (max-width: 640px) {
+  .nx-thumb { --nx-thumb-size: 56px; }
+}

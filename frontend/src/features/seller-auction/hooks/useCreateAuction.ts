@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { ApiError } from '../../../services/api/client';
 import { getSession } from '../../../services/api/auth';
 import { messageOf, type Auction } from '../../../services/api/seller';
@@ -6,7 +7,18 @@ import { createAuction, createAuctionDraft, getAuctionProducts } from '../servic
 import type { AuctionDraft, AuctionProduct } from '../types/createAuction';
 import { getAuctionEndDate } from '../utils/auctionFormatting';
 import { validateAuction } from '../utils/auctionValidation';
-export function useCreateAuction() {
+export interface CreateAuctionOptions {
+  /** Preselected product, used when the dialog is opened from an inventory row. */
+  initialProductId?: string | null;
+  /** Called once the auction has been created successfully. */
+  onSuccess?: (auction: Auction) => void;
+}
+export function useCreateAuction(options: CreateAuctionOptions = {}) {
+  const [params] = useSearchParams();
+  // The URL is the fallback so direct visits to /seller/auctions/new?productId=… still preselect.
+  const requestedProductId = options.initialProductId ?? params.get('productId');
+  const onSuccess = useRef(options.onSuccess);
+  onSuccess.current = options.onSuccess;
   const [products, setProducts] = useState<AuctionProduct[]>([]);
   const [draft, setDraft] = useState(createAuctionDraft);
   const [errors, setErrors] = useState<string[]>([]);
@@ -42,11 +54,14 @@ export function useCreateAuction() {
       if (!sellerId) throw new Error('Vui lòng đăng nhập tài khoản người bán.');
       return getAuctionProducts(sellerId, controller.signal);
     }).then(rows => {
-      if (!controller.signal.aborted && key === sessionKey()) setProducts(rows);
+      if (!controller.signal.aborted && key === sessionKey()) {
+        setProducts(rows);
+        if (requestedProductId && rows.some(row => row.id === requestedProductId)) setDraft(previous => previous.productId ? previous : { ...previous, productId: requestedProductId });
+      }
     }).catch(error => { if (!controller.signal.aborted && key === sessionKey()) setLoadError(messageOf(error)); })
       .finally(() => { if (!controller.signal.aborted && key === sessionKey()) setLoading(false); });
     return () => controller.abort();
-  }, [reload]);
+  }, [reload, requestedProductId]);
   const product = products.find(item => item.id === draft.productId);
   function update<K extends keyof AuctionDraft>(key: K, value: AuctionDraft[K]) {
     if (!lock.current && !created && !uncertain) setDraft(previous => ({ ...previous, [key]: value }));
@@ -64,7 +79,7 @@ export function useCreateAuction() {
     const attempt = revision.current;
     const key = sessionKey();
     const current = () => attempt === revision.current && key === sessionKey();
-    try { const auction = await createAuction(draft, products); if (current()) setCreated(auction); }
+    try { const auction = await createAuction(draft, products); if (current()) { setCreated(auction); onSuccess.current?.(auction); } }
     catch (error) {
       if (current()) {
         const unknownOutcome = !(error instanceof ApiError) || error.status < 400 || error.status >= 500 || error.status === 408;

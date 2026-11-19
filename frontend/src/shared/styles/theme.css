@@ -1,39 +1,9 @@
-.nx-button-primary {
-  background: #315bf4;
-  color: white !important;
-}
-.nx-button-red {
-  background: #c6002e;
-  color: #fff !important;
-}
-.nx-button-soft {
-  background: #f0eded;
-  color: #444;
-}
-.nx-button-light {
-  background: #fff;
-  color: #c4002c !important;
-}
-.nx-red {
-  color: #c6002e;
-}
-.nx-blue {
-  color: #0751e9;
-}
-.nx-muted {
-  color: #787986;
-  font-size: 12px;
-}
-.nx-eyebrow {
-  font-size: 10px;
-  font-weight: 750;
-  letter-spacing: 0.6px;
-}
-.nx-live-dot {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  background: currentColor;
-  border-radius: 50%;
-  margin-right: 4px;
-}
+.nx-button-primary { background: var(--nx-primary); color: white !important; }
+.nx-button-red { background: var(--nx-danger); color: white !important; }
+.nx-button-soft { background: #edf1fa; color: #334155; }
+.nx-button-light { background: #fff; color: var(--nx-primary) !important; border-color: #d8deea; }
+.nx-red { color: var(--nx-danger); }
+.nx-blue { color: var(--nx-primary); }
+.nx-muted { color: var(--nx-muted); font-size: 14px; }
+.nx-eyebrow { font-size: 12px; font-weight: 650; letter-spacing: 1px; }
+.nx-live-dot { display: inline-block; width: 6px; height: 6px; background: currentColor; border-radius: 50%; margin-right: 4px; }

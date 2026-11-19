@@ -10,7 +10,7 @@ export function AdminCommerceCampaignsPanel(model: ReturnType<typeof useAdminCom
                 <div>
                   <h2 className="nx-admin-card-title">Chiến dịch khuyến mãi toàn sàn (Marketing Campaigns)</h2>
                   <p style={{ margin: '4px 0 0 0', fontSize: '12.5px', color: '#64748b' }}>
-                    Khung chương trình marketing tổng thể theo mùa/sự kiện (FR-46, FR-58). Mỗi chiến dịch có thể chứa nhiều Mã giảm giá (Vouchers) trực thuộc.
+                    Khung chương trình marketing tổng thể theo mùa/sự kiện. Mỗi chiến dịch có thể chứa nhiều Mã giảm giá (Vouchers) trực thuộc.
                   </p>
                 </div>
                 <button
@@ -61,7 +61,7 @@ export function AdminCommerceCampaignsPanel(model: ReturnType<typeof useAdminCom
                             <strong style={{ color: '#1e293b', fontSize: '14px' }}>{camp.name}</strong>
                           </td>
                           <td style={{ color: '#475569', fontSize: '12.5px', lineHeight: 1.4 }}>
-                            {camp.description || <em style={{ color: '#94a3b8' }}>Không có mô tả</em>}
+                            {camp.description || <em style={{ color: '#64748b' }}>Không có mô tả</em>}
                           </td>
                           <td style={{ fontSize: '12.5px', whiteSpace: 'nowrap' }}>
                             <div>
@@ -106,7 +106,7 @@ export function AdminCommerceCampaignsPanel(model: ReturnType<typeof useAdminCom
                                 type="button"
                                 className="nx-btn nx-btn-outline nx-btn-sm"
                                 onClick={() => handleOpenEditCampaign(camp)}
-                                title="Chỉnh sửa chiến dịch (PUT /api/v1/admin/commerce/campaigns/{id})"
+                                title="Chỉnh sửa chiến dịch"
                               >
                                 <i className="bi bi-pencil"></i> Sửa
                               </button>
@@ -115,7 +115,7 @@ export function AdminCommerceCampaignsPanel(model: ReturnType<typeof useAdminCom
                                   type="button"
                                   className="nx-btn nx-btn-danger nx-btn-sm"
                                   onClick={() => handleEndCampaign(camp.id)}
-                                  title="Kết thúc chiến dịch (DELETE /api/v1/admin/commerce/campaigns/{id})"
+                                  title="Kết thúc chiến dịch"
                                 >
                                   <i className="bi bi-stop-circle"></i> Kết thúc
                                 </button>

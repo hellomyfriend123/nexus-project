@@ -1,0 +1,147 @@
+/* Account area frame shared by buyer and seller. Tokens are the global --nx-* set from
+   variables.css, so both roles read the same and the portal-free dialogs keep matching. */
+
+.nx-account {
+  padding: 32px 0 56px;
+  color: var(--nx-text);
+  font: 14px/1.6 'Segoe UI', Arial, sans-serif;
+}
+
+.nx-account .nx-account__container {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+  width: min(calc(100% - 64px), 1320px);
+  margin: 0 auto;
+}
+
+.nx-account .nx-account__rail { min-width: 0; }
+
+.nx-account .nx-account__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--nx-border);
+  border-radius: var(--nx-radius);
+  background: var(--nx-surface);
+}
+
+.nx-account .nx-account__nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  color: var(--nx-muted);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.nx-account .nx-account__nav-item:hover { background: var(--nx-background); color: var(--nx-text); }
+
+.nx-account .nx-account__nav-item.is-active {
+  background: #eef2ff;
+  color: var(--nx-primary);
+}
+
+.nx-account .nx-account__nav-item :is(i) { font-size: 16px; }
+
+.nx-account .nx-account__content { min-width: 0; }
+
+/* Existing feature pages now live inside the shared container. Avoid a second gutter. */
+.nx-account .nx-account__content > main { padding: 0; width: 100%; margin: 0; }
+.nx-account .nx-account__content > main > .nx-container { width: 100%; max-width: none; margin: 0; padding: 0; }
+.nx-account .nx-account__select { width: 100%; min-height: 42px; padding: 10px 12px; border: 1px solid var(--nx-border); border-radius: 9px; background: var(--nx-surface); color: var(--nx-text); font: inherit; }
+
+.nx-account .nx-account__mobile-picker { display: none; }
+
+.nx-account .nx-account__page { min-width: 0; }
+
+.nx-account .nx-account__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.nx-account .nx-account__heading h1 {
+  margin: 0 0 6px;
+  font-size: clamp(22px, 2.6vw, 30px);
+  line-height: 1.25;
+  letter-spacing: -0.4px;
+}
+
+.nx-account .nx-account__heading p { margin: 0; color: var(--nx-muted); }
+
+/* Shared form primitives for the account sections. Scoped so a bare `input` rule never leaks. */
+.nx-account .nx-account__form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  border: 1px solid var(--nx-border);
+  border-radius: var(--nx-radius);
+  background: var(--nx-surface);
+  max-width: 640px;
+}
+
+.nx-account .nx-account__field { display: flex; flex-direction: column; gap: 8px; }
+
+.nx-account .nx-account__field > label,
+.nx-account .nx-account__label { font-weight: 600; }
+
+.nx-account .nx-account__field :is(input, select, textarea) {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--nx-border);
+  border-radius: 9px;
+  background: var(--nx-surface);
+  color: var(--nx-text);
+  font: inherit;
+}
+
+.nx-account .nx-account__field :is(input, select, textarea):disabled {
+  background: var(--nx-background);
+  color: var(--nx-muted);
+  cursor: not-allowed;
+}
+
+.nx-account .nx-account__field textarea { min-height: 96px; resize: vertical; }
+
+.nx-account .nx-account__hint { margin: 0; color: var(--nx-muted); font-size: 13px; }
+
+.nx-account .nx-account__error { margin: 0; color: var(--nx-danger); font-weight: 600; }
+
+.nx-account .nx-account__status { margin: 0; color: #166534; font-weight: 600; }
+
+.nx-account .nx-account__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+/* Buttons inside the form default to the column's full width; only the action row keeps that. */
+.nx-account .nx-account__form > .nx-button { align-self: flex-start; }
+
+@media (max-width: 900px) {
+  .nx-account { padding: 24px 0 40px; }
+  .nx-account .nx-account__container {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .nx-account .nx-account__rail { display: none; }
+  .nx-account .nx-account__mobile-picker { display: flex; flex-direction: column; gap: 6px; }
+  .nx-account .nx-account__mobile-label { font-weight: 600; }
+}
+
+@media (max-width: 640px) {
+  .nx-account .nx-account__container { width: calc(100% - 32px); }
+  .nx-account .nx-account__form { padding: 16px; }
+}

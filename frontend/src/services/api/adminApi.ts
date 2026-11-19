@@ -141,6 +141,7 @@ export const adminCommerceApi = {
     status?: OrderStatus | 'ALL';
     page?: number;
     size?: number;
+    sort?: 'createdAt,asc' | 'createdAt,desc';
   }) => {
     const sp = new URLSearchParams();
     if (params?.buyerId) sp.set('buyerId', params.buyerId);
@@ -148,6 +149,7 @@ export const adminCommerceApi = {
     if (params?.status && params.status !== 'ALL') sp.set('status', params.status);
     if (params?.page !== undefined) sp.set('page', String(params.page));
     if (params?.size !== undefined) sp.set('size', String(params.size));
+    if (params?.sort) sp.set('sort', params.sort);
     const qs = sp.toString();
     return apiClient<PageResponse<DetailedAdminOrder>>(`/api/v1/admin/commerce/orders${qs ? `?${qs}` : ''}`);
   },

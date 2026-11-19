@@ -9,7 +9,7 @@ export function AdminCatalogCategoriesPanel(model: ReturnType<typeof useAdminCat
             <div className="nx-admin-card">
               <div className="nx-admin-card-header">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <h2 className="nx-admin-card-title">Danh sách Danh mục hàng hoá (FR-09, FR-54)</h2>
+                  <h2 className="nx-admin-card-title">Danh sách Danh mục hàng hoá</h2>
                   <select
                     value={categoryStatusFilter}
                     onChange={(e) => setCategoryStatusFilter(e.target.value)}

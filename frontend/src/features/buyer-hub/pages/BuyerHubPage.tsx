@@ -1,176 +1,30 @@
-import AuctionTab from '../components/AuctionTab';
-import AuctionWinAlert from '../components/AuctionWinAlert';
-import BuyerKpiGrid from '../components/BuyerKpiGrid';
-import BuyerProfileCard from '../components/BuyerProfileCard';
-import C2cTab from '../components/C2cTab';
-import GuaranteeWidget from '../components/GuaranteeWidget';
-import HubTabs from '../components/HubTabs';
-import LiveFeedWidget from '../components/LiveFeedWidget';
-import OrdersTab from '../components/OrdersTab';
-import SavedCartTab from '../components/SavedCartTab';
-import SupportWidget from '../components/SupportWidget';
-import { useBuyerHubViewModel } from '../hooks/useBuyerHubViewModel';
-import {
-  c2cCategories,
-  c2cDurations,
-  guaranteeItems,
-  hubCopy,
-} from '../constants/buyerHub.constants';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import Modal from 'react-bootstrap/Modal';
+import { useBuyerHub, orderStatusLabels } from '../hooks/useBuyerHub';
+import { formatVnd } from '../utils/buyerHub.format';
+import BuyerOrderCard from '../components/BuyerOrderCard';
+import Thumbnail from '../../../shared/components/Thumbnail/Thumbnail';
 
-/**
- * Buyer Hub — "Trung tâm Mua hàng & Quản lý Đấu giá".
- * Live orders and profile; unsupported backend capabilities retain empty states.
- */
 export default function BuyerHubPage() {
-  const {
-    orderCount, loading, loadError, buyerProfile,
-    displayKpis, displayTabs, displayAuctionFilters, displayOrderFilters,
-    handleMoveToCart,
-    activeTab,
-    setActiveTab,
-    auctionFilter,
-    orderFilter,
-    auctionSearch,
-    setAuctionSearch,
-    visibleBids,
-    visibleOrders,
-    winRemaining,
-    items,
-    selectedItemCount,
-    savedSubtotal,
-    c2cDraft,
-    handleOpenC2c,
-    handleBidAction,
-    handleBidHistory,
-    handleSelectAuctionFilter,
-    handleSelectOrderFilter,
-    handlePayment,
-    handleWinDetail,
-    handleTrackShipment,
-    handleCancelOrder,
-    handleReviewOrder,
-    handleRebuy,
-    handleToggleItem,
-    handleSelectAllItems,
-    handleQuantityChange,
-    handleRemoveItem,
-    handleCheckoutSelected,
-    handleC2cViewBidders,
-    handleC2cEndEarly,
-    handleC2cDraftChange,
-    handleC2cReset,
-    handleC2cSubmit,
-    handleLiveFeedAction,
-    handleGuaranteeLink,
-    handleComplaint,
-    handleSupportChat,
-  } = useBuyerHubViewModel();
-
-  return (
-    <main className="nx-hub-page">
-      <div className="nx-container">
-
-        <p className="nx-hub-empty" role="status">{loading ? "Đang tải dữ liệu..." : loadError || "Đơn hàng và hồ sơ được tải từ máy chủ. Backend chưa hỗ trợ danh sách đấu giá cá nhân, lưu sau, ví và chỉ số người mua."}</p>
-        <BuyerProfileCard profile={buyerProfile} onCreateAuction={handleOpenC2c} />
-
-        <BuyerKpiGrid kpis={displayKpis} timerSeconds={winRemaining} />
-
-        <AuctionWinAlert notice={null} onViewDetail={handleWinDetail} onPay={handlePayment} />
-
-        <div className="nx-hub-layout">
-          <div className="nx-hub-main">
-            <HubTabs tabs={displayTabs} activeTab={activeTab} onChange={setActiveTab} />
-
-            {activeTab === 'auctions' && (
-              <AuctionTab
-                filters={displayAuctionFilters}
-                activeFilter={auctionFilter}
-                search={auctionSearch}
-                filterLabel={hubCopy.auctionFilterLabel}
-                searchPlaceholder={hubCopy.auctionSearchPlaceholder}
-                bids={visibleBids}
-                onFilterChange={handleSelectAuctionFilter}
-                onSearchChange={setAuctionSearch}
-                onBidAction={handleBidAction}
-                onBidHistory={handleBidHistory}
-              />
-            )}
-
-            {activeTab === 'orders' && (
-              <>
-
-              <OrdersTab
-                filters={displayOrderFilters}
-                activeFilter={orderFilter}
-                summary={`${orderCount} đơn hàng từ máy chủ`}
-                orders={visibleOrders}
-                onFilterChange={handleSelectOrderFilter}
-                onTrack={handleTrackShipment}
-                onCancel={handleCancelOrder}
-                onReview={handleReviewOrder}
-                onRebuy={handleRebuy}
-              />
-              </>
-            )}
-
-            {activeTab === 'cart' && (
-              <SavedCartTab
-                title="Sản phẩm đã lưu"
-                summary="Backend chưa hỗ trợ danh sách lưu sau."
-                selectAllLabel="Chọn tất cả để chuyển vào giỏ"
-                items={items}
-                selectedCount={selectedItemCount}
-                subtotal={savedSubtotal}
-                onToggle={handleToggleItem}
-                onSelectAll={handleSelectAllItems}
-                onQuantityChange={handleQuantityChange}
-                onRemove={handleRemoveItem}
-                onMoveToCart={handleMoveToCart}
-                onCheckout={handleCheckoutSelected}
-              />
-            )}
-
-            {activeTab === 'c2c' && (
-              <C2cTab
-                title={hubCopy.c2cTitle}
-                subtitle={hubCopy.c2cSubtitle}
-                activeLabel={hubCopy.c2cActiveLabel}
-                formTitle={hubCopy.c2cFormTitle}
-                auction={null}
-                categories={c2cCategories}
-                durations={c2cDurations}
-                draft={c2cDraft}
-                onViewBidders={handleC2cViewBidders}
-                onEndEarly={handleC2cEndEarly}
-                onDraftChange={handleC2cDraftChange}
-                onReset={handleC2cReset}
-                onSubmit={handleC2cSubmit}
-              />
-            )}
-          </div>
-
-          <aside className="nx-hub-aside">
-            <LiveFeedWidget
-              title={hubCopy.liveFeedTitle}
-              items={[]}
-              onAction={handleLiveFeedAction}
-            />
-            <GuaranteeWidget
-              title={hubCopy.guaranteeTitle}
-              subtitle={hubCopy.guaranteeSubtitle}
-              items={guaranteeItems}
-              linkLabel={hubCopy.guaranteeLink}
-              onLink={handleGuaranteeLink}
-            />
-            <SupportWidget
-              title={hubCopy.supportTitle}
-              body={hubCopy.supportBody}
-              onComplaint={handleComplaint}
-              onChat={handleSupportChat}
-            />
-          </aside>
-        </div>
-      </div>
-    </main>
-  );
+  const hub = useBuyerHub();
+  const [score, setScore] = useState(5);
+  const [comment, setComment] = useState('');
+  const profileName = hub.profile?.fullName || hub.profile?.username;
+  if (!hub.signedIn) return <main className="nx-hub-page nx-hub-orders-page"><div className="nx-container"><header className="nx-hub-heading"><div><h1>Đơn hàng của tôi</h1><p>Đăng nhập để theo dõi và quản lý đơn hàng của bạn.</p></div></header><Link className="nx-button nx-button-primary" to="/login" state={{ from: '/buyer-hub' }}>Đăng nhập</Link></div></main>;
+  return <main className="nx-hub-page nx-hub-orders-page"><div className="nx-container">
+    <header className="nx-hub-heading"><div><p className="nx-hub-eyebrow">TÀI KHOẢN CỦA BẠN</p><h1>Đơn hàng của tôi</h1><p>Theo dõi đơn hàng, giao nhận và đánh giá người bán.</p></div><Link className="nx-button nx-button-primary" to="/products">Tiếp tục mua sắm</Link></header>
+    {hub.profile && <section className="nx-hub-account" aria-label="Thông tin tài khoản"><span className="nx-hub-account-avatar" aria-hidden="true">{profileName?.slice(0, 1)}</span><div><strong>{profileName}</strong><p>{hub.profile.email}</p></div><span>Tham gia từ {new Date(hub.profile.createdAt).toLocaleDateString('vi-VN')}</span></section>}
+    {hub.profileError && <p role="status">Chưa tải được hồ sơ. Bạn vẫn có thể quản lý đơn hàng.</p>}
+    <section className="nx-hub-orders" aria-label="Danh sách đơn hàng">
+      <div className="nx-hub-order-toolbar"><label htmlFor="buyer-order-status">Trạng thái <select id="buyer-order-status" value={hub.status} onChange={event => hub.selectStatus(event.target.value)}><option value="">Tất cả</option>{Object.entries(orderStatusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>{!hub.loading && !hub.loadError && <span>{hub.total} đơn hàng</span>}</div>
+      {hub.loading ? <p className="nx-hub-empty" role="status">Đang tải đơn hàng…</p> : hub.loadError ? <div className="nx-hub-empty" role="alert"><p>{hub.loadError}</p><button className="nx-button nx-button-soft" onClick={hub.retry}>Thử lại</button></div> : !hub.orders.length ? <div className="nx-hub-empty"><h2>Chưa có đơn hàng{hub.status ? ' ở trạng thái này' : ''}</h2><p>Đơn hàng của bạn sẽ xuất hiện tại đây sau khi đặt mua.</p></div> : <div className="nx-hub-order-list">{hub.orders.map(order => <BuyerOrderCard key={order.id} order={order} busy={hub.busy} reviewed={hub.reviewedIds.has(order.id)} onDetail={() => hub.openDetail(order.id)} onCancel={() => hub.cancelOrder(order)} onReview={() => { setScore(5); setComment(''); hub.openReview(order); }} onRebuy={() => hub.rebuy(order)} />)}</div>}
+      {!hub.loading && !hub.loadError && hub.totalPages > 1 && <nav className="nx-hub-pagination" aria-label="Phân trang đơn hàng"><button className="nx-button nx-button-soft" disabled={hub.page === 0} onClick={() => hub.setPage(hub.page - 1)}>Trước</button><span>Trang {hub.page + 1} / {hub.totalPages}</span><button className="nx-button nx-button-soft" disabled={hub.page + 1 >= hub.totalPages} onClick={() => hub.setPage(hub.page + 1)}>Tiếp</button></nav>}
+    </section>
+    <Modal show={Boolean(hub.selectedId)} onHide={hub.closeDetail} centered size="lg" aria-labelledby="buyer-order-detail-title"><Modal.Header closeButton closeLabel="Đóng chi tiết đơn"><Modal.Title as="h2" id="buyer-order-detail-title" className="fs-5">Chi tiết đơn hàng</Modal.Title></Modal.Header><Modal.Body>
+      {hub.detailLoading ? <p role="status">Đang tải chi tiết…</p> : hub.detailError ? <p role="alert">{hub.detailError}</p> : hub.orderDetail && <div className="nx-buyer-order-detail"><p><strong>{hub.orderDetail.orderNumber}</strong> · {orderStatusLabels[hub.orderDetail.status]}</p><ul>{hub.orderDetail.items.map(item => <li key={item.id}><Thumbnail src={hub.detailImages.get(item.productId) ?? null} alt={item.productNameSnapshot || 'Sản phẩm'} /><Link to={'/products/' + item.productId}>{item.productNameSnapshot || 'Xem sản phẩm'}</Link><span>{item.quantity} × {formatVnd(item.unitPrice)}</span></li>)}</ul><p><strong>Tổng tiền:</strong> {formatVnd(hub.orderDetail.totalAmount)}</p><h3>Người nhận</h3><p>{hub.orderDetail.receiverName} · {hub.orderDetail.receiverPhone}</p><p>{hub.orderDetail.shippingAddress}</p><h3>Vận chuyển</h3>{hub.shipmentError ? <p role="alert">{hub.shipmentError}</p> : hub.shipments.length ? hub.shipments.map((shipment, index) => <p key={index}>{shipment.trackingNumber || 'Chưa có mã vận đơn'} · {shipment.status}</p>) : <p>Đơn hàng chưa có vận đơn.</p>}</div>}
+    </Modal.Body><Modal.Footer><button className="btn btn-light" onClick={hub.closeDetail}>Đóng</button></Modal.Footer></Modal>
+    <Modal show={Boolean(hub.reviewOrder)} onHide={hub.closeReview} centered aria-labelledby="buyer-review-title"><form onSubmit={event => { event.preventDefault(); void hub.submitReview(score, comment); }}><Modal.Header closeButton={!hub.busy} closeLabel="Đóng đánh giá"><Modal.Title id="buyer-review-title" as="h2" className="fs-5">Đánh giá người bán</Modal.Title></Modal.Header><Modal.Body><p>Đơn {hub.reviewOrder?.orderNumber}</p><label className="form-label" htmlFor="buyer-review-score">Mức độ hài lòng</label><select className="form-select mb-3" id="buyer-review-score" value={score} onChange={event => setScore(Number(event.target.value))} disabled={hub.busy}>{[5, 4, 3, 2, 1].map(value => <option value={value} key={value}>{value} sao</option>)}</select><label className="form-label" htmlFor="buyer-review-comment">Nhận xét (không bắt buộc)</label><textarea className="form-control" id="buyer-review-comment" rows={4} maxLength={2000} value={comment} onChange={event => setComment(event.target.value)} disabled={hub.busy} />{hub.reviewError && <p className="text-danger mt-3" role="alert">{hub.reviewError}</p>}</Modal.Body><Modal.Footer><button type="button" className="btn btn-light" disabled={hub.busy} onClick={hub.closeReview}>Quay lại</button><button type="submit" className="btn btn-primary" disabled={hub.busy}>{hub.busy ? 'Đang gửi…' : 'Gửi đánh giá'}</button></Modal.Footer></form></Modal>
+  </div></main>;
 }
+

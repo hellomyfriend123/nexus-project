@@ -45,8 +45,8 @@ export const commerceApi = {
   remove: (id: string) => api<void>(`${base}/cart/items/${encodeURIComponent(id)}`, json('DELETE')),
   discount: (code: string, orderAmount: number) => api<unknown>(`${base}/checkout/apply-discount`, json('POST', { code, orderAmount, orderType: 'DIRECT' })).then(value => { const row = record(value); return { code: text(row.code), discountAmount: money(row.discountAmount) }; }),
   checkout: (body: { receiverName: string; receiverPhone: string; shippingAddress: string; paymentMethod: 'COD'; discountCode?: string }) => api<unknown>(`${base}/checkout`, json('POST', body)).then(adaptCommerceOrder),
-  orders: (page = 0) => api<unknown>(`${base}/orders?page=${page}&size=100&sort=createdAt,desc`).then(adaptOrderPage),
+  orders: (page = 0, status?: string) => api<unknown>(`${base}/orders?page=${page}&size=20&sort=createdAt,desc${status ? `&status=${encodeURIComponent(status)}` : ''}`).then(adaptOrderPage),
   order: (id: string) => api<unknown>(`${base}/orders/${encodeURIComponent(id)}`).then(adaptCommerceOrder),
   cancel: (id: string) => api<unknown>(`${base}/orders/${encodeURIComponent(id)}/cancel`, json('POST')).then(adaptCommerceOrder),
-  rateSeller: (orderId: string, sellerId: string, score: number) => api<unknown>(`${base}/seller-ratings`, json('POST', { orderId, sellerId, score })),
+  rateSeller: (orderId: string, sellerId: string, score: number, comment?: string) => api<unknown>(`${base}/seller-ratings`, json('POST', { orderId, sellerId, score, ...(comment?.trim() ? { comment: comment.trim() } : {}) })),
 };

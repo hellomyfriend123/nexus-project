@@ -1,3 +1,4 @@
+import { useId, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCategories } from '../../category/hooks/useCategories';
 interface Props {
@@ -17,14 +18,27 @@ function ProductFilter({
   onReset,
 }: Props) {
   const availableCategories = useCategories();
+  const [expanded, setExpanded] = useState(false);
+  const controlsId = useId();
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const collapseControls = () => {
+    setExpanded(false);
+    if (toggleRef.current?.offsetParent !== null) toggleRef.current?.focus();
+  };
   return (
     <aside className="nx-filter-panel">
-      <h2>Bộ lọc tìm kiếm</h2>
-      <h3>Danh mục sản phẩm</h3>
+      <h2 className="nx-filter-heading">Khám phá sản phẩm</h2>
+      <button ref={toggleRef} type="button" className="nx-filter-toggle" aria-expanded={expanded} aria-controls={controlsId} onClick={() => setExpanded(value => !value)}>
+        <span><i className="bi bi-sliders" aria-hidden="true" /> Bộ lọc · {mode === 'auction' ? 'Đấu giá' : 'Mua trực tiếp'}</span>
+        <i className={expanded ? 'bi bi-chevron-up' : 'bi bi-chevron-down'} aria-hidden="true" />
+      </button>
+      <div id={controlsId} className="nx-filter-controls" data-expanded={expanded}>
+      {mode === 'buy-now' && <><h3>Danh mục sản phẩm</h3>
       <nav className="nx-category-nav">
         <Link
           to="/categories/all"
           aria-current={categoryId === 'all' ? 'page' : undefined}
+          onClick={collapseControls}
         >
           Tất cả danh mục
         </Link>
@@ -33,28 +47,28 @@ function ProductFilter({
             key={c.id}
             to={`/categories/${c.id}`}
             aria-current={c.id === categoryId ? 'page' : undefined}
+            onClick={collapseControls}
           >
             {c.name}
           </Link>
         ))}
-      </nav>
+      </nav></>}
       <h3>Hình thức mua</h3>
       {[
-        ['all', 'Tất cả'],
-        ['auction', 'Đấu giá trực tiếp'],
-        ['buy-now', 'Mua ngay'],
+        ['buy-now', 'Mua trực tiếp'],
+        ['auction', 'Đấu giá'],
       ].map(([value, label]) => (
         <label className="nx-filter-option" key={value}>
           <input
             type="radio"
             name="mode"
             checked={mode === value}
-            onChange={() => setMode(value)}
+            onChange={() => { setMode(value); collapseControls(); }}
           />
           {label}
         </label>
       ))}
-      <h3>Khoảng giá</h3>
+      {mode === 'buy-now' && <><h3>Khoảng giá</h3>
       <select
         aria-label="Khoảng giá"
         value={budget}
@@ -72,7 +86,8 @@ function ProductFilter({
         }}
       >
         Xóa bộ lọc
-      </button>
+      </button></>}
+      </div>
     </aside>
   );
 }

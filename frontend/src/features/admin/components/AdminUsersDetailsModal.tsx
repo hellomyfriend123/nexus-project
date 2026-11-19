@@ -7,7 +7,7 @@ export function AdminUsersDetailsModal(model: ReturnType<typeof useAdminUsers>) 
     <AdminModal
       isOpen={Boolean(selectedUser && !showStatusModal)}
       onClose={() => setSelectedUser(null)}
-      title="Chi tiết tài khoản người dùng (GET /api/v1/admin/users/{id})"
+      title="Chi tiết tài khoản người dùng"
     >
       {selectedUser && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -51,7 +51,7 @@ export function AdminUsersDetailsModal(model: ReturnType<typeof useAdminUsers>) 
                   {selectedUser.phone || selectedUser.phoneNumber}
                 </strong>
               ) : (
-                <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Chưa cập nhật</span>
+                <span style={{ color: '#64748b', fontStyle: 'italic' }}>Chưa cập nhật</span>
               )}
             </div>
             <div>

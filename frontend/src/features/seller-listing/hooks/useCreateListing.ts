@@ -7,16 +7,23 @@ import type { Category } from '../../../services/api/seller';
 import { assertProductRetryMatches, productCreationFingerprint } from '../../../shared/utils/productCreationRetry';
 import type { PendingProductCreation } from '../../../shared/utils/productCreationRetry';
 import { MAX_LISTING_IMAGES, persistListingImages, validateListingImage } from '../services/listingMedia';
-import { initialListingDraft, listingAccessories } from '../services/listingDraft.mock';
 import type { ListingDraftForm, ListingMediaSlot } from '../types/createListing';
 const TITLE_MAX = 120;
 const formatVnd = (value: number) => `${value.toLocaleString('vi-VN')} đ`;
-export function useCreateListing() {
+export interface CreateListingOptions {
+  /** Called after the product, images, SKU and stock are all persisted. Defaults to navigating
+   *  to the inventory page, which is also what the legacy direct URL does. */
+  onSuccess?: () => void;
+}
+export function useCreateListing(options: CreateListingOptions = {}) {
   const navigate = useNavigate();
-  const [draft,setDraft]=useState<ListingDraftForm>({...initialListingDraft,title:'',description:'',sku:'',price:0,dealPrice:0,quantity:1});
+  // Read through a ref so a new callback identity never restarts the submit flow.
+  const onSuccess = useRef(options.onSuccess);
+  onSuccess.current = options.onSuccess;
+  const [draft,setDraft]=useState<ListingDraftForm>({title:'',description:'',sku:'',price:0,dealPrice:0,minOffer:0,quantity:1,brand:'',shutter:'',warranty:'',origin:'',weight:'',length:'',width:'',height:''});
   const [category,setCategory]=useState('');const [categories,setCategories]=useState<Category[]>([]);
-  const [condition,setCondition]=useState('like-new');const [saleModes,setSaleModes]=useState<string[]>(['fixed']);
-  const [shippingPayer,setShippingPayer]=useState<'buyer'|'seller'>('buyer');const [accessories,setAccessories]=useState<string[]>(listingAccessories);
+  const [condition,setCondition]=useState('');const [saleModes,setSaleModes]=useState<string[]>(['fixed']);
+  const [shippingPayer,setShippingPayer]=useState<'buyer'|'seller'>('buyer');const [accessories,setAccessories]=useState<string[]>([]);
   const [media,setMedia]=useState<ListingMediaSlot[]>([]);const [saved,setSaved]=useState(false);const [errors,setErrors]=useState<string[]>([]);
   const [submitting,setSubmitting]=useState(false);const pendingProduct=useRef<PendingProductCreation|null>(null);const mutationLock=useRef(false);
   useEffect(()=>{const c=new AbortController();sellerApi.categories(c.signal).then(rows=>setCategories(flatCategories(rows).filter(c=>c.status==='ACTIVE'))).catch(e=>{if(!c.signal.aborted)notify.warning(messageOf(e));});return()=>c.abort();},[]);
@@ -24,7 +31,7 @@ export function useCreateListing() {
   const mediaRef = useRef<ListingMediaSlot[]>([]);
   const uploadedImages = useRef(new Map<string, string>());
   useEffect(() => () => { urls.current.forEach(url => URL.revokeObjectURL(url)); }, []);
-  const mockAction = (label:string) => notify.info(label+' — backend chưa có API hỗ trợ.');
+  const mockAction = (label:string) => notify.info(label+' chưa được hỗ trợ.');
   function updateDraft<K extends keyof ListingDraftForm>(key: K, value: ListingDraftForm[K]) { setSaved(false); setDraft(previous => ({ ...previous, [key]: value })); }
   function toggleSaleMode(id: string) { setSaved(false); setSaleModes(previous => previous.includes(id) ? previous.filter(value => value !== id) : [...previous, id]); }
   function changeQuantity(delta: number) { updateDraft('quantity', Math.min(99, Math.max(1, draft.quantity + delta))); }
@@ -51,7 +58,7 @@ export function useCreateListing() {
     mediaRef.current = mediaRef.current.filter(value => value.id !== id).map((slot, index) => ({ ...slot, cover: index === 0 }));
     setMedia(mediaRef.current); setSaved(false);
   }
-  function saveDraft(){notify.info('Backend chưa có API lưu bản nháp. Không có dữ liệu được lưu.');}
+  function saveDraft(){notify.info('Lưu bản nháp chưa được hỗ trợ.');}
   async function submitListing(){
     if(mutationLock.current)return;
     const next=validateListing(draft,category,saleModes);
@@ -61,7 +68,7 @@ export function useCreateListing() {
     setErrors(next);if(next.length){notify.warning(next[0]);return;}
     mutationLock.current=true;setSubmitting(true);
     try{
-      const input={name:draft.title.trim(),description:draft.description.trim(),basePrice:draft.dealPrice,categoryId:category,images:[]};
+      const input={name:draft.title.trim(),description:draft.description.trim(),basePrice:draft.price,categoryId:category,images:[]};
       assertProductRetryMatches(pendingProduct.current,input);
       const id=pendingProduct.current?.id ?? (await sellerApi.createProduct(input)).id;
       pendingProduct.current={id,fingerprint:productCreationFingerprint(input)};
@@ -70,13 +77,15 @@ export function useCreateListing() {
       await persistListingImages(id,mediaRef.current,uploadedImages.current,sellerApi.uploadProductImage,
         images => sellerApi.updateProduct(id,{name:input.name,description:input.description,basePrice:input.basePrice,images}));
       await sellerApi.createSku({productId:id,skuCode:draft.sku.trim(),name:input.name,price:input.basePrice,initialTotalQuantity:draft.quantity,initialAvailableQuantity:draft.quantity});
-      pendingProduct.current=null;notify.success('Đã lưu sản phẩm, SKU và tồn kho.');navigate('/seller/products',{state:{listingPublished:true}});
+      pendingProduct.current=null;notify.success('Đã lưu sản phẩm, SKU và tồn kho.');
+      if(onSuccess.current)onSuccess.current();
+      else navigate('/seller/products',{state:{listingPublished:true}});
     }catch(e){notify.warning(messageOf(e)+(pendingProduct.current?' Sản phẩm đã tạo; giữ nguyên tên, mô tả, giá và danh mục rồi thử lại để hoàn tất ảnh, SKU và tồn kho.':''));}finally{mutationLock.current=false;setSubmitting(false);}
   }
   const titleLength = draft.title.length;
   const discountPercent = draft.price > 0 ? Math.round(((draft.price - draft.dealPrice) / draft.price) * 100) : 0;
-  const serviceFee = Math.round(draft.dealPrice * 0.03);
-  const netEarnings = draft.dealPrice - serviceFee;
+  const serviceFee = Math.round(draft.price * 0.03);
+  const netEarnings = draft.price - serviceFee;
   const formatted = useMemo(() => ({ dealPrice: formatVnd(draft.dealPrice), price: formatVnd(draft.price), minOffer: formatVnd(draft.minOffer), serviceFee: formatVnd(serviceFee), netEarnings: formatVnd(netEarnings) }), [draft.dealPrice, draft.price, draft.minOffer, serviceFee, netEarnings]);
   return { categories, submitting, draft, updateDraft, category, setCategory, condition, setCondition, saleModes, toggleSaleMode, shippingPayer, setShippingPayer, accessories, removeAccessory, changeQuantity, titleLength, titleMax: TITLE_MAX, titleOverLimit: titleLength > TITLE_MAX, discountPercent, formatted, submitListing, mockAction, saveDraft, saved, errors, media, addMedia, removeMedia };
 }

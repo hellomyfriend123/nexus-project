@@ -6,6 +6,8 @@ export interface HeaderNotification { id: string; title: string; content?: strin
 const notificationsPath = '/api/v1/notification/notifications';
 export const headerApi = {
   categories: (signal?: AbortSignal) => getCatalogCategories(signal).then(flattenCategories),
+  cartCount: (signal?: AbortSignal) => api<unknown>('/api/v1/buyer/commerce/cart', { signal })
+    .then(adaptCommerceCart).then(cart => cart.items.reduce((total, item) => total + item.quantity, 0)),
   cart: async (signal?: AbortSignal) => {
     const cart = await api<unknown>('/api/v1/buyer/commerce/cart', { signal }).then(adaptCommerceCart);
     const products = new Map(await Promise.all([...new Set(cart.items.map(item => item.productId))].map(async id => {

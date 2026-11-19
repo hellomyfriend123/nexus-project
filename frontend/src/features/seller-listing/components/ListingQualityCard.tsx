@@ -22,14 +22,14 @@ export default function ListingQualityCard({ score, label }: { score: number; la
             />
           </svg>
           <div className="nx-listing-gauge-label">
-            <strong>—</strong>
+            <strong>N/A</strong>
             <span>/100</span>
           </div>
         </div>
         <div>
           <p className="nx-listing-score-title">Chưa có đánh giá từ hệ thống</p>
           <p className="nx-listing-score-caption">
-            Chưa có API chấm chất lượng hoặc xác minh tin đăng.
+            Chấm chất lượng và xác minh tin đăng chưa được hỗ trợ.
           </p>
         </div>
       </div>

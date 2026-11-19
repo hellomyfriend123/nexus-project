@@ -7,7 +7,7 @@ export function AdminAuctionsDetailsModal(model: ReturnType<typeof useAdminAucti
     <AdminModal
       isOpen={Boolean(selectedAuction)}
       onClose={() => setSelectedAuction(null)}
-      title="Chi tiết phiên đấu giá & Lịch sử trả giá (FR-57)"
+      title="Chi tiết phiên đấu giá & Lịch sử trả giá"
       maxWidth="700px"
     >
       {selectedAuction && (
@@ -62,7 +62,7 @@ export function AdminAuctionsDetailsModal(model: ReturnType<typeof useAdminAucti
                   textAlign: 'center',
                   background: '#f8fafc',
                   borderRadius: '8px',
-                  color: '#94a3b8',
+                  color: '#64748b',
                   fontSize: '13px',
                 }}
               >
@@ -77,7 +77,7 @@ export function AdminAuctionsDetailsModal(model: ReturnType<typeof useAdminAucti
                   borderRadius: '8px',
                 }}
               >
-                <table className="nx-table" style={{ margin: 0 }}>
+                <table className="nx-admin-table" style={{ margin: 0 }}>
                   <thead>
                     <tr>
                       <th>#</th>
@@ -124,7 +124,7 @@ export function AdminAuctionsDetailsModal(model: ReturnType<typeof useAdminAucti
                 className="nx-btn nx-btn-danger nx-btn-sm"
                 onClick={() => handleCancelAuction(selectedAuction.id, selectedAuction.title)}
               >
-                <i className="bi bi-x-circle me-1"></i> Hủy phiên đấu giá này (FR-37)
+                <i className="bi bi-x-circle me-1"></i> Hủy phiên đấu giá này
               </button>
             ) : <div />}
             <button

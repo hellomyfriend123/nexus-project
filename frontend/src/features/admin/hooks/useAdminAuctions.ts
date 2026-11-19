@@ -12,7 +12,6 @@ export function useAdminAuctions() {
   const [selectedAuction, setSelectedAuction] = useState<AdminAuction | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [isUsingRealApi, setIsUsingRealApi] = useState(false);
 
   const requestRevision = useRef(0);
 
@@ -26,14 +25,12 @@ export function useAdminAuctions() {
         if (!isCurrent()) return;
       if (res && Array.isArray(res.content)) {
         setAuctions(res.content);
-        setIsUsingRealApi(true);
       } else {
         setAuctions([]);
       }
     } catch (error) {
       if (!isCurrent()) return;
       setError(error instanceof Error ? error.message : 'Không thể tải dữ liệu.');
-      setIsUsingRealApi(false);
       setAuctions([]);
     } finally {
       if (isCurrent()) setLoading(false);
@@ -46,14 +43,14 @@ export function useAdminAuctions() {
   }, [loadAuctions]);
 
   const handleCancelAuction = async (id: string, title?: string) => {
-    if (confirm(`Bạn có chắc chắn muốn hủy phiên đấu giá "${title || id}" theo quyền Admin (FR-37)?`)) {
+    if (confirm(`Bạn có chắc chắn muốn hủy phiên đấu giá "${title || id}" theo quyền Admin?`)) {
       try {
         await adminAuctionApi.cancel(id);
-        alert('Đã hủy phiên đấu giá thành công qua REST API!');
+        alert('Đã hủy phiên đấu giá thành công!');
         setSelectedAuction(null);
         loadAuctions();
       } catch (err: unknown) {
-        const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+        const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
         alert(`Không thể hủy phiên đấu giá:\n${errorMsg}`);
       }
     }
@@ -66,5 +63,5 @@ export function useAdminAuctions() {
     statusFilter === 'ALL' ? true : a.status === statusFilter,
   );
 
-  return { auctions, setAuctions, statusFilter, setStatusFilter, selectedAuction, setSelectedAuction, error, setError, loading, setLoading, isUsingRealApi, setIsUsingRealApi, loadAuctions, handleCancelAuction, formatCurrency, filteredAuctions };
+  return { auctions, setAuctions, statusFilter, setStatusFilter, selectedAuction, setSelectedAuction, error, setError, loading, setLoading, loadAuctions, handleCancelAuction, formatCurrency, filteredAuctions };
 }

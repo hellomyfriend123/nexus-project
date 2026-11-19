@@ -1,5 +1,12 @@
 :root {
   --nx-primary: #315bf4;
-  --nx-danger: #c6002e;
-  --nx-background: #faf8f7;
+  --nx-primary-hover: #2449cc;
+  --nx-danger: #b42338;
+  --nx-background: #f7f8fc;
+  --nx-surface: #fff;
+  --nx-text: #172033;
+  --nx-muted: #526079;
+  --nx-border: #e2e8f0;
+  --nx-radius: 12px;
+  --nx-shadow: 0 2px 10px #17203306;
 }

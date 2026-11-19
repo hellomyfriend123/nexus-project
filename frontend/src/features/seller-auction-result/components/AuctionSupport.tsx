@@ -2,6 +2,6 @@ export default function AuctionSupport({ onSupport }: { onSupport: () => void })
   <div className="nx-ar-help">
     <i className="bi bi-headset" aria-hidden="true" />
     <span>Cần hỗ trợ về giao dịch này?</span>
-    <button title="Chưa có API hỗ trợ thao tác này" disabled onClick={onSupport}>Liên hệ Nexus</button>
+    <button title="Liên hệ Nexus chưa được hỗ trợ." disabled onClick={onSupport}>Liên hệ Nexus</button>
   </div>
   ); }

@@ -9,6 +9,8 @@ export function validateAuction(draft: AuctionDraft, now = new Date()): string[]
   if (!draft.productId) errors.push('Vui lòng chọn sản phẩm đấu giá.');
   const price = Number(draft.startingPrice);
   if (!Number.isFinite(price) || price <= 0) errors.push('Giá khởi điểm phải là số hữu hạn lớn hơn 0.');
+  else if (!/^\d+(\.\d{1,2})?$/.test(draft.startingPrice.trim())) errors.push('Giá khởi điểm tối đa 2 chữ số thập phân.');
+  else if (!Number.isSafeInteger(Math.round(price * 100))) errors.push('Giá khởi điểm vượt giới hạn xử lý chính xác của giao diện.');
   const { start, end } = auctionTimes(draft, now);
   if (!Number.isFinite(start.getTime())) errors.push('Vui lòng chọn ngày và giờ bắt đầu hợp lệ.');
   else if (!draft.startNow && start.getTime() <= now.getTime()) errors.push('Thời gian bắt đầu phải ở tương lai.');

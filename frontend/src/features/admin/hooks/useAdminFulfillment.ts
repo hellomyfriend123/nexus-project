@@ -11,7 +11,6 @@ export function useAdminFulfillment() {
   const [activeTab, setActiveTab] = useState<'inventory' | 'warehouses'>('inventory');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [isUsingRealApi, setIsUsingRealApi] = useState(false);
 
   // Inventory State (1 task)
   const [inventory, setInventory] = useState<AdminInventoryItem[]>([]);
@@ -47,7 +46,6 @@ export function useAdminFulfillment() {
         if (!isCurrent()) return;
         if (res && Array.isArray(res.content)) {
           setInventory(res.content);
-          setIsUsingRealApi(true);
         } else {
           setInventory([]);
         }
@@ -56,7 +54,6 @@ export function useAdminFulfillment() {
         if (!isCurrent()) return;
         if (res && Array.isArray(res.content)) {
           setWarehouses(res.content);
-          setIsUsingRealApi(true);
         } else {
           setWarehouses([]);
         }
@@ -64,7 +61,6 @@ export function useAdminFulfillment() {
     } catch (error) {
       if (!isCurrent()) return;
       setError(error instanceof Error ? error.message : 'Không thể tải dữ liệu.');
-      setIsUsingRealApi(false);
       if (activeTab === 'inventory') setInventory([]);
       else if (activeTab === 'warehouses') setWarehouses([]);
     } finally {
@@ -126,7 +122,7 @@ export function useAdminFulfillment() {
           address: warehouseForm.address.trim(),
           status: (selectedWarehouse.status || 'ACTIVE') as any,
         });
-        alert('Đã cập nhật thông tin kho hàng qua REST API!');
+        alert('Đã cập nhật thông tin kho hàng!');
       } else {
         if (!warehouseForm.code.trim()) return;
         await adminFulfillmentApi.createWarehouse({
@@ -134,12 +130,12 @@ export function useAdminFulfillment() {
           code: warehouseForm.code.trim().toUpperCase(),
           address: warehouseForm.address.trim(),
         });
-        alert('Đã tạo mới kho hàng trong hệ thống qua REST API!');
+        alert('Đã tạo mới kho hàng trong hệ thống!');
       }
       setShowWarehouseModal(false);
       loadData();
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+      const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
       alert(`Không thể lưu kho hàng:\n${errorMsg}`);
     }
   };
@@ -154,10 +150,10 @@ export function useAdminFulfillment() {
         address: wh.address,
         status: nextStatus as any,
       });
-      alert(`Đã đổi trạng thái kho hàng sang ${nextStatus} qua REST API!`);
+      alert(`Đã đổi trạng thái kho hàng sang ${nextStatus}!`);
       loadData();
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+      const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
       alert(`Không thể đổi trạng thái kho hàng:\n${errorMsg}`);
     }
   };
@@ -168,5 +164,5 @@ export function useAdminFulfillment() {
     return matchWh && matchStatus;
   });
 
-  return { activeTab, setActiveTab, error, setError, loading, setLoading, isUsingRealApi, setIsUsingRealApi, inventory, setInventory, warehouseFilter, setWarehouseFilter, stockStatusFilter, setStockStatusFilter, warehouses, setWarehouses, selectedWarehouse, setSelectedWarehouse, showWarehouseModal, setShowWarehouseModal, warehouseForm, setWarehouseForm, loadData, handleOpenCreateWarehouse, handleOpenEditWarehouse, handleSaveWarehouse, handleToggleWarehouseStatus, filteredInventory };
+  return { activeTab, setActiveTab, error, setError, loading, setLoading, inventory, setInventory, warehouseFilter, setWarehouseFilter, stockStatusFilter, setStockStatusFilter, warehouses, setWarehouses, selectedWarehouse, setSelectedWarehouse, showWarehouseModal, setShowWarehouseModal, warehouseForm, setWarehouseForm, loadData, handleOpenCreateWarehouse, handleOpenEditWarehouse, handleSaveWarehouse, handleToggleWarehouseStatus, filteredInventory };
 }

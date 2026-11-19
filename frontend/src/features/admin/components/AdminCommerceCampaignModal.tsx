@@ -24,7 +24,7 @@ export function AdminCommerceCampaignModal(model: ReturnType<typeof useAdminComm
             }}
           >
             <i className="bi bi-info-circle-fill me-1"></i>
-            Chiến dịch (Campaign) là chương trình khuyến mãi theo mùa/sự kiện (FR-46, FR-58).
+            Chiến dịch (Campaign) là chương trình khuyến mãi theo mùa/sự kiện.
             Sau khi tạo chiến dịch, bạn có thể tạo các mã giảm giá (Vouchers) gắn vào chiến dịch này.
           </div>
 
