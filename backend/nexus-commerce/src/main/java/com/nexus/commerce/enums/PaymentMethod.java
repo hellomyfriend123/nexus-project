@@ -9,6 +9,9 @@ public enum PaymentMethod {
     /** Thanh toán khi nhận hàng. */
     COD,
 
+    /** Cổng thanh toán VNPAY (bao gồm Sandbox). */
+    VNPAY,
+
     BANK_TRANSFER,
 
     E_WALLET,

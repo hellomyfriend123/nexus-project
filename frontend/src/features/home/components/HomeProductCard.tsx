@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { getSession } from '../../../services/api/auth';
 import type { Listing } from '../../../services/api/catalog';
 import { formatPrice } from '../../product/services/productService';
 import AddToCartButton from '../../product/components/AddToCartButton';
@@ -9,6 +10,8 @@ import '../../product/styles/product-card-motion.css';
 export default function HomeProductCard({ product }: { product: Listing }) {
   const [failedImage, setFailedImage] = useState<string | null>(null);
   const { cardRef, onPointerMove, onPointerLeave } = useProductCardMotion();
+  const session = getSession();
+  const isReadOnlyRole = Boolean(session?.roles?.includes('SELLER') || session?.roles?.includes('ADMIN'));
   const auction = product.auction;
   const to = `/products/${product.id}${auction ? `?auctionId=${encodeURIComponent(auction.id)}` : ''}`;
   return <article ref={cardRef} className="nx-home-card u049-product-card" onPointerMove={onPointerMove} onPointerLeave={onPointerLeave}>
@@ -25,7 +28,15 @@ export default function HomeProductCard({ product }: { product: Listing }) {
         <strong className="nx-home-card__price" aria-label={`${auction ? 'Giá đấu hiện tại' : 'Giá'}: ${formatPrice(auction?.currentPrice ?? product.basePrice)}`}>{formatPrice(auction?.currentPrice ?? product.basePrice)}</strong>
       </div>
       {auction && <time className="nx-home-card__end" dateTime={auction.endTime}>Kết thúc {new Date(auction.endTime).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</time>}
-      <div className="nx-home-card__action">{auction ? <Link className="nx-button nx-button-light" to={to}>Xem phiên đấu giá →</Link> : <AddToCartButton product={product} className="nx-button nx-button-light" />}</div>
+      <div className="nx-home-card__action">
+        {isReadOnlyRole ? (
+          <Link className="nx-button nx-button-light" to={to}>Xem chi tiết</Link>
+        ) : auction ? (
+          <Link className="nx-button nx-button-light" to={to}>Xem phiên đấu giá →</Link>
+        ) : (
+          <AddToCartButton product={product} className="nx-button nx-button-light" />
+        )}
+      </div>
     </div>
   </article>;
 }

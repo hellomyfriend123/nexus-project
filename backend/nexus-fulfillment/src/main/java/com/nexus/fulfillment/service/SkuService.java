@@ -5,6 +5,7 @@ import com.nexus.fulfillment.dto.common.SkuResponse;
 import com.nexus.fulfillment.dto.seller.CreateSkuRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 /** SKU — endpoint nội bộ phục vụ FR-05 và FR-13 (lọc tồn kho theo Seller). */
@@ -20,4 +21,7 @@ public interface SkuService {
 
     /** Danh sách SKU của Seller đang đăng nhập. */
     PageResponse<SkuResponse> listBySeller(UUID sellerId, Pageable pageable);
+
+    /** Seller cập nhật tên, giá gốc (costPrice) và giá bán riêng (price) của SKU. */
+    SkuResponse update(UUID sellerId, UUID skuId, String name, BigDecimal costPrice, BigDecimal price);
 }

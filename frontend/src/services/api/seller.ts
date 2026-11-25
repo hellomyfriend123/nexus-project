@@ -1,4 +1,4 @@
-﻿import { api, ApiError, apiErrorMessage } from './client';
+import { api, ApiError, apiErrorMessage } from './client';
 import { adaptUserProfile, type UpdateProfileInput } from './buyer';
 const rawGet = <T>(path: string, signal?: AbortSignal) => api<T>('/api/v1' + path, { method: 'GET', signal });
 const rawRequest = <T>(path: string, options: RequestInit) => api<T>('/api/v1' + path, options);
@@ -7,8 +7,8 @@ export interface Category { id: string; name: string; status: string; children: 
 export interface Product { id: string; sellerId: string; name: string; description: string | null; basePrice: number; categoryId: string; categoryName: string; status: string; images: string[]; primaryImageUrl?: string | null }
 export interface ProductInput { name: string; description: string; basePrice: number; images: { imageUrl: string; primary: boolean }[] }
 export interface Inventory { id: string; skuId: string; productId: string; skuCode: string; skuName: string | null; warehouseId: string; totalQuantity: number; availableQuantity: number; status: string }
-export interface Sku { id: string; productId: string; sellerId: string; skuCode: string; name: string | null; price: number | null }
-export interface SkuInput { productId: string; skuCode: string; name?: string; price?: number; initialTotalQuantity?: number; initialAvailableQuantity?: number }
+export interface Sku { id: string; productId: string; sellerId: string; skuCode: string; name: string | null; costPrice?: number | null; price: number | null }
+export interface SkuInput { productId: string; skuCode: string; name?: string; costPrice?: number | null; price?: number; initialTotalQuantity?: number; initialAvailableQuantity?: number }
 export interface OrderItem { id: string; productId: string; skuId?: string | null; productNameSnapshot: string; skuCodeSnapshot?: string | null; quantity: number; unitPrice: number; subtotal: number }
 export interface Order { id: string; orderNumber: string; status: string; totalAmount: number; itemCount?: number; createdAt: string; receiverName?: string; receiverPhone?: string; shippingAddress?: string; items?: OrderItem[] }
 const productPath = '/seller/catalog/products';
@@ -34,8 +34,9 @@ export const sellerApi = {
     deleteProduct: (id: string) => apiRequest<void>(productPath + '/' + encodeURIComponent(id), json('DELETE')),
     inventories: (query: URLSearchParams, signal?: AbortSignal) => apiGet<Page<Inventory>>(fulfillmentPath + '/inventories?' + query, signal),
     updateInventory: (id: string, operation: string, quantity: number) => apiRequest<Inventory>(fulfillmentPath + '/inventories/' + encodeURIComponent(id), json('PATCH', { operation, quantity })),
-    skus: (page: number, signal?: AbortSignal) => apiGet<Page<Sku>>(fulfillmentPath + '/skus?page=' + page + '&size=10', signal),
+    skus: (page: number, signal?: AbortSignal) => apiGet<Page<Sku>>(fulfillmentPath + '/skus?page=' + page + '&size=200', signal),
     createSku: (data: SkuInput) => apiRequest<Sku>(fulfillmentPath + '/skus', json('POST', data)),
+    updateSku: (id: string, data: { name?: string; costPrice?: number | null; price?: number | null }) => apiRequest<Sku>(fulfillmentPath + '/skus/' + encodeURIComponent(id), json('PATCH', data)),
     orders: (page: number, status: string, signal?: AbortSignal) => apiGet<Page<Order>>(orderPath + '?page=' + page + '&size=10' + (status ? '&status=' + encodeURIComponent(status) : ''), signal),
     order: (id: string, signal?: AbortSignal) => apiGet<Order>(orderPath + '/' + encodeURIComponent(id), signal),
     updateOrder: (id: string, status: string) => apiRequest<Order>(orderPath + '/' + encodeURIComponent(id) + '/status', json('PATCH', { status })),
@@ -55,7 +56,7 @@ function strings(value: Record<string, unknown>, keys: string[]) { return keys.e
 function item(value: unknown, kind: string): boolean {
     if (!record(value)) return false;
     if (kind === 'inventory') return strings(value, ['id', 'skuId', 'productId', 'skuCode', 'warehouseId', 'status']) && (value.skuName == null || text(value.skuName)) && ['totalQuantity', 'availableQuantity'].every(k => Number.isInteger(value[k]) && Number(value[k]) >= 0);
-    if (kind === 'sku') return strings(value, ['id', 'productId', 'sellerId', 'skuCode']) && (value.name == null || text(value.name)) && (value.price == null || money(value.price));
+    if (kind === 'sku') return strings(value, ['id', 'productId', 'sellerId', 'skuCode']) && (value.name == null || text(value.name)) && (value.costPrice == null || money(value.costPrice)) && (value.price == null || money(value.price));
     if (kind === 'product') return strings(value, ['id', 'sellerId', 'name', 'status']) && (value.categoryId == null || text(value.categoryId)) && (value.primaryImageUrl == null || text(value.primaryImageUrl)) && (value.description == null || text(value.description)) && money(value.basePrice) && Array.isArray(value.images) && value.images.every(text);
     if (kind === 'order') return strings(value, ['id', 'orderNumber', 'status', 'createdAt']) && money(value.totalAmount) && (value.itemCount === undefined || (Number.isInteger(value.itemCount) && Number(value.itemCount) >= 0));
     return false;
@@ -83,6 +84,14 @@ async function apiRequest<T>(path: string, options: RequestInit): Promise<T> { c
 export async function loadSellerInventory(signal?: AbortSignal) {
  const inventories: Inventory[] = [];
  for(let page=0;;page++) { const result=await sellerApi.inventories(new URLSearchParams({page:String(page),size:'100'}),signal); inventories.push(...result.content); if(result.last || page+1>=result.totalPages) break; }
+ const skus = new Map<string, Sku>();
+ try {
+   for(let page=0;;page++) {
+     const skuPage = await sellerApi.skus(page, signal);
+     for (const s of skuPage.content) skus.set(s.id, s);
+     if (skuPage.last || page + 1 >= skuPage.totalPages) break;
+   }
+ } catch { /* ignore if skus endpoint unavailable */ }
  const products=new Map<string,Product>();
  await Promise.all([...new Set(inventories.map(i=>i.productId))].map(async id => {
    try { products.set(id, await sellerApi.product(id, signal)); }
@@ -92,7 +101,7 @@ export async function loadSellerInventory(signal?: AbortSignal) {
      if (!(error instanceof ApiError) || error.status !== 404) throw error;
    }
  }));
- return {inventories: inventories.filter(row => products.has(row.productId)),products};
+ return {inventories: inventories.filter(row => products.has(row.productId)),products,skus};
 }
 export async function loadSellerOrders(signal?: AbortSignal) {
  const orders:Order[]=[];

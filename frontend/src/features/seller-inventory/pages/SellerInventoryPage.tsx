@@ -4,15 +4,12 @@ import InventoryOverview from '../components/InventoryOverview';
 import InventoryFilters from '../components/InventoryFilters';
 import InventoryTable from '../components/InventoryTable';
 import InventoryEditor from '../components/InventoryEditor';
-import CreateListingDialog from '../../seller-listing/components/CreateListingDialog';
 import { useInventory } from '../hooks/useInventory';
 import '../styles/inventory.css';
 
 export interface SellerInventoryPageProps {
   /**
    * When true the page renders only the list and delegates "Thêm sản phẩm" to onAddProduct.
-   * The legacy /seller/products/new route uses this so it can own a single dialog instance
-   * instead of nesting a second one inside this page's own.
    */
   controlled?: boolean;
   onAddProduct?: () => void;
@@ -20,8 +17,6 @@ export interface SellerInventoryPageProps {
 
 export default function SellerInventoryPage({ controlled = false, onAddProduct }: SellerInventoryPageProps) {
   const hub=useInventory();const location=useLocation();
-  // Opened in place so the list keeps its filters and page.
-  const [adding,setAdding]=useState(false);
-  const [published,setPublished]=useState(Boolean(location.state?.listingPublished));
-  return <main className="nx-stock-page"><div className="nx-container"><InventoryOverview onAddProduct={controlled ? onAddProduct : () => setAdding(true)} />{published&&<p role="status" className="nx-seller-success">Sản phẩm đã được lưu.</p>}{hub.loading?<p role="status">Đang tải kho hàng…</p>:hub.error?<div role="alert" className="nx-seller-alert"><p>{hub.error}</p><button type="button" onClick={hub.retry}>Thử lại</button></div>:<><InventoryFilters hub={hub} /><InventoryTable hub={hub} /></>}<InventoryEditor hub={hub} />{!controlled && <CreateListingDialog open={adding} onClose={()=>setAdding(false)} onSaved={()=>{setAdding(false);setPublished(true);hub.retry();}} />}</div></main>;
+  const [published]=useState(Boolean(location.state?.listingPublished));
+  return <main className="nx-stock-page"><div className="nx-container"><InventoryOverview onAddProduct={controlled ? onAddProduct : undefined} />{published&&<p role="status" className="nx-seller-success">Sản phẩm đã được lưu.</p>}{hub.loading?<p role="status">Đang tải kho hàng…</p>:hub.error?<div role="alert" className="nx-seller-alert"><p>{hub.error}</p><button type="button" onClick={hub.retry}>Thử lại</button></div>:<><InventoryFilters hub={hub} /><InventoryTable hub={hub} /></>}<InventoryEditor hub={hub} /></div></main>;
 }

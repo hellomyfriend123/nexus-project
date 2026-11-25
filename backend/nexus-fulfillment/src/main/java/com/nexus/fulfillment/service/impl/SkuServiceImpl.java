@@ -3,6 +3,8 @@ package com.nexus.fulfillment.service.impl;
 import com.nexus.common.api.PageResponse;
 import com.nexus.common.exception.BusinessException;
 import com.nexus.common.exception.DuplicateResourceException;
+import com.nexus.common.exception.ForbiddenOperationException;
+import com.nexus.common.exception.ResourceNotFoundException;
 import com.nexus.fulfillment.dto.common.SkuResponse;
 import com.nexus.fulfillment.dto.seller.CreateSkuRequest;
 import com.nexus.fulfillment.entity.Inventory;
@@ -21,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -42,12 +45,18 @@ public class SkuServiceImpl implements SkuService {
         if (skuRepository.existsBySkuCode(request.skuCode())) {
             throw new DuplicateResourceException("SKU", "skuCode", request.skuCode());
         }
+        if (request.costPrice() != null && request.price() != null
+                && request.costPrice().compareTo(request.price()) > 0) {
+            throw new BusinessException("Không được phép bán lỗ: Giá bán SKU (" + request.price()
+                    + ") không được thấp hơn Giá gốc (" + request.costPrice() + ")");
+        }
 
         Sku sku = Sku.builder()
                 .productId(request.productId())
                 .sellerId(sellerId)
                 .skuCode(request.skuCode())
                 .name(request.name())
+                .costPrice(request.costPrice())
                 .price(request.price())
                 .build();
         Sku saved = skuRepository.save(sku);
@@ -63,6 +72,31 @@ public class SkuServiceImpl implements SkuService {
     public PageResponse<SkuResponse> listBySeller(UUID sellerId, Pageable pageable) {
         Page<Sku> page = skuRepository.findAllBySellerId(sellerId, pageable);
         return PageResponse.from(page, SkuMapper::toResponse);
+    }
+
+    @Override
+    @Transactional
+    public SkuResponse update(UUID sellerId, UUID skuId, String name, BigDecimal costPrice, BigDecimal price) {
+        Sku sku = skuRepository.findById(skuId)
+                .orElseThrow(() -> new ResourceNotFoundException("SKU", skuId));
+        if (!sku.getSellerId().equals(sellerId)) {
+            throw new ForbiddenOperationException("Bạn không có quyền chỉnh sửa SKU này");
+        }
+        if (name != null && !name.isBlank()) {
+            sku.setName(name.trim());
+        }
+        if (costPrice != null && costPrice.compareTo(BigDecimal.ZERO) >= 0) {
+            sku.setCostPrice(costPrice);
+        }
+        if (price != null && price.compareTo(BigDecimal.ZERO) > 0) {
+            sku.setPrice(price);
+        }
+        if (sku.getCostPrice() != null && sku.getPrice() != null
+                && sku.getCostPrice().compareTo(sku.getPrice()) > 0) {
+            throw new BusinessException("Không được phép bán lỗ: Giá bán SKU (" + sku.getPrice()
+                    + ") không được thấp hơn Giá gốc (" + sku.getCostPrice() + ")");
+        }
+        return SkuMapper.toResponse(skuRepository.save(sku));
     }
 
     /**

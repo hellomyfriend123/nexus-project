@@ -39,6 +39,7 @@ export function useBuyerHub() {
   const [reviewOrder, setReviewOrder] = useState<CommerceOrderSummary | null>(null);
   const [reviewError, setReviewError] = useState('');
   const [reviewedIds, setReviewedIds] = useState<Set<string>>(() => new Set());
+  const [payOrder, setPayOrder] = useState<{ id: string; orderNumber: string; amount: number } | null>(null);
   const queryOrderId = searchParams.get('orderId');
   useEffect(() => { setSelectedId(queryOrderId); }, [queryOrderId]);
   useEffect(() => {
@@ -147,11 +148,23 @@ export function useBuyerHub() {
     } catch (error) { if (isCurrentSession()) setReviewError(apiErrorMessage(error)); }
     finally { if (isCurrentSession()) { actionLock.current = false; setBusy(false); } }
   };
+  const openPay = (order: { id: string; orderNumber: string; totalAmount: number }) => {
+    setPayOrder({ id: order.id, orderNumber: order.orderNumber, amount: order.totalAmount });
+  };
+  const handlePaySuccess = () => {
+    if (payOrder) {
+      setOrders(current => current.map(item => item.id === payOrder.id ? { ...item, status: 'CONFIRMED' } : item));
+      setOrderDetail(current => current?.id === payOrder.id ? { ...current, status: 'CONFIRMED' } : current);
+      notify.success(`Thanh toán VNPAY thành công cho đơn ${payOrder.orderNumber}.`);
+    }
+    setRevision(value => value + 1);
+  };
+  const closePay = () => setPayOrder(null);
   return {
     signedIn: Boolean(sessionToken), profile, profileError, orders, status, page, totalPages, total, loading, loadError, busy,
     setPage, selectStatus: (value: string) => { setPage(0); setStatus(value); }, retry: () => setRevision(value => value + 1),
     selectedId, orderDetail, detailError, detailLoading, detailImages, shipments, shipmentError, openDetail: setSelectedId, closeDetail: () => setSelectedId(null),
-    cancelOrder, rebuy, reviewOrder, reviewError, reviewedIds, submitReview,
+    cancelOrder, rebuy, payOrder, openPay, handlePaySuccess, closePay, reviewOrder, reviewError, reviewedIds, submitReview,
     openReview: (order: CommerceOrderSummary) => { setReviewError(''); setReviewOrder(order); },
     closeReview: () => { if (!actionLock.current) setReviewOrder(null); },
   };

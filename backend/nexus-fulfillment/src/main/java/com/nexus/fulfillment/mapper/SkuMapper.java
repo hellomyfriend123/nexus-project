@@ -18,6 +18,7 @@ public final class SkuMapper {
                 entity.getSellerId(),
                 entity.getSkuCode(),
                 entity.getName(),
+                entity.getCostPrice(),
                 entity.getPrice(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()

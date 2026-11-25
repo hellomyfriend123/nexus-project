@@ -21,7 +21,10 @@ export function useInventory() {
       if (controller.signal.aborted) return;
       setProducts(data.inventories.map(row => {
         const product = data.products.get(row.productId)!;
-        return { id:row.id, productId:product.id, description:product.description??'', images:product.images, primaryImageUrl:product.primaryImageUrl, name:product.name, sku:row.skuCode, category:product.categoryName, categoryId:product.categoryId, image:product.primaryImageUrl??product.images[0]??'', condition:'',conditionId:'',photoLabel:'',price:Number(product.basePrice),priceNote:product.status,stock:String(row.availableQuantity),sold:'',views:'',engagement:'',status:row.availableQuantity===0?'out':'listed',visible:product.status==='ACTIVE' };
+        const sku = data.skus?.get(row.skuId);
+        const skuPrice = sku?.price != null && Number(sku.price) > 0 ? Number(sku.price) : Number(product.basePrice);
+        const skuCost = sku?.costPrice != null ? Number(sku.costPrice) : null;
+        return { id:row.id, productId:product.id, description:product.description??'', images:product.images, primaryImageUrl:product.primaryImageUrl, name:product.name, sku:row.skuCode, skuName:row.skuName??sku?.name??'', category:product.categoryName, categoryId:product.categoryId, image:product.primaryImageUrl??product.images[0]??'', condition:'',conditionId:'',photoLabel:'',price:skuPrice,costPrice:skuCost,priceNote:product.status,stock:String(row.availableQuantity),sold:'',views:'',engagement:'',status:row.availableQuantity===0?'out':'listed',visible:product.status==='ACTIVE' };
       }));
     }).catch(error => { if (!controller.signal.aborted) setError(messageOf(error)); }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
@@ -51,8 +54,11 @@ export function useInventory() {
     if (!row?.productId || lock.current) return;
     if (label==='Xem sản phẩm') { navigate('/products/'+row.productId); return; }
     if (label==='Mở đấu giá') { navigate('/seller/auctions/new?productId='+encodeURIComponent(row.productId)); return; }
-    if (label==='Chỉnh sửa'||label==='Điều chỉnh tồn kho') {
-      setEditorError('');setEditor({kind:label==='Chỉnh sửa'?'product':'stock',row,name:row.name,description:row.description??'',price:String(row.price),operation:'INCREASE',quantity:''});return;
+    if (label==='Chỉnh sửa') {
+      navigate('/seller/products/'+encodeURIComponent(row.productId)+'/edit');return;
+    }
+    if (label==='Điều chỉnh tồn kho') {
+      setEditorError('');setEditor({kind:'stock',row,name:row.name,description:row.description??'',price:String(row.price),operation:'INCREASE',quantity:''});return;
     }
     if (label==='Xóa sản phẩm' && window.confirm('Xóa sản phẩm “'+row.name+'”?')) {
       lock.current=true;setBusy(true);

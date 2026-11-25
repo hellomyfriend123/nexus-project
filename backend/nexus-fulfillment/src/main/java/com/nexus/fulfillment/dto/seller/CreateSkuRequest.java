@@ -32,6 +32,9 @@ public record CreateSkuRequest(
         @Size(max = 200, message = "Tên SKU tối đa 200 ký tự")
         String name,
 
+        @PositiveOrZero(message = "Giá gốc phải lớn hơn hoặc bằng 0")
+        BigDecimal costPrice,
+
         @PositiveOrZero(message = "Giá SKU phải lớn hơn hoặc bằng 0")
         BigDecimal price,
 
@@ -41,4 +44,14 @@ public record CreateSkuRequest(
         @PositiveOrZero(message = "Tồn khả dụng ban đầu phải lớn hơn hoặc bằng 0")
         Integer initialAvailableQuantity
 ) {
+    public CreateSkuRequest(
+            UUID productId,
+            String skuCode,
+            String name,
+            BigDecimal price,
+            Integer initialTotalQuantity,
+            Integer initialAvailableQuantity
+    ) {
+        this(productId, skuCode, name, null, price, initialTotalQuantity, initialAvailableQuantity);
+    }
 }

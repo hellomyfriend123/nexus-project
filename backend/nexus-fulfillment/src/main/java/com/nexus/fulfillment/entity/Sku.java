@@ -46,6 +46,10 @@ public class Sku extends BaseEntity {
     @Column(name = "name", length = 200)
     private String name;
 
+    /** Giá gốc (giá vốn nhập hàng) của SKU — dùng để tính lợi nhuận cho Seller. */
+    @Column(name = "cost_price", precision = 19, scale = 2)
+    private BigDecimal costPrice;
+
     /** Giá riêng của SKU; để trống thì lấy giá của Product. */
     @Column(name = "price", precision = 19, scale = 2)
     private BigDecimal price;

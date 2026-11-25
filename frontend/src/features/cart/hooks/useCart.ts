@@ -38,6 +38,7 @@ export function useCart() {
   const cartRevision = useRef(0);
   const [shippingId] = useState<ShippingMethodId>('standard');
   const [paymentId, setPaymentId] = useState<PaymentMethodId>('cod');
+  const [vnpayOrder, setVnpayOrder] = useState<{ id: string; orderNumber: string; amount: number } | null>(null);
   const [voucherInput, setVoucherInput] = useState('');
   const [voucher, setVoucher] = useState<Voucher | null>(null);
   const report = useCallback((error: unknown) => { if (scope.current() && !(error instanceof DOMException && error.name === 'AbortError')) notify.error(apiErrorMessage(error)); }, [scope]);
@@ -199,7 +200,7 @@ export function useCart() {
     if (!scope.current() || mutationLock.current || checkoutLock.current || preparingCheckout.current) return;
     if (multipleSellers) { notify.warning('Vui lòng giữ sản phẩm của một người bán trước khi đặt hàng.'); return; }
     if (!items.length) { notify.warning('Giỏ hàng đang trống.'); return; }
-    if (paymentId !== 'cod') { notify.warning('Thanh toán qua VNPay, thẻ và MoMo chưa được hỗ trợ. Vui lòng chọn COD.'); return; }
+    if (paymentId !== 'cod' && paymentId !== 'vnpay') { notify.warning('Thanh toán qua thẻ và MoMo chưa được hỗ trợ. Vui lòng chọn COD hoặc VNPAY Sandbox.'); return; }
     const invalidAddress = validateCheckoutAddress({ receiverName: deliveryAddress.receiverName, receiverPhone: deliveryAddress.phone, shippingAddress: deliveryAddress.line });
     if (invalidAddress) { notify.warning(invalidAddress); return; }
     preparingCheckout.current = true; setCheckoutPreparing(true);
@@ -214,15 +215,29 @@ export function useCart() {
     try {
       if (!(await syncBeforeCheckout())) { setCheckoutOpen(false); return; }
       if (!scope.current()) return;
+      const isVnpay = paymentId === 'vnpay';
       const order = await api.checkout({ receiverName: deliveryAddress.receiverName, receiverPhone: deliveryAddress.phone,
-        shippingAddress: deliveryAddress.line, paymentMethod: 'COD', ...(voucher ? { discountCode: voucher.code } : {}) });
+        shippingAddress: deliveryAddress.line, paymentMethod: isVnpay ? 'MOCK' : 'COD', ...(voucher ? { discountCode: voucher.code } : {}) });
       if (!scope.current()) return;
-      notify.success(`Đã tạo đơn ${order.orderNumber}. Thanh toán COD khi nhận hàng.`);
       window.dispatchEvent(new Event("nexus:cart-changed"));
-      setCheckoutOpen(false); setItems([]); navigate('/buyer-hub');
+      setCheckoutOpen(false); setItems([]);
+      if (isVnpay) {
+        setVnpayOrder({ id: order.id, orderNumber: order.orderNumber, amount: order.totalAmount });
+      } else {
+        notify.success(`Đã tạo đơn ${order.orderNumber}. Thanh toán COD khi nhận hàng.`);
+        navigate('/buyer-hub');
+      }
     } catch (error) { report(error); } finally { checkoutLock.current = false; if (scope.current()) setCheckoutSubmitting(false); }
   };
+  const handleVnpaySuccess = () => {
+    notify.success(`Thanh toán VNPAY thành công cho đơn ${vnpayOrder?.orderNumber ?? ''}.`);
+  };
+  const closeVnpayModal = () => {
+    setVnpayOrder(null);
+    navigate('/buyer-hub');
+  };
   return { sellerGroups, multipleSellers, items, loading, loadError, deliveryAddress, cartSessionCode: cart?.id ?? 'N/A', shippingId, setShippingId, paymentId, setPaymentId,
+    vnpayOrder, handleVnpaySuccess, closeVnpayModal,
     voucherInput, setVoucherInput, voucher, hasAuctionItems: false, totals, itemCount: items.reduce((sum, item) => sum + item.quantity, 0),
     shippingLabel: 'Theo đơn hàng máy chủ', handleQuantityChange, handleRemove, handleSaveForLater, handleApplyVoucher, handleClearVoucher,
     handleChangeAddress, addressOpen, closeAddress: () => setAddressOpen(false), saveAddress, handleSupport, handleCheckout, handleRetry, checkoutPreparing, checkoutSubmitting, checkoutOpen, cancelCheckout, confirmCheckout };

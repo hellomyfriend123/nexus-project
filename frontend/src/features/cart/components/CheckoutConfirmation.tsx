@@ -1,17 +1,19 @@
-﻿import Modal from 'react-bootstrap/Modal';
+import Modal from 'react-bootstrap/Modal';
 import { formatVnd } from '../utils/cart.format';
+import type { PaymentMethodId } from '../types/cart';
 
 interface CheckoutConfirmationProps {
   open: boolean;
   submitting?: boolean;
   itemCount: number;
   total: number;
+  paymentId?: PaymentMethodId;
   onCancel: () => void;
   onConfirm: () => void;
 }
 
-/** Confirmation submits a backend COD order, without collecting payment online. */
-export default function CheckoutConfirmation({ open, submitting = false, itemCount, total, onCancel, onConfirm }: CheckoutConfirmationProps) {
+/** Confirmation submits a backend order (COD or VNPAY Sandbox). */
+export default function CheckoutConfirmation({ open, submitting = false, itemCount, total, paymentId = 'cod', onCancel, onConfirm }: CheckoutConfirmationProps) {
   return (
     <Modal show={open} onHide={() => { if (!submitting) onCancel(); }} centered aria-labelledby="checkout-confirm-title">
       <Modal.Header closeButton={!submitting} closeLabel="Đóng xác nhận đơn hàng">
@@ -25,7 +27,11 @@ export default function CheckoutConfirmation({ open, submitting = false, itemCou
         <dl className="d-flex justify-content-between mb-3">
           <dt>Tổng tạm tính</dt><dd className="mb-0 fw-bold text-primary">{formatVnd(total)}</dd>
         </dl>
-        <p className="alert alert-info small mb-0">Thanh toán khi nhận hàng (COD). Tổng tiền và phí giao hàng được xác nhận khi tạo đơn.</p>
+        <p className="alert alert-info small mb-0">
+          {paymentId === 'vnpay'
+            ? 'Thanh toán trực tuyến qua cổng VNPAY Sandbox. Sau khi tạo đơn, cửa sổ nhập thẻ NCB & OTP thử nghiệm sẽ hiển thị.'
+            : 'Thanh toán khi nhận hàng (COD). Tổng tiền và phí giao hàng được xác nhận khi tạo đơn.'}
+        </p>
       </Modal.Body>
       <Modal.Footer>
         <button type="button" className="btn btn-light rounded-pill" disabled={submitting} onClick={onCancel}>Quay lại</button>

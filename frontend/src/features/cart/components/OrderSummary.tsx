@@ -2,10 +2,10 @@ import type { FormEvent } from 'react';
 import type { CartTotals, Voucher } from '../types/cart';
 import { formatVnd } from '../utils/cart.format';
 interface Props {
-  totals: CartTotals; voucher: Voucher | null; voucherInput: string; hasItems: boolean; preparing?: boolean; blockedReason?: string;
+  totals: CartTotals; voucher: Voucher | null; voucherInput: string; hasItems: boolean; preparing?: boolean; blockedReason?: string; paymentId?: 'vnpay' | 'card' | 'momo' | 'cod';
   onVoucherInput: (value: string) => void; onApplyVoucher: () => void; onClearVoucher: () => void; onCheckout: () => void;
 }
-export default function OrderSummary({ totals, voucher, voucherInput, hasItems, preparing, blockedReason, onVoucherInput, onApplyVoucher, onClearVoucher, onCheckout }: Props) {
+export default function OrderSummary({ totals, voucher, voucherInput, hasItems, preparing, blockedReason, paymentId = 'cod', onVoucherInput, onApplyVoucher, onClearVoucher, onCheckout }: Props) {
   const apply = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); onApplyVoucher(); };
   return <div className="nx-cart-summary"><div className="nx-cart-summary-card">
     <h2 className="nx-cart-summary-title">Tóm tắt đơn hàng</h2>
@@ -20,7 +20,7 @@ export default function OrderSummary({ totals, voucher, voucherInput, hasItems, 
       <div className="nx-cart-breakdown-divider" />
       <div className="nx-cart-total"><div className="nx-cart-total-label"><span>Tổng tạm tính</span></div><span className="nx-cart-total-amount">{formatVnd(totals.total)}</span></div>
     </div>
-    <div className="nx-cart-cta"><button type="button" className="nx-cart-cta-button" disabled={!hasItems || preparing || !!blockedReason} aria-describedby={blockedReason ? 'cart-checkout-restriction' : undefined} onClick={onCheckout}>{preparing ? 'Đang kiểm tra giỏ hàng…' : 'Đặt hàng COD'}</button>{blockedReason && <p id="cart-checkout-restriction" className="nx-cart-seller-warning">{blockedReason}</p>}<p className="nx-cart-cta-note">Bạn sẽ kiểm tra lại đơn trước khi xác nhận.</p></div>
+    <div className="nx-cart-cta"><button type="button" className="nx-cart-cta-button" disabled={!hasItems || preparing || !!blockedReason} aria-describedby={blockedReason ? 'cart-checkout-restriction' : undefined} onClick={onCheckout}>{preparing ? 'Đang kiểm tra giỏ hàng…' : paymentId === 'vnpay' ? 'Thanh toán VNPAY' : 'Đặt hàng COD'}</button>{blockedReason && <p id="cart-checkout-restriction" className="nx-cart-seller-warning">{blockedReason}</p>}<p className="nx-cart-cta-note">Bạn sẽ kiểm tra lại đơn trước khi xác nhận.</p></div>
   </div></div>;
 }
 

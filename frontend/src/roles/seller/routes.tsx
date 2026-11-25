@@ -26,6 +26,7 @@ const sellerRoutes: RouteObject[] = [
       { path: '/seller-hub', element: <SellerHubPage /> },
       { path: '/seller/products', element: <SellerInventoryPage /> },
       { path: '/seller/products/new', element: <CreateListingPage /> },
+      { path: '/seller/products/:productId/edit', element: <CreateListingPage /> },
       { path: '/seller/orders/success', element: <OrderSuccessPage /> },
           { path: '/seller/profile', element: <ProfilePage role="SELLER" /> },
           { path: '/seller/address', element: <AddressPage role="SELLER" /> },

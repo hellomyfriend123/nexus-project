@@ -24,6 +24,16 @@
 .u393-role[data-role='seller'] .u393-role-pill {
   transform: translateX(100%);
 }
+.u393-role[data-count='3'] .u393-role-pill {
+  width: calc((100% - 6px) / 3);
+}
+.u393-role[data-count='3'][data-role='admin'] .u393-role-pill {
+  transform: translateX(200%);
+}
+.u062 .auth-role-selector.u393-role[data-count='3'] button {
+  font-size: 13px;
+  white-space: nowrap;
+}
 .u062 .auth-role-selector.u393-role button {
   position: relative;
   z-index: 1;

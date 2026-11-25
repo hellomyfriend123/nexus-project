@@ -1,4 +1,4 @@
-export type AuthRole = 'buyer' | 'seller';
+export type AuthRole = 'buyer' | 'seller' | 'admin';
 export interface LoginInput { identifier: string; password: string; role: AuthRole; }
 export interface MeResponse { userId: string; username?: string; email: string; fullName: string; roles: string[]; status: string; }
 export interface LoginResponse extends Omit<MeResponse, 'status'> { accessToken: string; tokenType: string; expiresAt: string; }

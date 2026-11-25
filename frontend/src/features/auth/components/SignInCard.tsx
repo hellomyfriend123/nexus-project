@@ -30,6 +30,7 @@ function SignInCard() {
         <RoleSelector
           value={role}
           disabled={busy}
+          allowAdmin
           onChange={(value) => {
             setRole(value);
             clearFeedback();

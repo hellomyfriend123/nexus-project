@@ -168,8 +168,12 @@ export default function Header() {
             {categoriesLoading ? <p role="status">Đang tải danh mục…</p> : categoryError ? <p role="alert">{categoryError}</p> : categories.map(category => <Link key={category.id} to={`/categories/${category.id}?mode=buy-now`} onClick={() => setOpen(null)}>{category.name}</Link>)}
           </div>}
         </div>
-        <Link to="/products?mode=buy-now" onClick={() => setOpen(null)}>Mua ngay</Link>
-        <Link to="/products?mode=auction" onClick={() => setOpen(null)}>Đấu giá</Link>
+        {!session?.roles.includes('SELLER') && !session?.roles.includes('ADMIN') && (
+          <>
+            <Link to="/products?mode=buy-now" onClick={() => setOpen(null)}>Mua ngay</Link>
+            <Link to="/products?mode=auction" onClick={() => setOpen(null)}>Đấu giá</Link>
+          </>
+        )}
         <div className="nexus-navigation-end">
           {session?.roles.includes('SELLER') ? <NavLink to="/seller-hub">Kênh người bán <span aria-hidden="true">↗</span></NavLink> : !session && <Link to="/register">Đăng ký</Link>}
           {session && <button type="button" onClick={() => void signOut()}>Đăng xuất</button>}

@@ -11,6 +11,7 @@ public record SkuResponse(
         UUID sellerId,
         String skuCode,
         String name,
+        BigDecimal costPrice,
         BigDecimal price,
         Instant createdAt,
         Instant updatedAt

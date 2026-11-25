@@ -7,13 +7,15 @@ interface RoleSelectorProps {
   value: AuthRole;
   onChange: (role: AuthRole) => void;
   disabled?: boolean;
+  allowAdmin?: boolean;
 }
 
-function RoleSelector({ value, onChange, disabled }: RoleSelectorProps) {
+function RoleSelector({ value, onChange, disabled, allowAdmin = false }: RoleSelectorProps) {
   return (
     <div
       className="auth-role-selector u393-role"
       data-role={value}
+      data-count={allowAdmin ? '3' : '2'}
       role="group"
       aria-label="Vai trò tài khoản"
     >
@@ -25,7 +27,7 @@ function RoleSelector({ value, onChange, disabled }: RoleSelectorProps) {
         onClick={() => onChange('buyer')}
       >
         <Icon name="bag" />
-        Người mua (Buyer)
+        {allowAdmin ? 'Người mua' : 'Người mua (Buyer)'}
       </button>
       <button
         type="button"
@@ -34,8 +36,19 @@ function RoleSelector({ value, onChange, disabled }: RoleSelectorProps) {
         onClick={() => onChange('seller')}
       >
         <Icon name="store" />
-        Người bán (Seller)
+        {allowAdmin ? 'Người bán' : 'Người bán (Seller)'}
       </button>
+      {allowAdmin && (
+        <button
+          type="button"
+          aria-pressed={value === 'admin'}
+          disabled={disabled}
+          onClick={() => onChange('admin')}
+        >
+          <i className="bi bi-shield-lock" aria-hidden="true" />
+          Admin
+        </button>
+      )}
     </div>
   );
 }

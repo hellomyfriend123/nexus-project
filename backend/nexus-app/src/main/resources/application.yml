@@ -103,8 +103,8 @@ nexus:
     # FR-33/FR-34: chu kỳ job tự chuyển SCHEDULED -> ACTIVE -> ENDED (mili giây)
     scheduler-interval-ms: ${AUCTION_SCHEDULER_INTERVAL_MS:15000}
   supabase:
-    url: ${SUPABASE_URL}
-    service-role-key: ${SUPABASE_SERVICE_ROLE_KEY}
+    url: ${SUPABASE_URL:}
+    service-role-key: ${SUPABASE_SERVICE_ROLE_KEY:}
     storage-bucket: ${SUPABASE_STORAGE_BUCKET:product-images}
   storage:
     max-file-size-mb: 5

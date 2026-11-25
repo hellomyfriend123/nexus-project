@@ -69,6 +69,22 @@ public class FulfillmentSellerController {
         return ResponseEntity.ok(skuService.listBySeller(sellerId, pageable));
     }
 
+    @PatchMapping("/skus/{id}")
+    @PreAuthorize("hasRole('SELLER')")
+    @Operation(summary = "Seller cập nhật tên biến thể, giá gốc (costPrice) và giá bán riêng (price) của SKU")
+    public ResponseEntity<SkuResponse> updateSku(@PathVariable UUID id,
+                                                 @RequestBody java.util.Map<String, Object> body) {
+        UUID sellerId = SecurityUtils.currentUserId();
+        String name = body.get("name") != null ? String.valueOf(body.get("name")) : null;
+        java.math.BigDecimal costPrice = body.get("costPrice") != null && !String.valueOf(body.get("costPrice")).isBlank()
+                ? new java.math.BigDecimal(String.valueOf(body.get("costPrice")))
+                : null;
+        java.math.BigDecimal price = body.get("price") != null && !String.valueOf(body.get("price")).isBlank()
+                ? new java.math.BigDecimal(String.valueOf(body.get("price")))
+                : null;
+        return ResponseEntity.ok(skuService.update(sellerId, id, name, costPrice, price));
+    }
+
     // ---------------------------------------------------------------- Tồn kho (FR-13, FR-14)
 
     @GetMapping("/inventories")
