@@ -17,23 +17,10 @@ if (-not $MavenArgs -or $MavenArgs.Count -eq 0) {
 }
 
 $backendDir = $PSScriptRoot
+$repoLocal = Join-Path (Split-Path $backendDir -Parent) '.m2repo'
+$env:MAVEN_OPTS = "-Dmaven.repo.local=$repoLocal"
 
-# Tìm .m2repo ở backend/ hoặc các thư mục cha (workaround cho máy build hiện tại,
-# nơi Maven không ghi được ~/.m2). Trên máy bình thường không có .m2repo
-# → dùng local repository mặc định (~/.m2) của Maven.
-$repoLocal = $null
-$dir = $backendDir
-for ($i = 0; $i -lt 3 -and $dir; $i++) {
-    $candidate = Join-Path $dir '.m2repo'
-    if (Test-Path $candidate) { $repoLocal = $candidate; break }
-    $dir = Split-Path $dir -Parent
-}
-if ($repoLocal) {
-    $env:MAVEN_OPTS = "-Dmaven.repo.local=$repoLocal"
-    Write-Host "[build.ps1] Local repo: $repoLocal" -ForegroundColor Cyan
-} else {
-    Write-Host "[build.ps1] Khong thay .m2repo -> dung ~/.m2 mac dinh cua Maven" -ForegroundColor Cyan
-}
+Write-Host "[build.ps1] MAVEN_OPTS=$env:MAVEN_OPTS" -ForegroundColor Cyan
 Write-Host "[build.ps1] mvn -f $backendDir\pom.xml $($MavenArgs -join ' ')" -ForegroundColor Cyan
 
 # Cài parent POM trước (chỉ POM, không build module con).

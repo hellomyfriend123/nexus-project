@@ -1,0 +1,45 @@
+/* Lucian UX/UI Prompt #393 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#393 */
+/* Adapt the platform pill to two roles; retain the original spring timing. */
+.u062 .auth-role-selector.u393-role {
+  position: relative;
+  isolation: isolate;
+  gap: 0;
+  padding: 3px;
+  box-shadow: inset 0 0 0 1px var(--ux-line);
+}
+.u393-role .u393-role-pill {
+  position: absolute;
+  z-index: 0;
+  left: 3px;
+  top: 3px;
+  bottom: 3px;
+  width: calc((100% - 6px) / 2);
+  border-radius: 9px;
+  background: var(--ux-surface);
+  box-shadow: 0 1px 4px -1px var(--ux-shadow-strong), 0 0 0 1px var(--ux-line);
+  pointer-events: none;
+  transform: translateX(0);
+  transition: transform .35s cubic-bezier(.3, 1.3, .5, 1);
+}
+.u393-role[data-role='seller'] .u393-role-pill {
+  transform: translateX(100%);
+}
+.u062 .auth-role-selector.u393-role button {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  border-radius: 9px;
+  background: transparent;
+  box-shadow: none;
+  transition: color .2s;
+}
+.u062 .auth-role-selector.u393-role button[aria-pressed='true'] {
+  background: transparent;
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .u393-role .u393-role-pill,
+  .u062 .auth-role-selector.u393-role button {
+    transition: none;
+  }
+}

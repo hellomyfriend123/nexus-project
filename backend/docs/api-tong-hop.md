@@ -868,7 +868,6 @@ Ký hiệu role: 🌐 = công khai (không cần token), 🔓 = mọi role đã 
   ```json
   {
     "productId": "...",
-    "skuCode": "IP15P-256-BLK",
     "name": "iPhone 15 Pro 256GB Đen",
     "price": 28990000.00,
     "initialTotalQuantity": 100,
@@ -878,21 +877,21 @@ Ký hiệu role: 🌐 = công khai (không cần token), 🔓 = mọi role đã 
   | Field | Bắt buộc | Ràng buộc |
   |---|---|---|
   | `productId` | ✅ | Sản phẩm đã tồn tại (thuộc Seller) |
-  | `skuCode` | ✅ | ≤ 100 ký tự, **duy nhất toàn hệ thống** |
   | `name` | ❌ | ≤ 200 ký tự |
   | `price` | ❌ | `>= 0` |
   | `initialTotalQuantity` | ❌ | `>= 0`, bỏ trống = 0 |
   | `initialAvailableQuantity` | ❌ | `>= 0`, bỏ trống = 0 |
 
+- Mã `skuCode` không nhận từ client; hệ thống cấp tuần tự theo dạng `ORD-001`, `ORD-002`, ...
 - **Response `201 Created`** — `SkuResponse`:
   ```json
   {
     "id": "...", "productId": "...", "sellerId": "...",
-    "skuCode": "IP15P-256-BLK", "name": "...", "price": 28990000.00,
+    "skuCode": "ORD-001", "name": "...", "price": 28990000.00,
     "createdAt": "...", "updatedAt": "..."
   }
   ```
-- **Lỗi:** `409` (`skuCode` trùng), `404`
+- **Lỗi:** `400` nếu dữ liệu không hợp lệ (ví dụ tồn khả dụng lớn hơn tồn tổng)
 - **Ghi chú:** endpoint này **đồng thời tạo bản ghi tồn kho** ở kho `ACTIVE` đầu tiên — nên Seller
   không cần gọi thêm API nào để có tồn kho ban đầu.
 - **⚠️ Chưa hoàn thiện:** luồng "tạo Product kèm SKU trong **một** transaction" (FR-05) chưa nối;

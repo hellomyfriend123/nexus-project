@@ -17,6 +17,10 @@ server:
 spring:
   application:
     name: nexus
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
 
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/nexus}
@@ -75,9 +79,36 @@ nexus:
       ttl-minutes: ${TOKEN_TTL_MINUTES:480}
     cors:
       allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+    # ---------------------------------------------------------------------------------
+    # Đăng nhập bằng Google (OAuth 2.0 / OpenID Connect)
+    #
+    # KHÔNG dùng khối spring.security.oauth2.client của Spring Boot vì khối đó tạo
+    # ClientRegistration ngay khi khởi động: nếu client-id rỗng thì ứng dụng NÉM LỖI
+    # ("clientId cannot be empty") và không chạy được — kể cả khi chỉ muốn mở Swagger.
+    # Cấu hình dưới đây được đọc bởi GoogleOAuth2Config (nexus-common), lớp này chỉ bật
+    # bean OAuth2 khi CẢ client-id và client-secret đều có giá trị.
+    #
+    # Bỏ trống = tắt Google login, mọi API khác vẫn hoạt động bình thường.
+    # ---------------------------------------------------------------------------------
+    oauth2:
+      google:
+        client-id: ${GOOGLE_CLIENT_ID:}
+        client-secret: ${GOOGLE_CLIENT_SECRET:}
+      # Nơi backend chuyển hướng trình duyệt về sau khi Google xác thực xong.
+      # Phải là một route của frontend (mặc định: http://localhost:5173/oauth2/callback).
+      frontend-callback-url: ${OAUTH2_FRONTEND_CALLBACK_URL:http://localhost:5173/oauth2/callback}
+      # Vai trò gán cho tài khoản tạo mới từ Google khi client không gửi ?role=
+      default-role: ${OAUTH2_DEFAULT_ROLE:BUYER}
   auction:
     # FR-33/FR-34: chu kỳ job tự chuyển SCHEDULED -> ACTIVE -> ENDED (mili giây)
     scheduler-interval-ms: ${AUCTION_SCHEDULER_INTERVAL_MS:15000}
+  supabase:
+    url: ${SUPABASE_URL:}
+    service-role-key: ${SUPABASE_SERVICE_ROLE_KEY:}
+    storage-bucket: ${SUPABASE_STORAGE_BUCKET:product-images}
+  storage:
+    max-file-size-mb: 5
+    allowed-types: image/jpeg,image/png,image/webp,image/gif
 
 logging:
   level:

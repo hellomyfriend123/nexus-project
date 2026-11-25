@@ -1,0 +1,32 @@
+﻿/* Values preserved from the existing Product Detail assurance panels. */
+.nx-product-assurances {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+  min-width: 0;
+}
+.nx-assurance-item {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid #f0ecec;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.nx-assurance-item h3 {
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+.nx-assurance-item h3 .nx-assurance-icon {
+  color: #315bf4;
+  font-size: 20px;
+}
+.nx-assurance-item .nx-assurance-icon svg {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+}
+.nx-assurance-item p {
+  font-size: 11px;
+  color: #88818b;
+}

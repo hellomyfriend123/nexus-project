@@ -1,0 +1,352 @@
+### =====================================================================================
+### PROJECT NEXUS — Auth API test cases: POST /register and POST /login
+### Run with VS Code REST Client. Start the app and use a test database/account only.
+###
+### IMPORTANT: Before the first run, change @runId to a value not used in this database.
+### Registration cases create persistent users; use a fresh @runId on each complete rerun.
+### Cases that intentionally register duplicates must run after the matching success case.
+###
+### Expected error contract: { status, error, message, path, details }
+### =====================================================================================
+
+@host = http://localhost:8080
+@contentType = application/json
+@runId = 20261105
+@buyerEmail = auth.buyer.{{runId}}@example.com
+@buyerUsername = auth_buyer_{{runId}}
+@sellerEmail = auth.seller.{{runId}}@example.com
+@sellerUsername = auth_seller_{{runId}}
+@testPassword = TestPass@123
+
+### -------------------------------------------------------------------------------
+### REGISTER — happy paths, 201 CREATED
+### -------------------------------------------------------------------------------
+
+### REG-01: Register BUYER successfully; response must not expose password/hash
+# @name registerBuyer
+POST {{host}}/api/v1/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "{{buyerEmail}}",
+  "username": "{{buyerUsername}}",
+  "password": "{{testPassword}}",
+  "fullName": "Auth API Buyer",
+  "phone": "0912345678",
+  "role": "BUYER"
+}
+
+> {% client.test("REG-01 returns 201 and a safe BUYER profile", function() {
+    client.assert(response.status === 201, "Expected HTTP 201");
+    client.assert(response.body.email === request.variables.get("buyerEmail"), "Email mismatch");
+    client.assert(response.body.roles.includes("BUYER"), "BUYER role missing");
+    client.assert(!("password" in response.body) && !("passwordHash" in response.body), "Password data leaked");
+}); %}
+
+### REG-02: Register SELLER successfully
+# @name registerSeller
+POST {{host}}/api/v1/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "{{sellerEmail}}",
+  "username": "{{sellerUsername}}",
+  "password": "{{testPassword}}",
+  "fullName": "Auth API Seller",
+  "phone": "",
+  "role": "SELLER"
+}
+
+> {% client.test("REG-02 returns 201 and assigns SELLER", function() {
+    client.assert(response.status === 201, "Expected HTTP 201");
+    client.assert(response.body.roles.includes("SELLER"), "SELLER role missing");
+}); %}
+
+### -------------------------------------------------------------------------------
+### REGISTER — expected 400 VALIDATION_ERROR cases
+### -------------------------------------------------------------------------------
+
+### REG-03: Invalid email format
+POST {{host}}/api/v1/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "not-an-email",
+  "username": "bad_email_{{runId}}",
+  "password": "{{testPassword}}",
+  "fullName": "Invalid Email",
+  "role": "BUYER"
+}
+
+> {% client.test("REG-03 returns VALIDATION_ERROR", function() {
+    client.assert(response.status === 400 && response.body.error === "VALIDATION_ERROR", "Expected 400 VALIDATION_ERROR");
+    client.assert(response.body.details.some(function(item) { return item.field === "email"; }), "Expected email violation");
+}); %}
+
+### REG-04: Password shorter than 8 characters
+POST {{host}}/api/v1/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "short.pass.{{runId}}@example.com",
+  "username": "short_pass_{{runId}}",
+  "password": "short",
+  "fullName": "Short Password",
+  "role": "BUYER"
+}
+
+> {% client.test("REG-04 returns password validation error", function() {
+    client.assert(response.status === 400 && response.body.error === "VALIDATION_ERROR", "Expected 400 VALIDATION_ERROR");
+    client.assert(response.body.details.some(function(item) { return item.field === "password"; }), "Expected password violation");
+}); %}
+
+### REG-05: Password longer than 72 characters
+POST {{host}}/api/v1/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "long.pass.{{runId}}@example.com",
+  "username": "long_pass_{{runId}}",
+  "password": "1234567890123456789012345678901234567890123456789012345678901234567890123",
+  "fullName": "Long Password",
+  "role": "BUYER"
+}
+
+> {% client.test("REG-05 returns password validation error", function() {
+    client.assert(response.status === 400 && response.body.error === "VALIDATION_ERROR", "Expected 400 VALIDATION_ERROR");
+    client.assert(response.body.details.some(function(item) { return item.field === "password"; }), "Expected password violation");
+}); %}
+
+### REG-06: Missing required fields / blank values
+POST {{host}}/api/v1/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": " ",
+  "username": "",
+  "password": "",
+  "fullName": " ",
+  "role": ""
+}
+
+> {% client.test("REG-06 returns field validation details", function() {
+    client.assert(response.status === 400 && response.body.error === "VALIDATION_ERROR", "Expected 400 VALIDATION_ERROR");
+    client.assert(response.body.details.length >= 5, "Expected multiple field violations");
+}); %}
+
+### REG-07: Username shorter than 3 characters
+POST {{host}}/api/v1/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "short.username.{{runId}}@example.com",
+  "username": "ab",
+  "password": "{{testPassword}}",
+  "fullName": "Short Username",
+  "role": "BUYER"
+}
+
+> {% client.test("REG-07 returns username validation error", function() {
+    client.assert(response.status === 400 && response.body.error === "VALIDATION_ERROR", "Expected 400 VALIDATION_ERROR");
+    client.assert(response.body.details.some(function(item) { return item.field === "username"; }), "Expected username violation");
+}); %}
+
+### REG-08: Username contains unsupported characters
+POST {{host}}/api/v1/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "bad.username.{{runId}}@example.com",
+  "username": "bad name",
+  "password": "{{testPassword}}",
+  "fullName": "Bad Username",
+  "role": "BUYER"
+}
+
+> {% client.test("REG-08 returns username validation error", function() {
+    client.assert(response.status === 400 && response.body.error === "VALIDATION_ERROR", "Expected 400 VALIDATION_ERROR");
+    client.assert(response.body.details.some(function(item) { return item.field === "username"; }), "Expected username violation");
+}); %}
+
+### REG-09: Self-registration with ADMIN role is rejected
+POST {{host}}/api/v1/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "admin.attempt.{{runId}}@example.com",
+  "username": "admin_try_{{runId}}",
+  "password": "{{testPassword}}",
+  "fullName": "Admin Attempt",
+  "role": "ADMIN"
+}
+
+> {% client.test("REG-09 rejects ADMIN self-registration", function() {
+    client.assert(response.status === 400 && response.body.error === "VALIDATION_ERROR", "Expected 400 VALIDATION_ERROR");
+    client.assert(response.body.details.some(function(item) { return item.field === "role"; }), "Expected role violation");
+}); %}
+
+### REG-10: Invalid phone format
+POST {{host}}/api/v1/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "bad.phone.{{runId}}@example.com",
+  "username": "bad_phone_{{runId}}",
+  "password": "{{testPassword}}",
+  "fullName": "Bad Phone",
+  "phone": "phone-number",
+  "role": "BUYER"
+}
+
+> {% client.test("REG-10 returns phone validation error", function() {
+    client.assert(response.status === 400 && response.body.error === "VALIDATION_ERROR", "Expected 400 VALIDATION_ERROR");
+    client.assert(response.body.details.some(function(item) { return item.field === "phone"; }), "Expected phone violation");
+}); %}
+
+### REG-11: Malformed JSON is rejected with 400 BAD_REQUEST
+POST {{host}}/api/v1/auth/register
+Content-Type: {{contentType}}
+
+{ "email": "broken-json", "password":
+
+> {% client.test("REG-11 returns BAD_REQUEST", function() {
+    client.assert(response.status === 400 && response.body.error === "BAD_REQUEST", "Expected 400 BAD_REQUEST");
+}); %}
+
+### -------------------------------------------------------------------------------
+### REGISTER — expected 409 CONFLICT cases (run after REG-01 and REG-02)
+### -------------------------------------------------------------------------------
+
+### REG-12: Duplicate email
+POST {{host}}/api/v1/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "{{buyerEmail}}",
+  "username": "another_{{runId}}",
+  "password": "{{testPassword}}",
+  "fullName": "Duplicate Email",
+  "role": "BUYER"
+}
+
+> {% client.test("REG-12 returns 409 CONFLICT for duplicate email", function() {
+    client.assert(response.status === 409 && response.body.error === "CONFLICT", "Expected 409 CONFLICT");
+}); %}
+
+### REG-13: Duplicate username with a different email
+POST {{host}}/api/v1/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "another.user.{{runId}}@example.com",
+  "username": "{{sellerUsername}}",
+  "password": "{{testPassword}}",
+  "fullName": "Duplicate Username",
+  "role": "BUYER"
+}
+
+> {% client.test("REG-13 returns 409 CONFLICT for duplicate username", function() {
+    client.assert(response.status === 409 && response.body.error === "CONFLICT", "Expected 409 CONFLICT");
+}); %}
+
+### -------------------------------------------------------------------------------
+### LOGIN — expected 200, 400, and 401 cases
+### -------------------------------------------------------------------------------
+
+### LOG-01: Correct credentials; normalize email case/whitespace; capture token
+# @name loginBuyer
+POST {{host}}/api/v1/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "  AUTH.BUYER.{{runId}}@EXAMPLE.COM  ",
+  "password": "{{testPassword}}"
+}
+
+> {% client.test("LOG-01 returns token and user profile", function() {
+    client.assert(response.status === 200, "Expected HTTP 200");
+    client.assert(response.body.accessToken.length > 0, "Missing accessToken");
+    client.assert(response.body.tokenType === "Bearer", "Expected Bearer token type");
+    client.assert(response.body.user.email === request.variables.get("buyerEmail"), "User email mismatch");
+});
+client.global.set("authTestToken", response.body.accessToken); %}
+
+### LOG-02: Incorrect password; same generic message as unknown email
+POST {{host}}/api/v1/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "{{buyerEmail}}",
+  "password": "DefinitelyWrong@123"
+}
+
+> {% client.test("LOG-02 returns generic 401 UNAUTHORIZED", function() {
+    client.assert(response.status === 401 && response.body.error === "UNAUTHORIZED", "Expected 401 UNAUTHORIZED");
+    client.assert(response.body.message === "Email hoặc mật khẩu không đúng", "Unexpected credential error message");
+}); %}
+
+### LOG-03: Unknown email; same generic message as incorrect password
+POST {{host}}/api/v1/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "not.found.{{runId}}@example.com",
+  "password": "{{testPassword}}"
+}
+
+> {% client.test("LOG-03 returns the same generic 401", function() {
+    client.assert(response.status === 401 && response.body.error === "UNAUTHORIZED", "Expected 401 UNAUTHORIZED");
+    client.assert(response.body.message === "Email hoặc mật khẩu không đúng", "Credential errors should not reveal account existence");
+}); %}
+
+### LOG-04: Empty email/password
+POST {{host}}/api/v1/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "",
+  "password": " "
+}
+
+> {% client.test("LOG-04 returns 400 VALIDATION_ERROR", function() {
+    client.assert(response.status === 400 && response.body.error === "VALIDATION_ERROR", "Expected 400 VALIDATION_ERROR");
+    client.assert(response.body.details.length >= 2, "Expected email and password violations");
+}); %}
+
+### LOG-05: Password longer than 72 characters
+POST {{host}}/api/v1/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "{{buyerEmail}}",
+  "password": "1234567890123456789012345678901234567890123456789012345678901234567890123"
+}
+
+> {% client.test("LOG-05 returns password validation error", function() {
+    client.assert(response.status === 400 && response.body.error === "VALIDATION_ERROR", "Expected 400 VALIDATION_ERROR");
+    client.assert(response.body.details.some(function(item) { return item.field === "password"; }), "Expected password violation");
+}); %}
+
+### LOG-06: Malformed JSON
+POST {{host}}/api/v1/auth/login
+Content-Type: {{contentType}}
+
+{ "email": "broken-json", "password":
+
+> {% client.test("LOG-06 returns 400 BAD_REQUEST", function() {
+    client.assert(response.status === 400 && response.body.error === "BAD_REQUEST", "Expected 400 BAD_REQUEST");
+}); %}
+
+### -------------------------------------------------------------------------------
+### Expected status/error summary
+### 201: registration succeeds
+### 200: login succeeds
+### 400 VALIDATION_ERROR: request fields violate DTO constraints
+### 400 BAD_REQUEST: malformed JSON
+### 401 UNAUTHORIZED: incorrect password OR unknown email (same public message)
+### 409 CONFLICT: duplicate email OR username
+###
+### 403 FORBIDDEN is also expected for login when an existing user has INACTIVE/BANNED
+### status and supplies the correct password. Do not change a shared/production Supabase
+### account to test this; use a disposable local/test database and restore its status after.
+### =====================================================================================

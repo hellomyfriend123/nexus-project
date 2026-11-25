@@ -1,0 +1,60 @@
+/* Quantity stepper */
+
+.nx-quantity-stepper {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 9999px;
+  background: var(--quantity-stepper-surface-lowest, #ffffff);
+  box-shadow: var(--quantity-stepper-shadow, 0 1px 3px rgba(28, 27, 27, 0.08));
+}
+
+.nx-quantity-stepper-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--quantity-stepper-outline, #747686);
+  font-size: 12px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.nx-quantity-stepper-button:hover:not(:disabled) {
+  background: var(--quantity-stepper-surface-container, #f0eded);
+  color: var(--quantity-stepper-on-surface, #1c1b1b);
+}
+
+.nx-quantity-stepper-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.nx-quantity-stepper-value {
+  width: 48px;
+  min-width: 32px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  appearance: textfield;
+  -moz-appearance: textfield;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--quantity-stepper-on-surface, #1c1b1b);
+}
+
+.nx-quantity-stepper-value::-webkit-inner-spin-button,
+.nx-quantity-stepper-value::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}

@@ -1,0 +1,135 @@
+### =====================================================================================
+### PROJECT NEXUS — Google OAuth2 login/logout test cases
+### Run with VS Code REST Client.
+###
+### CHUẨN BỊ (làm 1 lần):
+###   1. backend/.env đã có GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET
+###   2. Google Cloud Console > Credentials > OAuth 2.0 Client:
+###        Authorized JavaScript origins : http://localhost:5173
+###        Authorized redirect URIs     : http://localhost:8080/login/oauth2/code/google
+###   3. Khởi động backend, kiểm tra log có dòng "OAuth2 client registration: google"
+###
+### LƯU Ý: các case dưới đây KHÔNG chạy trọn vẹn bằng REST Client, vì luồng OAuth2 bắt buộc
+### phải mở trình duyệt thật để người dùng đăng nhập Google (không thể tự động hoá bằng HTTP
+### thuần). Dùng phần "KIỂM TRA TỰ ĐỘNG" ở cuối để test những gì test được, còn luồng đầy đủ
+### thì làm theo hướng dẫn ở mục "KIỂM TRA THỦ CÔNG".
+### =====================================================================================
+
+@host = http://localhost:8080
+@contentType = application/json
+
+### -------------------------------------------------------------------------------
+### KIỂM TRA TỰ ĐỘNG
+### -------------------------------------------------------------------------------
+
+### OAU-01: Endpoint bắt đầu đăng nhập phải trả 302 sang accounts.google.com
+### (REST Client không tự theo redirect — chỉ cần thấy status 302 + header Location)
+GET {{host}}/oauth2/authorization/google?role=BUYER
+
+> {% client.test("OAU-01 redirects to Google consent screen", function() {
+    client.assert(response.status === 302, "Expected HTTP 302, got " + response.status);
+    var location = response.headers.valueOf("Location") || "";
+    client.assert(location.indexOf("accounts.google.com") !== -1, "Location must point to Google: " + location);
+    client.assert(location.indexOf("client_id=") !== -1, "Missing client_id in redirect");
+    client.assert(location.indexOf("code") !== -1 || location.indexOf("response_type=code") !== -1,
+                  "Missing authorization code flow");
+    // scope phải chứa openid để Google trả id_token (nguồn của email_verified)
+    client.assert(location.indexOf("openid") !== -1, "Missing openid scope: " + location);
+}); %}
+
+### OAU-02: Đổi mã rỗng → 400 VALIDATION_ERROR (không phải 500)
+POST {{host}}/api/v1/auth/oauth2/exchange
+Content-Type: {{contentType}}
+
+{
+  "code": ""
+}
+
+> {% client.test("OAU-02 rejects blank code with 400", function() {
+    client.assert(response.status === 400, "Expected HTTP 400, got " + response.status);
+    client.assert(response.body.error === "VALIDATION_ERROR", "Expected VALIDATION_ERROR");
+}); %}
+
+### OAU-03: Đổi mã bịa → 401 UNAUTHORIZED
+POST {{host}}/api/v1/auth/oauth2/exchange
+Content-Type: {{contentType}}
+
+{
+  "code": "ma-gia-mao-khong-ton-tai"
+}
+
+> {% client.test("OAU-03 rejects unknown code with 401", function() {
+    client.assert(response.status === 401, "Expected HTTP 401, got " + response.status);
+    client.assert(response.body.error === "UNAUTHORIZED", "Expected UNAUTHORIZED");
+}); %}
+
+### OAU-04: Mã dùng một lần — gọi hai lần với cùng một mã phải thất bại ở lần hai
+### (chạy sau khi đã lấy được mã thật từ trình duyệt; dán mã vào @realCode)
+@realCode = dan-ma-that-lay-tu-trinh-duyet
+
+### OAU-04a: Lần 1 — phải thành công
+POST {{host}}/api/v1/auth/oauth2/exchange
+Content-Type: {{contentType}}
+
+{
+  "code": "{{realCode}}"
+}
+
+> {% client.test("OAU-04a first exchange succeeds", function() {
+    client.assert(response.status === 200, "Expected HTTP 200, got " + response.status);
+    client.assert(typeof response.body.accessToken === "string" && response.body.accessToken.length > 0,
+                  "Missing accessToken");
+    client.assert(response.body.tokenType === "Bearer", "Expected Bearer");
+    client.assert(Array.isArray(response.body.user.roles), "Missing roles");
+});
+client.global.set("oauthToken", response.body.accessToken); %}
+
+### OAU-04b: Lần 2 — cùng mã phải bị từ chối (dùng một lần)
+POST {{host}}/api/v1/auth/oauth2/exchange
+Content-Type: {{contentType}}
+
+{
+  "code": "{{realCode}}"
+}
+
+> {% client.test("OAU-04b reused code is rejected", function() {
+    client.assert(response.status === 401, "Code must be single-use; got " + response.status);
+}); %}
+
+### OAU-05: Token lấy từ Google exchange dùng được với API nghiệp vụ
+GET {{host}}/api/v1/auth/me
+Authorization: Bearer {{oauthToken}}
+
+> {% client.test("OAU-05 Google token works on protected API", function() {
+    client.assert(response.status === 200, "Expected HTTP 200");
+    client.assert(typeof response.body.email === "string", "Missing email");
+}); %}
+
+### OAU-06: Logout — stateless, chỉ cần client xoá token
+POST {{host}}/api/v1/auth/logout
+Authorization: Bearer {{oauthToken}}
+
+> {% client.test("OAU-06 logout returns 204", function() {
+    client.assert(response.status === 204, "Expected HTTP 204");
+}); %}
+
+### -------------------------------------------------------------------------------
+### KIỂM TRA THỦ CÔNG (bắt buộc cho luồng đầy đủ)
+###
+### 1. Mở trình duyệt: http://localhost:8080/oauth2/authorization/google?role=BUYER
+###    → Google hiện màn hình chọn tài khoản.
+### 2. Chọn một tài khoản Gmail → đồng ý.
+### 3. Trình duyệt được đưa về:
+###      http://localhost:5173/oauth2/callback?code=<mã>&newUser=true
+###    (nếu frontend chưa có route này sẽ thấy lỗi 404 của Vite — đó là phía FE, xem
+###     HUONG-DAN-GOOGLE-LOGIN.md)
+### 4. Sao chép <mã>, dán vào OAU-04a, chạy → nhận accessToken.
+### 5. Kiểm tra DB: bảng nexus_user.users có dòng mới với email là Gmail vừa đăng nhập,
+###    và nexus_user.user_roles có vai trò BUYER (hoặc SELLER nếu truyền ?role=SELLER).
+###
+### KẾT QUẢ MONG ĐỢI
+###   302 → accounts.google.com          : cấu hình Google OK
+###   302 → /oauth2/callback?code=...    : đổi token Google OK, tạo/tìm user OK
+###   200 + accessToken                  : mã dùng một lần OK
+###   401 (lần 2 cùng mã)                : chống dùng lại mã OK
+### =====================================================================================

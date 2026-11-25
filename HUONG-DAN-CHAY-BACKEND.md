@@ -1,7 +1,6 @@
 # BÁO CÁO: Vì sao backend Nexus không chạy được & Cách chạy
 
-> Phạm vi: **không sửa một dòng nào trong `backend\`** (mã nguồn, pom, .env, run.bat giữ nguyên).
-> Mọi thứ dưới đây là chẩn đoán + một script chạy đặt **ngoài** `backend\`.
+> Phạm vi: chẩn đoán môi trường Windows và cách chạy backend. Mã nguồn hiện cho phép chạy API sản phẩm/SKU khi Supabase Storage chưa cấu hình; upload ảnh vẫn yêu cầu cấu hình Storage.
 
 ---
 
@@ -23,23 +22,32 @@ Ngoài ra (không chặn nhưng gây khó chịu):
 - Chạy `java -jar` từ thư mục khác `backend\` thì `.env` không được nạp → mất `DB_URL`, app rơi về `localhost:5432`.
 - Seeder báo `Không tạo được tài khoản quản trị demo vì tên đăng nhập 'admin' đã được sử dụng` → trên Supabase đã có user `admin` nhưng **email là `admin@nexus.vn`**, không phải `admin@nexus.local`. Vì vậy đăng nhập `admin@nexus.local / Admin@123` trả **401** dù hệ thống chạy bình thường.
 
+### Lỗi đăng bán mới nhất (25/11/2026)
+
+Log mới nhất báo `java.lang.Error: Unresolved compilation problem: SecurityUtils cannot be resolved` tại `CatalogSellerController.create`. Request lỗi trước khi gọi service tạo sản phẩm, nên không ghi Product hoặc SKU vào DB. Source hiện có import `SecurityUtils` hợp lệ; JAR đang chạy chứa bytecode build lỗi/cũ. Dừng backend bằng `Ctrl+C`, sau đó từ thư mục gốc chạy `.\run-backend.cmd 8080 build` để ép `mvn clean package` rồi khởi động lại. Không dùng lệnh chạy mặc định lần này vì nó có thể giữ lại JAR cũ.
+
+Lỗi thiếu `SUPABASE_URL` trước đó là vấn đề riêng: API Product/SKU hiện có thể chạy khi chưa cấu hình Storage, còn upload ảnh vẫn cần `SUPABASE_URL` và `SUPABASE_SERVICE_ROLE_KEY`. Hai biến Storage khác với `DB_URL`/`DB_USERNAME`/`DB_PASSWORD` của PostgreSQL; chỉ lưu service role key ở backend.
+
 ---
 
-## 2. Cách chạy (không sửa code)
+## 2. Cách chạy
 
 ```powershell
 cd D:\FPTU\semester_6\OJT
-.\run-backend.cmd                  # chạy ở cổng 8080 (mặc định)
-.\run-backend.cmd 8080 build       # build lại jar rồi chạy
-.\run-backend.cmd 8085             # nếu cần cổng khác
+.\run-backend.cmd                  # tự build nếu source mới hơn jar, chạy ở cổng 8080
+.\run-backend.cmd 8080 build       # ép build lại jar rồi chạy
+.\run-backend.cmd 8085             # nếu cần cổng khác; vẫn tự build nếu source mới
 ```
 
-Script tự làm 4 việc:
+Script tự làm các việc:
 
 1. Tìm JDK ≥ 21 (đọc `release` của từng JDK) và đặt `JAVA_HOME` + `PATH` **chỉ cho tiến trình này** → không đụng biến môi trường hệ thống, không đụng `backend\`.
 2. Đặt `MAVEN_OPTS=-Dmaven.repo.local=<repo>\.m2repo` (đúng như `build.ps1` của dự án).
 3. Kiểm tra cổng trước khi chạy, báo rõ ai đang giữ cổng.
-4. Đặt `SERVER_PORT=<cổng>` rồi `java -jar` với **working directory = `backend\`** để `.env` được nạp.
+4. Build lại jar khi chưa có jar hoặc source Java/POM mới hơn jar; tùy chọn `build` luôn ép build.
+5. Đặt `SERVER_PORT=<cổng>` rồi `java -jar` với **working directory = `backend\`** để `.env` được nạp.
+
+Nếu backend cũ đang chạy, nhấn `Ctrl+C` trong terminal của backend trước khi chạy lại script để giải phóng cổng.
 
 Sau khi chạy:
 

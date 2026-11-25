@@ -18,9 +18,9 @@ REM    4) backend\run.bat luu kieu LF (cmd.exe doc sai) + khong set JAVA_HOME
 REM       => script nay dung CRLF, khong dung run.bat
 REM
 REM  Cach dung:
-REM     run-backend.cmd              -> chay o cong 8080
-REM     run-backend.cmd 8085         -> chay o cong 8085 (neu 8080 dang bi chiem)
-REM     run-backend.cmd 8080 build   -> build lai jar truoc khi chay
+REM     run-backend.cmd              -> build neu source moi hon jar, chay o cong 8080
+REM     run-backend.cmd 8085         -> build neu can, chay o cong 8085
+REM     run-backend.cmd 8080 build   -> ep build lai jar truoc khi chay
 REM ============================================================================
 
 set "ROOT_DIR=%~dp0"
@@ -77,10 +77,12 @@ if defined PORT_BUSY (
 )
 
 REM ---------------------------------------------------------------------------
-REM  4. Build (neu thieu jar hoac co tham so "build")
+REM  4. Build (neu thieu jar, source moi hon jar, hoac co tham so "build")
 REM ---------------------------------------------------------------------------
 if /I "%DO_BUILD%"=="build" goto :do_build
 if not exist "%APP_JAR%" goto :do_build
+ powershell -NoProfile -ExecutionPolicy Bypass -Command "$jar=Get-Item -LiteralPath '%APP_JAR%' -ErrorAction SilentlyContinue; if(-not $jar){exit 1}; $newer=Get-ChildItem -LiteralPath '%BACKEND_DIR%' -Recurse -File | Where-Object { ($_.Extension -eq '.java' -or $_.Name -eq 'pom.xml') -and $_.FullName -notmatch '\\target\\' -and $_.LastWriteTime -gt $jar.LastWriteTime } | Select-Object -First 1; if($newer){exit 1}"
+if errorlevel 1 goto :do_build
 echo [3/4] Jar       : da co san (%APP_JAR%)
 goto :run
 

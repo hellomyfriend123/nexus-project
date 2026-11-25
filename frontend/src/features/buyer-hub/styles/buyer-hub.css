@@ -1,0 +1,2143 @@
+/* Buyer Hub — "Trung tâm Mua hàng & Quản lý Đấu giá"
+   Design source: design/buyer-hub-source.html (Stitch export)
+   Tokens are scoped to .nx-hub-page so the rest of the app keeps its palette. */
+
+.nx-hub-page {
+  --hub-primary: #074ada;
+  --hub-primary-container: #3665f3;
+  --hub-primary-fixed: #dce1ff;
+  --hub-primary-fixed-dim: #b6c4ff;
+  --hub-on-primary: #ffffff;
+  --hub-on-primary-fixed: #001550;
+  --hub-on-primary-fixed-variant: #003ab3;
+  --hub-on-primary-container: #f8f6ff;
+
+  --hub-secondary: #ba081f;
+  --hub-secondary-container: #de2c34;
+  --hub-secondary-fixed: #ffdad7;
+  --hub-on-secondary: #ffffff;
+  --hub-on-secondary-fixed: #410004;
+  --hub-on-secondary-fixed-variant: #930014;
+  --hub-on-secondary-container: #fffbff;
+
+  --hub-tertiary: #7d4e00;
+  --hub-tertiary-container: #9f6400;
+  --hub-tertiary-fixed: #ffddb8;
+  --hub-tertiary-fixed-dim: #ffb95f;
+  --hub-on-tertiary: #ffffff;
+  --hub-on-tertiary-fixed: #2a1700;
+  --hub-on-tertiary-fixed-variant: #653e00;
+  --hub-on-tertiary-container: #fff5ed;
+
+  --hub-error: #ba1a1a;
+  --hub-error-container: #ffdad6;
+  --hub-on-error-container: #93000a;
+
+  --hub-surface: #fcf9f8;
+  --hub-surface-lowest: #ffffff;
+  --hub-surface-low: #f6f3f2;
+  --hub-surface-container: #f0eded;
+  --hub-surface-high: #eae7e7;
+  --hub-surface-highest: #e5e2e1;
+  --hub-on-surface: #1c1b1b;
+  --hub-on-surface-variant: #434655;
+  --hub-outline: #747686;
+  --hub-outline-variant: #c3c5d7;
+
+  --hub-shadow: 0 1px 3px rgba(28, 27, 27, 0.08);
+  --hub-shadow-md: 0 4px 14px rgba(28, 27, 27, 0.08);
+  --hub-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  padding: 24px 0 48px;
+  color: var(--hub-on-surface);
+}
+
+/* Vertical rhythm of the exported design: 24px between page blocks. */
+.nx-hub-page > .nx-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.nx-hub-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.nx-hub-muted {
+  color: var(--hub-on-surface-variant);
+}
+
+/* ---------- 1. Profile summary card ---------- */
+
+.nx-hub-profile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px;
+  border-radius: 12px;
+  background: var(--hub-surface-lowest);
+  box-shadow: var(--hub-shadow);
+}
+
+.nx-hub-profile-identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.nx-hub-avatar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 9999px;
+  background: var(--hub-primary-fixed);
+  color: var(--hub-primary);
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 700;
+}
+
+.nx-hub-avatar-letter {
+  letter-spacing: 0.01em;
+  user-select: none;
+}
+
+.nx-hub-avatar-verified {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 9999px;
+  background: var(--hub-secondary);
+  color: var(--hub-on-secondary);
+  box-shadow: var(--hub-shadow);
+}
+
+.nx-hub-avatar-verified i {
+  font-size: 12px;
+}
+
+.nx-hub-profile-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.nx-hub-profile-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.nx-hub-profile-name {
+  margin: 0;
+  font-size: 22px;
+  line-height: 28px;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 9999px;
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+}
+
+.nx-hub-pill i {
+  font-size: 14px;
+}
+
+.nx-hub-pill--tier {
+  padding: 2px 10px;
+  background: var(--hub-tertiary-fixed);
+  color: var(--hub-on-tertiary-fixed);
+}
+
+.nx-hub-pill--id {
+  padding: 2px 8px;
+  background: var(--hub-surface-high);
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-profile-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-profile-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-profile-rating i {
+  font-size: 16px;
+  color: var(--hub-tertiary-fixed-dim);
+}
+
+.nx-hub-profile-rating strong {
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+}
+
+.nx-hub-profile-sep {
+  color: var(--hub-outline-variant);
+}
+
+.nx-hub-profile-rate {
+  color: var(--hub-on-surface);
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+}
+
+.nx-hub-profile-rate strong {
+  color: var(--hub-primary);
+  font-weight: 600;
+}
+
+.nx-hub-profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.nx-hub-wallet {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: var(--hub-surface-low);
+}
+
+.nx-hub-wallet-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nx-hub-wallet-label {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-wallet-value {
+  margin: 0;
+  font-size: 18px;
+  line-height: 22px;
+  font-weight: 700;
+  color: var(--hub-primary);
+}
+
+.nx-hub-wallet-voucher {
+  margin: 0;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--hub-secondary);
+}
+
+.nx-hub-wallet-divider {
+  width: 1px;
+  height: 32px;
+  background: var(--hub-surface-highest);
+}
+
+.nx-hub-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--hub-secondary-container);
+  color: var(--hub-on-secondary-container);
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--hub-shadow-md);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.nx-hub-cta:hover {
+  background: var(--hub-secondary);
+  color: var(--hub-on-secondary);
+}
+
+.nx-hub-cta i {
+  font-size: 18px;
+}
+
+/* ---------- 2. KPI metric cards ---------- */
+
+.nx-hub-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.nx-hub-kpi {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--hub-surface-lowest);
+  box-shadow: var(--hub-shadow);
+}
+
+.nx-hub-kpi--emphasis {
+  box-shadow: var(--hub-shadow), inset 0 0 0 1px rgba(186, 8, 31, 0.2);
+}
+
+.nx-hub-kpi-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nx-hub-kpi-label {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-kpi-value {
+  margin: 0;
+  font-size: 30px;
+  line-height: 38px;
+  letter-spacing: -0.015em;
+  font-weight: 700;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-kpi-value--secondary {
+  color: var(--hub-secondary);
+}
+
+.nx-hub-kpi-unit {
+  margin-left: 4px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-kpi-pill {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+}
+
+.nx-hub-kpi-pill i {
+  font-size: 13px;
+}
+
+.nx-hub-kpi-pill--primary {
+  background: var(--hub-primary-fixed);
+  color: var(--hub-primary);
+}
+
+.nx-hub-kpi-pill--secondary {
+  background: var(--hub-secondary-fixed);
+  color: var(--hub-secondary);
+}
+
+.nx-hub-kpi-timer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  font-family: var(--hub-font-mono);
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+  color: var(--hub-secondary);
+}
+
+.nx-hub-kpi-timer i {
+  font-size: 13px;
+}
+
+.nx-hub-kpi-caption {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-kpi-caption strong {
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-kpi-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: var(--hub-surface-container);
+}
+
+.nx-hub-kpi-icon i {
+  font-size: 20px;
+}
+
+.nx-hub-kpi-icon--primary {
+  color: var(--hub-primary);
+}
+
+.nx-hub-kpi-icon--secondary {
+  color: var(--hub-secondary);
+}
+
+.nx-hub-kpi-icon--highlight {
+  background: var(--hub-secondary-container);
+  color: var(--hub-on-secondary-container);
+}
+
+.nx-hub-kpi-icon--accent {
+  color: var(--hub-primary-container);
+}
+
+/* ---------- 3. Auction-won alert banner ---------- */
+
+.nx-hub-win {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--hub-tertiary-fixed);
+  color: var(--hub-on-tertiary-fixed);
+  box-shadow: var(--hub-shadow);
+}
+
+.nx-hub-win-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  min-width: 0;
+}
+
+.nx-hub-win-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: var(--hub-tertiary-container);
+  color: var(--hub-on-tertiary-container);
+}
+
+.nx-hub-win-icon i {
+  font-size: 22px;
+}
+
+.nx-hub-win-text {
+  min-width: 0;
+}
+
+.nx-hub-win-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nx-hub-win-title {
+  margin: 0;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--hub-on-tertiary-fixed);
+}
+
+.nx-hub-win-tag {
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: var(--hub-secondary);
+  color: var(--hub-on-secondary);
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+  white-space: nowrap;
+  animation: nx-hub-pulse 1.8s ease-in-out infinite;
+}
+
+.nx-hub-win-desc {
+  margin: 2px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--hub-on-tertiary-fixed-variant);
+}
+
+.nx-hub-win-desc strong {
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--hub-on-tertiary-fixed);
+}
+
+.nx-hub-win-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ---------- Shared buttons ---------- */
+
+.nx-hub-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 9999px;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.nx-hub-btn--white {
+  background: var(--hub-surface-lowest);
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-btn--white:hover {
+  background: var(--hub-surface);
+}
+
+.nx-hub-btn--pay {
+  padding: 8px 24px;
+  background: var(--hub-primary-container);
+  color: var(--hub-on-primary-container);
+  box-shadow: var(--hub-shadow);
+}
+
+.nx-hub-btn--pay:hover {
+  background: var(--hub-primary);
+}
+
+.nx-hub-btn--primary {
+  padding: 6px 16px;
+  background: var(--hub-primary);
+  color: var(--hub-on-primary);
+}
+
+.nx-hub-btn--primary:hover {
+  background: var(--hub-primary-container);
+}
+
+.nx-hub-btn--ghost {
+  padding: 6px 16px;
+  background: var(--hub-surface-container);
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-btn--ghost:hover {
+  background: var(--hub-error-container);
+  color: var(--hub-on-error-container);
+}
+
+.nx-hub-btn--cancel {
+  padding: 10px 24px;
+  background: var(--hub-surface-high);
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-btn--cancel:hover {
+  background: var(--hub-surface-highest);
+}
+
+.nx-hub-btn--danger {
+  padding: 10px 24px;
+  background: var(--hub-secondary-container);
+  color: var(--hub-on-secondary-container);
+  box-shadow: var(--hub-shadow);
+}
+
+.nx-hub-btn--danger:hover {
+  background: var(--hub-secondary);
+  color: var(--hub-on-secondary);
+}
+
+/* ---------- 4. Split workspace grid ---------- */
+
+.nx-hub-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.nx-hub-main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.nx-hub-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* ---------- Tab bar ---------- */
+
+.nx-hub-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 12px;
+  background: var(--hub-surface-lowest);
+  box-shadow: var(--hub-shadow);
+}
+
+.nx-hub-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--hub-on-surface-variant);
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.nx-hub-tab i {
+  font-size: 18px;
+}
+
+.nx-hub-tab:hover {
+  background: var(--hub-surface-container);
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-tab.is-active {
+  background: var(--hub-primary);
+  color: var(--hub-on-primary);
+  box-shadow: var(--hub-shadow);
+}
+
+.nx-hub-tab.is-active:hover {
+  background: var(--hub-primary);
+  color: var(--hub-on-primary);
+}
+
+.nx-hub-tab-count {
+  margin-left: 4px;
+  min-width: 18px;
+  padding: 0 6px;
+  border-radius: 9999px;
+  background: var(--hub-surface-container);
+  color: var(--hub-on-surface-variant);
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+  text-align: center;
+}
+
+.nx-hub-tab.is-active .nx-hub-tab-count {
+  background: var(--hub-surface-lowest);
+  color: var(--hub-primary);
+}
+
+.nx-hub-tab-count--alert {
+  background: var(--hub-secondary-fixed);
+  color: var(--hub-on-secondary-fixed-variant);
+}
+
+/* ---------- Panels ---------- */
+
+.nx-hub-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.nx-hub-panel--card {
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--hub-surface-lowest);
+  box-shadow: var(--hub-shadow);
+}
+
+.nx-hub-empty {
+  margin: 0;
+  padding: 32px 16px;
+  border-radius: 12px;
+  background: var(--hub-surface-low);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--hub-on-surface-variant);
+  text-align: center;
+}
+
+/* ---------- Filter bar + chips ---------- */
+
+.nx-hub-filter-bar {
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--hub-surface-lowest);
+  box-shadow: var(--hub-shadow);
+}
+
+.nx-hub-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.nx-hub-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.nx-hub-filter-label {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.nx-hub-chip {
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--hub-surface-container);
+  color: var(--hub-on-surface-variant);
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.nx-hub-chip:hover {
+  background: var(--hub-surface-high);
+}
+
+.nx-hub-chips--filled .nx-hub-chip.is-active {
+  background: var(--hub-primary-fixed);
+  color: var(--hub-on-primary-fixed);
+}
+
+.nx-hub-chips--solid .nx-hub-chip.is-active {
+  background: var(--hub-primary);
+  color: var(--hub-on-primary);
+}
+
+.nx-hub-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nx-hub-search i {
+  font-size: 18px;
+  color: var(--hub-outline);
+}
+
+.nx-hub-search-input {
+  width: 160px;
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--hub-surface-low);
+  color: var(--hub-on-surface);
+  font-size: 12px;
+  line-height: 16px;
+  outline: none;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.nx-hub-search-input::placeholder {
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-search-input:focus {
+  background: var(--hub-surface-lowest);
+  box-shadow: inset 0 0 0 1px var(--hub-primary-fixed-dim);
+}
+
+/* ---------- 5. Auction lifecycle rows ---------- */
+
+.nx-hub-bid-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nx-hub-bid {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--hub-surface-low);
+  transition: box-shadow 0.15s ease;
+}
+
+.nx-hub-bid:hover {
+  box-shadow: var(--hub-shadow);
+}
+
+.nx-hub-bid--lost {
+  background: rgba(246, 243, 242, 0.7);
+  opacity: 0.75;
+}
+
+.nx-hub-bid--lost:hover {
+  box-shadow: none;
+}
+
+.nx-hub-bid-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.nx-hub-bid-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  background: var(--hub-surface-highest);
+  color: var(--hub-primary);
+}
+
+.nx-hub-bid-thumb i {
+  font-size: 32px;
+}
+
+.nx-hub-bid-thumb--muted {
+  color: var(--hub-outline);
+}
+
+.nx-hub-bid-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.nx-hub-bid-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nx-hub-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.nx-hub-badge--outbid {
+  background: var(--hub-secondary-fixed);
+  color: var(--hub-on-secondary-fixed);
+}
+
+.nx-hub-badge--leading {
+  background: var(--hub-primary-fixed);
+  color: var(--hub-on-primary-fixed);
+}
+
+.nx-hub-badge--ended {
+  background: var(--hub-surface-highest);
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: var(--hub-secondary);
+}
+
+.nx-hub-dot--ping {
+  animation: nx-hub-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.nx-hub-bid-code {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-bid-title {
+  margin: 0;
+  overflow: hidden;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--hub-on-surface);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nx-hub-bid-title--ended {
+  text-decoration: line-through;
+}
+
+.nx-hub-bid-meta,
+.nx-hub-bid-meta-row {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-bid-meta {
+  display: block;
+}
+
+.nx-hub-bid-meta-strong {
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-bid-meta-strong--primary {
+  font-size: 18px;
+  line-height: 22px;
+  font-weight: 700;
+  color: var(--hub-primary);
+}
+
+.nx-hub-bid-meta-strong--danger {
+  font-size: 18px;
+  line-height: 22px;
+  font-weight: 700;
+  color: var(--hub-secondary);
+}
+
+.nx-hub-bid-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.nx-hub-bid-timer {
+  text-align: right;
+}
+
+.nx-hub-bid-timer-label {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-bid-timer-value {
+  margin: 0;
+  font-family: var(--hub-font-mono);
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-bid-timer-value--danger {
+  color: var(--hub-secondary);
+}
+
+.nx-hub-bid-ended-label {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-bid-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nx-hub-bid-btn {
+  padding: 6px 16px;
+  border: 0;
+  border-radius: 9999px;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.nx-hub-bid-btn--danger {
+  background: var(--hub-secondary);
+  color: var(--hub-on-secondary);
+  box-shadow: var(--hub-shadow);
+}
+
+.nx-hub-bid-btn--danger:hover {
+  background: var(--hub-secondary-container);
+}
+
+.nx-hub-bid-btn--plain {
+  background: var(--hub-surface-lowest);
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-bid-btn--plain:hover {
+  background: var(--hub-surface);
+}
+
+.nx-hub-bid-btn--muted {
+  background: var(--hub-surface-container);
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-bid-btn--muted:hover {
+  background: var(--hub-surface-high);
+}
+
+.nx-hub-bid-icon-btn {
+  padding: 6px;
+  border: 0;
+  background: transparent;
+  color: var(--hub-outline);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.nx-hub-bid-icon-btn:hover {
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-bid-icon-btn i {
+  font-size: 20px;
+}
+
+/* ---------- 6. Order management ---------- */
+
+.nx-hub-order-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.nx-hub-order-summary {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.nx-hub-order {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--hub-surface-low);
+}
+
+.nx-hub-order-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--hub-surface-high);
+}
+
+.nx-hub-order-head-left {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.nx-hub-order-code {
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-order-tag {
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.nx-hub-order-tag--primary {
+  background: var(--hub-primary-fixed);
+  color: var(--hub-on-primary-fixed);
+}
+
+.nx-hub-order-tag--tertiary {
+  background: var(--hub-tertiary-fixed);
+  color: var(--hub-on-tertiary-fixed);
+}
+
+.nx-hub-order-placed {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-order-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+}
+
+.nx-hub-order-status i {
+  font-size: 16px;
+}
+
+.nx-hub-order-status--primary {
+  color: var(--hub-primary);
+}
+
+.nx-hub-order-status--muted {
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-order-status--muted i {
+  color: var(--hub-primary);
+}
+
+.nx-hub-order-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.nx-hub-order-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.nx-hub-order-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  background: var(--hub-surface-highest);
+}
+
+.nx-hub-order-thumb--primary {
+  color: var(--hub-primary);
+}
+
+.nx-hub-order-thumb--accent {
+  color: var(--hub-primary-container);
+}
+
+.nx-hub-order-thumb i {
+  font-size: 28px;
+}
+
+.nx-hub-order-info {
+  min-width: 0;
+}
+
+.nx-hub-order-title {
+  margin: 0;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-order-meta {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-order-price {
+  margin: 4px 0 0;
+  font-size: 18px;
+  line-height: 22px;
+  font-weight: 700;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.nx-hub-order-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 16px;
+  border: 0;
+  border-radius: 9999px;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.nx-hub-order-btn i {
+  font-size: 16px;
+  color: var(--hub-tertiary-fixed-dim);
+}
+
+.nx-hub-order-btn--primary {
+  background: var(--hub-primary);
+  color: var(--hub-on-primary);
+}
+
+.nx-hub-order-btn--primary:hover {
+  background: var(--hub-primary-container);
+}
+
+.nx-hub-order-btn--plain {
+  background: var(--hub-surface-container);
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-order-btn--plain:hover {
+  background: var(--hub-surface-high);
+}
+
+.nx-hub-order-btn--white {
+  background: var(--hub-surface-lowest);
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-order-btn--white:hover {
+  background: var(--hub-surface);
+}
+
+/* ---------- 7. Saved items & cart ---------- */
+
+.nx-hub-saved-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.nx-hub-saved-title {
+  margin: 0;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-saved-summary {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-saved-selectall {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--hub-primary);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+.nx-hub-saved-selectall:hover {
+  text-decoration: underline;
+}
+
+.nx-hub-saved-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nx-hub-saved-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--hub-outline);
+}
+
+.nx-hub-saved-checkout-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-saved-checkout-meta strong {
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: 700;
+  color: var(--hub-primary);
+}
+
+.nx-hub-saved-checkout {
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--hub-primary);
+  color: #fff;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.nx-hub-saved-checkout:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.nx-hub-saved-checkout:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.nx-hub-saved-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--hub-surface-low);
+}
+
+.nx-hub-saved-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.nx-hub-checkbox {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--hub-primary);
+  cursor: pointer;
+}
+
+.nx-hub-saved-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 4px;
+  background: var(--hub-surface-highest);
+  color: var(--hub-primary);
+}
+
+.nx-hub-saved-thumb i {
+  font-size: 24px;
+}
+
+.nx-hub-saved-body {
+  min-width: 0;
+}
+
+.nx-hub-saved-name {
+  margin: 0;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-saved-meta {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-saved-price {
+  display: block;
+  margin-top: 2px;
+  font-size: 18px;
+  line-height: 22px;
+  font-weight: 700;
+  color: var(--hub-primary);
+}
+
+.nx-hub-saved-side {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.nx-hub-qty {
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  background: var(--hub-surface-lowest);
+}
+
+.nx-hub-qty-btn {
+  padding: 4px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--hub-on-surface);
+  font-size: 13px;
+  line-height: 16px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+}
+
+.nx-hub-qty-btn:hover:not(:disabled) {
+  background: var(--hub-surface-container);
+}
+
+.nx-hub-qty-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.nx-hub-qty-btn--left {
+  border-radius: 8px 0 0 8px;
+}
+
+.nx-hub-qty-btn--right {
+  border-radius: 0 8px 8px 0;
+}
+
+.nx-hub-qty-value {
+  padding: 4px 12px;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-saved-remove {
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--hub-outline);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.nx-hub-saved-remove:hover {
+  color: var(--hub-error);
+}
+
+.nx-hub-saved-remove i {
+  font-size: 20px;
+}
+
+/* ---------- 8. C2C self-auctions ---------- */
+
+.nx-hub-c2c-panel {
+  gap: 24px;
+}
+
+.nx-hub-c2c-intro-title {
+  margin: 0;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-c2c-intro-text {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-c2c-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--hub-surface-low);
+}
+
+.nx-hub-c2c-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.nx-hub-c2c-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nx-hub-c2c-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  background: var(--hub-secondary-fixed);
+  color: var(--hub-on-secondary-fixed);
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+}
+
+.nx-hub-c2c-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: var(--hub-secondary);
+  animation: nx-hub-pulse 1.8s ease-in-out infinite;
+}
+
+.nx-hub-c2c-code {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-c2c-timer {
+  font-family: var(--hub-font-mono);
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-c2c-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.nx-hub-c2c-product {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.nx-hub-c2c-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  background: var(--hub-surface-highest);
+  color: var(--hub-tertiary);
+}
+
+.nx-hub-c2c-thumb i {
+  font-size: 28px;
+}
+
+.nx-hub-c2c-info {
+  min-width: 0;
+}
+
+.nx-hub-c2c-name {
+  margin: 0;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-c2c-meta {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-c2c-top {
+  margin: 4px 0 0;
+  font-size: 18px;
+  line-height: 22px;
+  font-weight: 700;
+  color: var(--hub-secondary);
+}
+
+.nx-hub-c2c-top-note {
+  margin-left: 4px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-c2c-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* C2C create-auction form */
+
+.nx-hub-c2c-form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  border-radius: 12px;
+  background: var(--hub-surface-container);
+}
+
+.nx-hub-c2c-form-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nx-hub-c2c-form-head i {
+  font-size: 22px;
+  color: var(--hub-primary);
+}
+
+.nx-hub-c2c-form-title {
+  margin: 0;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-c2c-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.nx-hub-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.nx-hub-field--full {
+  grid-column: 1 / -1;
+}
+
+.nx-hub-field-label {
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-input,
+.nx-hub-select {
+  width: 100%;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--hub-surface-lowest);
+  color: var(--hub-on-surface);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  outline: none;
+  transition: box-shadow 0.15s ease;
+}
+
+.nx-hub-input::placeholder {
+  color: var(--hub-outline);
+}
+
+.nx-hub-input:focus,
+.nx-hub-select:focus {
+  box-shadow: inset 0 0 0 2px var(--hub-primary);
+}
+
+.nx-hub-select {
+  cursor: pointer;
+}
+
+.nx-hub-c2c-escrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.nx-hub-c2c-escrow-label {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface);
+  cursor: pointer;
+}
+
+.nx-hub-c2c-escrow-label strong {
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--hub-primary);
+}
+
+.nx-hub-c2c-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 8px;
+  grid-column: 1 / -1;
+}
+
+/* ---------- 9. Aside widgets ---------- */
+
+.nx-hub-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--hub-surface-lowest);
+  box-shadow: var(--hub-shadow);
+}
+
+.nx-hub-widget-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.nx-hub-widget-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-widget-title i {
+  font-size: 20px;
+  color: var(--hub-secondary);
+}
+
+/* Widget 1 — live feed */
+
+.nx-hub-feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.nx-hub-feed-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--hub-surface-container);
+}
+
+.nx-hub-feed-item--outbid {
+  background: rgba(255, 218, 215, 0.4);
+}
+
+.nx-hub-feed-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+}
+
+.nx-hub-feed-label--outbid {
+  color: var(--hub-secondary);
+}
+
+.nx-hub-feed-label--shipping {
+  color: var(--hub-primary);
+}
+
+.nx-hub-feed-label--seller {
+  color: var(--hub-tertiary);
+}
+
+.nx-hub-feed-text {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-feed-text strong {
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+}
+
+.nx-hub-feed-btn {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--hub-secondary);
+  color: var(--hub-on-secondary);
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--hub-shadow);
+  transition: background-color 0.15s ease;
+}
+
+.nx-hub-feed-btn:hover {
+  background: var(--hub-secondary-container);
+}
+
+/* Widget 2 — Nexus Guarantee */
+
+.nx-hub-guarantee-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nx-hub-guarantee-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: var(--hub-primary-fixed);
+  color: var(--hub-primary);
+}
+
+.nx-hub-guarantee-icon i {
+  font-size: 22px;
+}
+
+.nx-hub-widget-heading {
+  margin: 0;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-widget-subtext {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-guarantee-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--hub-on-surface-variant);
+}
+
+.nx-hub-guarantee-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.nx-hub-guarantee-list i {
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-size: 18px;
+  color: var(--hub-primary);
+}
+
+.nx-hub-guarantee-list strong {
+  font-weight: 700;
+}
+
+.nx-hub-widget-footer {
+  padding-top: 4px;
+}
+
+.nx-hub-widget-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--hub-primary);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.nx-hub-widget-link:hover {
+  text-decoration: underline;
+}
+
+.nx-hub-widget-link i {
+  font-size: 14px;
+}
+
+/* Widget 3 — quick support */
+
+.nx-hub-widget-label {
+  margin: 0;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--hub-on-surface);
+}
+
+.nx-hub-widget-label + .nx-hub-widget-subtext {
+  margin-top: -8px;
+}
+
+.nx-hub-support-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.nx-hub-widget-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--hub-surface-container);
+  color: var(--hub-on-surface);
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.nx-hub-widget-btn i {
+  font-size: 16px;
+}
+
+.nx-hub-widget-btn:hover {
+  background: var(--hub-surface-high);
+}
+
+.nx-hub-widget-btn--primary {
+  background: var(--hub-primary-fixed);
+  color: var(--hub-on-primary-fixed);
+}
+
+.nx-hub-widget-btn--primary:hover {
+  background: var(--hub-primary-fixed-dim);
+  color: var(--hub-on-primary-fixed);
+}
+
+/* ---------- Motion ---------- */
+
+@keyframes nx-hub-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+
+  75%,
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes nx-hub-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nx-hub-dot--ping,
+  .nx-hub-c2c-dot,
+  .nx-hub-win-tag {
+    animation: none;
+  }
+}

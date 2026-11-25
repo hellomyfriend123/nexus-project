@@ -1,0 +1,253 @@
+.btn-expand-horizontal span::before {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  transform: translateX(-50%);
+}
+
+.btn-expand-horizontal:hover span::before {
+  width: 100%;
+}
+
+.btn-expand-vertical span::before {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 0;
+  transform: translateY(-50%);
+}
+
+.btn-expand-vertical:hover span::before {
+  height: 100%;
+}
+
+.btn-radial-fill span::before {
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform: translate(-50%, -50%);
+}
+
+.btn-radial-fill:hover span::before {
+  width: 400%;
+  height: 400%;
+}
+
+/* Lucian #062/#066 auth action buttons; scoped to their owning cards. */
+.u062 .u062-go {
+  position: relative;
+  align-self: center;
+  width: 100%;
+  height: 54px;
+  margin-top: 12px;
+  border: 0;
+  border-radius: 17px;
+  background: var(--ux-ink);
+  color: var(--ux-page);
+  font-size: 15.5px;
+  font-weight: 760;
+  overflow: hidden;
+  transition:
+    width 0.45s var(--ux-spring),
+    border-radius 0.45s var(--ux-spring),
+    background-color 0.4s,
+    transform 0.3s var(--ux-spring);
+}
+
+.u062 .u062-go:active {
+  transform: scale(0.97);
+}
+
+.u062 .u062-go:focus-visible {
+  outline: 2px solid var(--ux-accent);
+  outline-offset: 3px;
+}
+
+.u062 .u062-go span {
+  transition: opacity 0.2s;
+}
+
+.u062 .u062-go i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border-radius: 50%;
+  border: 2.5px solid currentColor;
+  border-right-color: transparent;
+  opacity: 0;
+  animation: u062-spin 0.7s linear infinite;
+}
+
+.u062 .u062-go svg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.u062 .u062-go svg path {
+  stroke-dasharray: 26;
+  stroke-dashoffset: 26;
+  transition: stroke-dashoffset 0.4s var(--ux-ease) 0.1s;
+}
+
+.u062 .u062-go.busy,
+.u062 .u062-go.ok {
+  width: 54px;
+  border-radius: 27px;
+}
+
+.u062 .u062-go.busy span,
+.u062 .u062-go.ok span {
+  opacity: 0;
+}
+
+.u062 .u062-go.busy i {
+  opacity: 1;
+}
+
+.u062 .u062-go.ok {
+  background: var(--ux-mint);
+  color: var(--ux-accent-ink);
+}
+
+.u062 .u062-go.ok svg path {
+  stroke-dashoffset: 0;
+}
+
+.u062 .u062-go {
+  flex-shrink: 0;
+}
+
+.u066 .u066-b {
+  position: relative;
+  width: 100%;
+  height: 54px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-block: 12px;
+  padding: 0;
+  overflow: hidden;
+  background: var(--ux-ink);
+  color: var(--ux-page);
+  font-family: inherit;
+  font-size: 15.5px;
+  font-weight: 760;
+  cursor: pointer;
+  transition:
+    width 0.45s var(--ux-spring),
+    border-radius 0.45s var(--ux-spring),
+    background-color 0.4s,
+    transform 0.3s var(--ux-spring);
+}
+
+.u066 .u066-b:active {
+  transform: scale(0.97);
+}
+
+.u066 .u066-b:focus-visible,
+.u066 .u066-back:focus-visible {
+  outline: 2px solid var(--ux-accent);
+  outline-offset: 3px;
+}
+
+.u066 .u066-b:disabled {
+  cursor: wait;
+}
+
+.u066 .u066-b.busy,
+.u066 .u066-b.ok {
+  width: 54px;
+  border-radius: 27px;
+}
+
+.u066 .u066-b.busy .u066-ic,
+.u066 .u066-b.busy .u066-tx,
+.u066 .u066-b.ok .u066-ic,
+.u066 .u066-b.ok .u066-tx {
+  opacity: 0;
+}
+
+.u066 .u066-b.ok {
+  background: var(--ux-mint);
+  color: var(--ux-accent-ink);
+}
+
+.u066 .u066-b.busy .u066-st i {
+  opacity: 1;
+}
+
+.u066 .u066-b.ok .u066-st path {
+  stroke-dashoffset: 0;
+}
+
+/* Auth actions share hover/press feedback, without moving busy states. */
+.u062 .u062-go,
+.u066 .u066-b {
+  background: #fff;
+  color: #16151b;
+  box-shadow: inset 0 0 0 1.5px var(--ux-line-2, rgba(22, 21, 27, 0.17));
+}
+
+.u062 .u062-go {
+  background: #000;
+  color: #fff;
+}
+
+.u062 .u062-go.ok,
+.u066 .u066-b.ok {
+  background: var(--ux-mint);
+  color: var(--ux-accent-ink);
+  box-shadow: none;
+}
+
+@media (hover: hover) {
+  .u062 .u062-go:not(:disabled):not(.busy):not(.ok):hover,
+  .u066 .u066-b:not(:disabled):not(.busy):not(.ok):hover {
+    transform: translateY(-1px);
+    background: color-mix(in srgb, var(--ux-accent) 6%, white);
+    box-shadow:
+      inset 0 0 0 1.5px var(--ux-accent),
+      0 5px 14px -8px var(--ux-accent);
+  }
+}
+
+@media (hover: hover) {
+  .u062 .u062-go:not(:disabled):not(.busy):not(.ok):hover {
+    background: #202020;
+  }
+}
+
+.u062 .u062-go:not(:disabled):not(.busy):not(.ok):active,
+.u066 .u066-b:not(:disabled):not(.busy):not(.ok):active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .u062 .u062-go,
+  .u062 .u062-go *,
+  .u066 .u066-b,
+  .u066 .u066-b * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
+  }
+}

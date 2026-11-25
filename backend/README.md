@@ -98,7 +98,17 @@ psql "$DB_URL" -f db/04-commerce.sql
 psql "$DB_URL" -f db/05-auction.sql
 psql "$DB_URL" -f db/06-notification.sql
 psql "$DB_URL" -f db/99-seed.sql
+psql "$DB_URL" -v ON_ERROR_STOP=1 -f db/08-sku-code-sequence.sql
 ```
+
+Với database đã có từ trước, chạy các migration bổ sung một lần:
+
+```bash
+psql "$DB_URL" -v ON_ERROR_STOP=1 -f db/07-user-roles-assigned-at.sql
+psql "$DB_URL" -v ON_ERROR_STOP=1 -f db/08-sku-code-sequence.sql
+```
+
+Migration `07` gán thời điểm chạy migration cho các bản ghi phân quyền cũ; migration `08` tạo sequence cấp mã SKU.
 
 > Trên DB dùng chung / demo, đặt `DDL_AUTO=validate` để Hibernate **không** tự sửa schema.
 > Trên máy cá nhân có thể để `DDL_AUTO=update` cho nhanh.
@@ -115,6 +125,11 @@ Copy `.env.example` → `.env` và điền giá trị thật. Các biến chính
 | `DDL_AUTO` | `update` (dev) hoặc `validate` (DB chung) |
 | `JWT_SECRET` | chuỗi ký token, **phải đổi** trước khi deploy |
 | `CORS_ALLOWED_ORIGINS` | origin của Frontend (mặc định `localhost:3000,localhost:5173`) |
+| `SUPABASE_URL` | Project URL (`https://<project-ref>.supabase.co`) dùng cho Supabase Storage |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service role key cho backend upload ảnh; chỉ lưu trong `backend/.env`, không đưa vào frontend hoặc Git |
+| `SUPABASE_STORAGE_BUCKET` | Bucket ảnh (mặc định `product-images`) |
+
+`SUPABASE_URL` và `SUPABASE_SERVICE_ROLE_KEY` lấy trong Supabase Dashboard → Project Settings → API. Hai biến này chỉ cần cho upload ảnh, không phải kết nối PostgreSQL. Có thể bỏ trống khi chỉ chạy backend hoặc thử API tạo sản phẩm/SKU; khi chưa cấu hình, endpoint upload ảnh sẽ trả lỗi cấu hình rõ ràng. Bucket `public` chỉ cho phép đọc ảnh công khai, không tự cho phép upload. Chỉ lưu service role key ở backend, tuyệt đối không đưa vào frontend hoặc Git.
 
 ### 4.3 Build
 

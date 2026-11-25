@@ -1,0 +1,128 @@
+﻿/* Lucian #066 provider content with the existing #062 submit-button motion. */
+.u066 {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 14px;
+  min-width: 0;
+  color: var(--ux-ink);
+  --ux-line-2: color-mix(in srgb, var(--ux-ink) 17%, transparent);
+}
+.u066 .u066-list,
+.u066 .u066-it,
+.u066 .u066-it > div {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+}
+.u066 .u066-ic {
+  width: 22px;
+  height: 22px;
+  flex: none;
+}
+.u066 .u066-ic svg {
+  width: 22px;
+  height: 22px;
+}
+.u066 .u066-ic,
+.u066 .u066-tx {
+  transition: opacity 0.2s;
+}
+.u066 .u066-tx {
+  white-space: nowrap;
+}
+.u066 .u066-st {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+}
+.u066 .u066-st i {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2.5px solid currentColor;
+  border-right-color: transparent;
+  opacity: 0;
+  animation: u066-spin 0.7s linear infinite;
+}
+.u066 .u066-st svg {
+  position: absolute;
+  inset: 0;
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.u066 .u066-st path {
+  stroke-dasharray: 26;
+  stroke-dashoffset: 26;
+  transition: stroke-dashoffset 0.4s var(--ux-ease) 0.1s;
+}
+@keyframes u066-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.u066 .u066-msg {
+  margin: 10px 0 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ux-ink-2);
+  text-align: center;
+}
+.u066 .u066-msg:empty {
+  margin: 0;
+}
+.u066 .u066-back {
+  height: 46px;
+  max-height: 0;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 15px;
+  padding: 0;
+  background: none;
+  box-shadow: inset 0 0 0 1.5px var(--ux-line-2);
+  color: var(--ux-ink-2);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  overflow: hidden;
+  transform: translateY(12px);
+  transition:
+    opacity 0.3s,
+    transform 0.4s var(--ux-spring),
+    max-height 0.45s var(--ux-ease),
+    visibility 0s 0.45s;
+}
+.u066.is-done .u066-back {
+  max-height: 46px;
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .u066,
+  .u066 *,
+  .u066 *::before,
+  .u066 *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
+  }
+}

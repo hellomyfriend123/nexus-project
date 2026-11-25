@@ -1,0 +1,60 @@
+﻿/* Lucian UX/UI Prompt #070 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#070 */
+.u070 {
+  --ux-surface: var(--nx-surface, #fff);
+  --ux-surface-2: var(--nx-surface-2, #f5f3ef);
+  --ux-ink: var(--nx-ink, #16151b);
+  --ux-ink-3: var(--nx-ink-muted, #8e8a97);
+  --ux-line: var(--nx-line, rgba(22,21,27,.09));
+  --ux-shadow-strong: var(--nx-shadow-strong, rgba(40,30,80,.3));
+  --ux-accent: var(--nx-primary, #6a57f2);
+  --ux-mint: var(--nx-success, #119c72);
+  --ux-warn: var(--nx-warning, #d6731e);
+  --ux-danger: var(--nx-danger, #d93a55);
+  --ux-spring: cubic-bezier(.34,1.45,.64,1);
+  position: fixed; right: 24px; bottom: 24px; width: 350px; max-width: calc(100vw - 32px); z-index: 9999;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--ux-ink); -webkit-font-smoothing: antialiased; letter-spacing: -.01em;
+  -webkit-tap-highlight-color: transparent; overflow-wrap: anywhere; outline: none; color-scheme: light;
+}
+.u070, .u070 *, .u070 *::before, .u070 *::after { box-sizing: border-box; }
+.u070 button { font: inherit; cursor: pointer; }
+.u070:focus-visible { outline: 2px solid var(--ux-accent); outline-offset: 5px; border-radius: 20px; }
+.u070 .u070-toast { position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: center; gap: 12px; min-height: 68px; padding: 12px 12px 12px 14px; border-radius: 20px; background: var(--ux-surface); box-shadow: 0 0 0 1px var(--ux-line),0 16px 30px -18px var(--ux-shadow-strong); transform-origin: 50% 100%; transition: transform .5s var(--ux-spring),opacity .35s; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.u070 .u070-toast.leave { pointer-events: none; }
+.u070 .u070-toast > * { transition: opacity .25s; }
+.u070 .u070-toast.back > * { opacity: 0; }
+.u070 .u070-success { --c: var(--ux-mint); }
+.u070 .u070-error { --c: var(--ux-danger); }
+.u070 .u070-warning, .u070 .u070-loading { --c: var(--ux-warn); }
+.u070 .u070-info { --c: var(--ux-accent); }
+.u070 .u070-icon { width: 36px; height: 36px; flex: none; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb,var(--c) 15%,transparent); color: var(--c); }
+.u070 .u070-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.u070 .u070-spinner { width: 18px; height: 18px; border-radius: 50%; border: 2.5px solid currentColor; border-right-color: transparent; animation: u070-spin .7s linear infinite; }
+@keyframes u070-spin { to { transform: rotate(360deg); } }
+.u070 .u070-body { flex: 1; min-width: 0; }
+.u070 .u070-message, .u070 .u070-title { display: block; font-size: 14px; font-weight: 780; letter-spacing: -.02em; }
+.u070 .u070-title + .u070-message { margin-top: 2px; font-size: 12.5px; font-weight: 600; color: var(--ux-ink-3); letter-spacing: normal; }
+.u070 .u070-action { height: 32px; padding: 0 11px; border: 0; border-radius: 10px; background: var(--ux-surface-2); font-size: 12.5px; font-weight: 750; color: var(--ux-ink); }
+.u070 .u070-close { width: 30px; height: 30px; flex: none; border: 0; padding: 0; border-radius: 50%; display: grid; place-items: center; background: none; color: var(--ux-ink-3); }
+.u070 .u070-close:hover { background: var(--ux-surface-2); color: var(--ux-ink); }
+.u070 .u070-close svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.u070 .u070-action:focus-visible, .u070 .u070-close:focus-visible { outline: 2px solid var(--ux-accent); outline-offset: 1px; }
+.u070 .u070-bar { position: absolute; left: 16px; right: 16px; bottom: 0; height: 2px; border-radius: 2px; background: var(--c); opacity: .5; transform-origin: 0 50%; transform: scaleX(var(--left,1)); }
+@media (prefers-color-scheme: dark) {
+  .u070:not(:where([data-theme='light'] *)) {
+    --ux-surface: var(--nx-surface-dark, #13141c); --ux-surface-2: var(--nx-surface-2-dark, #1a1b25);
+    --ux-ink: var(--nx-ink-dark, #f4f0e8); --ux-ink-3: var(--nx-ink-muted-dark, rgba(244,240,232,.42));
+    --ux-line: var(--nx-line-dark, rgba(255,255,255,.08)); --ux-shadow-strong: var(--nx-shadow-strong-dark, rgba(0,0,0,.72));
+    --ux-accent: var(--nx-primary-dark, #b7a4ff); --ux-mint: var(--nx-success-dark, #7ee8c0); --ux-warn: var(--nx-warning-dark, #ffb26b); --ux-danger: var(--nx-danger-dark, #ff7d8c); color-scheme: dark;
+  }
+}
+[data-theme='dark'] .u070 {
+  --ux-surface: var(--nx-surface-dark, #13141c); --ux-surface-2: var(--nx-surface-2-dark, #1a1b25);
+  --ux-ink: var(--nx-ink-dark, #f4f0e8); --ux-ink-3: var(--nx-ink-muted-dark, rgba(244,240,232,.42));
+  --ux-line: var(--nx-line-dark, rgba(255,255,255,.08)); --ux-shadow-strong: var(--nx-shadow-strong-dark, rgba(0,0,0,.72));
+  --ux-accent: var(--nx-primary-dark, #b7a4ff); --ux-mint: var(--nx-success-dark, #7ee8c0); --ux-warn: var(--nx-warning-dark, #ffb26b); --ux-danger: var(--nx-danger-dark, #ff7d8c); color-scheme: dark;
+}
+@media (max-width: 480px) { .u070 { right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); } }
+@media (prefers-reduced-motion: reduce) {
+  .u070, .u070 *, .u070 *::before, .u070 *::after { transition-duration: .001ms !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; }
+}

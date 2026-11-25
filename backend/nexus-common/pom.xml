@@ -32,6 +32,20 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+
+        <!--
+          Đăng nhập bằng Google (OAuth 2.0 / OpenID Connect).
+          Boot 4 đổi tên starter theo quy ước mới: thêm tiền tố "security-".
+          Tên cũ spring-boot-starter-oauth2-client vẫn được BOM quản lý nhưng là bí danh
+          tương thích — dùng tên mới để khớp tài liệu Boot 4.
+          Starter kéo theo: spring-security-oauth2-client, spring-security-oauth2-jose
+          (cần để xác minh chữ ký id_token của Google) và nimbus-jose-jwt.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security-oauth2-client</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>

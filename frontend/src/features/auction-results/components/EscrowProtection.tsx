@@ -1,0 +1,1 @@
+﻿export default function EscrowProtection(_props: { benefits: string[]; onAction: (label: string) => void }) { return <section className="ar-panel ar-escrow"><h2><i className="bi bi-shield-check ar-blue" /> Cơ chế Bảo vệ Nexus Escrow</h2><p>API chưa cung cấp trạng thái ký quỹ hoặc điều kiện bảo chứng cho phiên này. Chưa thể xác nhận tiền được giữ hay hoàn trả.</p></section>; }
