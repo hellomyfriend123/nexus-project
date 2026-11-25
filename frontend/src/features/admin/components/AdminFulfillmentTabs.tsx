@@ -9,14 +9,14 @@ export function AdminFulfillmentTabs(model: ReturnType<typeof useAdminFulfillmen
         className={`nx-tab-btn ${activeTab === 'inventory' ? 'active' : ''}`}
         onClick={() => setActiveTab('inventory')}
       >
-        <i className="bi bi-box-seam me-1"></i> Giám sát tồn kho (1 task)
+        <i className="bi bi-box-seam me-1" aria-hidden="true"></i> Giám sát tồn kho
       </button>
       <button
         type="button"
         className={`nx-tab-btn ${activeTab === 'warehouses' ? 'active' : ''}`}
         onClick={() => setActiveTab('warehouses')}
       >
-        <i className="bi bi-buildings me-1"></i> Mạng lưới kho hàng (4 tasks)
+        <i className="bi bi-buildings me-1" aria-hidden="true"></i> Mạng lưới kho hàng
       </button>
     </div>
   );

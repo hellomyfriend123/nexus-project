@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { adminNotify } from '../../../roles/administrator/layouts/AdminLayout';
 import { adminFulfillmentApi } from '../services/admin.service';
 import { loadAllAdminPages } from '../services/adminPagination';
 import type {
@@ -122,7 +123,7 @@ export function useAdminFulfillment() {
           address: warehouseForm.address.trim(),
           status: (selectedWarehouse.status || 'ACTIVE') as any,
         });
-        alert('Đã cập nhật thông tin kho hàng!');
+        adminNotify.success('Đã cập nhật thông tin kho hàng', warehouseForm.name.trim());
       } else {
         if (!warehouseForm.code.trim()) return;
         await adminFulfillmentApi.createWarehouse({
@@ -130,13 +131,13 @@ export function useAdminFulfillment() {
           code: warehouseForm.code.trim().toUpperCase(),
           address: warehouseForm.address.trim(),
         });
-        alert('Đã tạo mới kho hàng trong hệ thống!');
+        adminNotify.success('Đã tạo mới kho hàng thành công', warehouseForm.name.trim());
       }
       setShowWarehouseModal(false);
       loadData();
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
-      alert(`Không thể lưu kho hàng:\n${errorMsg}`);
+      const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+      adminNotify.error('Không thể lưu kho hàng', errorMsg);
     }
   };
 
@@ -150,11 +151,11 @@ export function useAdminFulfillment() {
         address: wh.address,
         status: nextStatus as any,
       });
-      alert(`Đã đổi trạng thái kho hàng sang ${nextStatus}!`);
+      adminNotify.success('Đã đổi trạng thái kho hàng', `Trạng thái mới: ${nextStatus}`);
       loadData();
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
-      alert(`Không thể đổi trạng thái kho hàng:\n${errorMsg}`);
+      const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+      adminNotify.error('Không thể đổi trạng thái kho hàng', errorMsg);
     }
   };
 

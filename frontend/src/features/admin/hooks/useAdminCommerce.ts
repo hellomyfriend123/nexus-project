@@ -1,24 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { adminNotify, adminConfirm } from '../../../roles/administrator/layouts/AdminLayout';
 import { adminCommerceApi } from '../services/admin.service';
 import { loadAllAdminPages } from '../services/adminPagination';
 import type {
-  AdminOrder,
-  AdminCampaign,
-  AdminCoupon,
   OrderStatus,
   CampaignStatus,
-  CouponStatus,
 } from '../types/admin.types';
-
-
-
-
-
-
-
-
-
-import type { OrderItemDetail, DetailedAdminOrder, DetailedAdminCampaign, DetailedAdminCoupon } from '../types/commerce.types';
+import type { DetailedAdminOrder, DetailedAdminCampaign, DetailedAdminCoupon } from '../types/commerce.types';
 
 export function useAdminCommerce() {
   const [activeTab, setActiveTab] = useState<'orders' | 'campaigns' | 'coupons'>('orders');
@@ -145,29 +133,35 @@ export function useAdminCommerce() {
   const handleUpdateOrderStatus = async (id: string, newStatus: OrderStatus) => {
     try {
       await adminCommerceApi.updateOrderStatus(id, newStatus);
-      alert(`Đã cập nhật trạng thái đơn hàng #${id} thành ${newStatus}!`);
+      adminNotify.success('Đã cập nhật đơn hàng', `Trạng thái mới: ${newStatus}`);
       loadData();
       if (selectedOrder && selectedOrder.id === id) {
         setSelectedOrder((prev) => (prev ? { ...prev, status: newStatus } : null));
       }
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
-      alert(`Không thể đổi trạng thái đơn hàng:\n${errorMsg}`);
+      const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+      adminNotify.error('Không thể đổi trạng thái đơn hàng', errorMsg);
     }
   };
 
   const handleCancelOrder = async (id: string) => {
-    if (confirm('Xác nhận huỷ đơn hàng này? Hệ thống sẽ hoàn tiền cho người mua.')) {
+    const ok = await adminConfirm({
+      title: 'Xác nhận huỷ đơn hàng',
+      message: 'Xác nhận huỷ đơn hàng này? Hệ thống sẽ hoàn tiền cho người mua.',
+      confirmLabel: 'Huỷ đơn hàng',
+      danger: true,
+    });
+    if (ok) {
       try {
         await adminCommerceApi.cancelOrder(id);
-        alert(`Đã huỷ đơn hàng #${id}!`);
+        adminNotify.success('Đã huỷ đơn hàng thành công');
         loadData();
         if (selectedOrder && selectedOrder.id === id) {
           setSelectedOrder((prev) => (prev ? { ...prev, status: 'CANCELLED' } : null));
         }
       } catch (err: unknown) {
-        const errorMsg = err instanceof Error ? err.message : 'Lỗi huỷ đơn hàng';
-        alert(`Không thể huỷ đơn hàng:\n${errorMsg}`);
+        const errorMsg = err instanceof Error ? err.message : 'Lỗi huỷ đơn hàng từ Backend';
+        adminNotify.error('Không thể huỷ đơn hàng', errorMsg);
       }
     }
   };
@@ -217,14 +211,20 @@ export function useAdminCommerce() {
   };
 
   const handleEndCampaign = async (id: string) => {
-    if (confirm('Bạn muốn kết thúc chiến dịch khuyến mãi này? Trạng thái sẽ chuyển thành ENDED.')) {
+    const ok = await adminConfirm({
+      title: 'Kết thúc chiến dịch khuyến mãi',
+      message: 'Bạn muốn kết thúc chiến dịch khuyến mãi này? Trạng thái sẽ chuyển thành ENDED.',
+      confirmLabel: 'Kết thúc chiến dịch',
+      danger: true,
+    });
+    if (ok) {
       try {
         await adminCommerceApi.endCampaign(id);
-        alert('Đã kết thúc chiến dịch khuyến mãi!');
+        adminNotify.success('Đã kết thúc chiến dịch khuyến mãi');
         loadData();
       } catch (err: unknown) {
-        const errorMsg = err instanceof Error ? err.message : 'Lỗi kết thúc chiến dịch';
-        alert(`Không thể kết thúc chiến dịch:\n${errorMsg}`);
+        const errorMsg = err instanceof Error ? err.message : 'Lỗi kết thúc chiến dịch từ Backend';
+        adminNotify.error('Không thể kết thúc chiến dịch', errorMsg);
       }
     }
   };
@@ -232,7 +232,7 @@ export function useAdminCommerce() {
   const handleSaveCampaign = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!campaignForm.name.trim()) return;
-    if (campaignForm.startDate > campaignForm.endDate) { setError('Ngày kết thúc phải sau ngày bắt đầu.'); return; }
+    if (campaignForm.startDate && campaignForm.endDate && campaignForm.startDate > campaignForm.endDate) { setError('Ngày kết thúc phải sau ngày bắt đầu.'); return; }
 
     try {
       const payload: any = {
@@ -245,16 +245,16 @@ export function useAdminCommerce() {
 
       if (selectedCampaign) {
         await adminCommerceApi.updateCampaign(selectedCampaign.id, payload);
-        alert('Đã cập nhật chiến dịch khuyến mãi thành công!');
+        adminNotify.success('Đã cập nhật chiến dịch khuyến mãi', campaignForm.name.trim());
       } else {
         await adminCommerceApi.createCampaign(payload);
-        alert('Đã tạo chiến dịch khuyến mãi mới!');
+        adminNotify.success('Đã tạo chiến dịch khuyến mãi mới', campaignForm.name.trim());
       }
       setShowCampaignModal(false);
       loadData();
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
-      alert(`Không thể lưu chiến dịch:\n${errorMsg}`);
+      const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+      adminNotify.error('Không thể lưu chiến dịch', errorMsg);
     }
   };
 
@@ -321,11 +321,11 @@ export function useAdminCommerce() {
     const nextStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
     try {
       await adminCommerceApi.updateDiscountCodeStatus(id, nextStatus as 'ACTIVE' | 'INACTIVE');
-      alert(`Đã chuyển trạng thái mã giảm giá sang ${nextStatus}!`);
+      adminNotify.success('Đã đổi trạng thái mã giảm giá', `Trạng thái mới: ${nextStatus}`);
       loadData();
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Lỗi cập nhật mã giảm giá';
-      alert(`Không thể đổi trạng thái mã giảm giá:\n${errorMsg}`);
+      const errorMsg = err instanceof Error ? err.message : 'Lỗi cập nhật mã giảm giá từ Backend';
+      adminNotify.error('Không thể đổi trạng thái mã giảm giá', errorMsg);
     }
   };
 
@@ -350,16 +350,16 @@ export function useAdminCommerce() {
 
       if (selectedCoupon) {
         await adminCommerceApi.updateDiscountCode(selectedCoupon.id, payload);
-        alert('Đã cập nhật mã giảm giá thành công!');
+        adminNotify.success('Đã cập nhật mã giảm giá', payload.code);
       } else {
         await adminCommerceApi.createDiscountCode(payload);
-        alert('Đã tạo mã giảm giá mới!');
+        adminNotify.success('Đã tạo mã giảm giá mới', payload.code);
       }
       setShowCouponModal(false);
       loadData();
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
-      alert(`Không thể lưu mã giảm giá:\n${errorMsg}`);
+      const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+      adminNotify.error('Không thể lưu mã giảm giá', errorMsg);
     }
   };
 

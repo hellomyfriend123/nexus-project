@@ -1,5 +1,4 @@
 import { AdminCatalogCategoryModal } from './AdminCatalogCategoryModal';
-import { AdminCatalogReviewsPanel } from './AdminCatalogReviewsPanel';
 import { AdminCatalogProductsPanel } from './AdminCatalogProductsPanel';
 import { AdminCatalogCategoriesPanel } from './AdminCatalogCategoriesPanel';
 import { AdminCatalogTabs } from './AdminCatalogTabs';
@@ -21,9 +20,6 @@ export function AdminCatalogView(model: ReturnType<typeof useAdminCatalog>) {
 
       {/* TAB 2: PRODUCTS */}
       <AdminCatalogProductsPanel {...model} />
-
-      {/* TAB 3: REVIEWS MODERATION */}
-      <AdminCatalogReviewsPanel {...model} />
 
       {/* Category Create/Edit Modal */}
       <AdminCatalogCategoryModal {...model} />

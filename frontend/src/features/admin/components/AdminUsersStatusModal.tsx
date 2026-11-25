@@ -7,7 +7,7 @@ export function AdminUsersStatusModal(model: ReturnType<typeof useAdminUsers>) {
     <AdminModal
       isOpen={showStatusModal}
       onClose={() => setShowStatusModal(false)}
-      title="Kích hoạt / Vô hiệu hoá / Khoá tài khoản (PATCH /status)"
+      title="Cập nhật trạng thái tài khoản"
     >
       {selectedUser && (
         <div>
@@ -114,7 +114,7 @@ export function AdminUsersStatusModal(model: ReturnType<typeof useAdminUsers>) {
               disabled={actionLoading}
               onClick={handleUpdateStatus}
             >
-              {actionLoading ? 'Đang cập nhật...' : 'Lưu thay đổi (PATCH /status)'}
+              {actionLoading ? 'Đang cập nhật...' : 'Lưu thay đổi'}
             </button>
           </div>
         </div>

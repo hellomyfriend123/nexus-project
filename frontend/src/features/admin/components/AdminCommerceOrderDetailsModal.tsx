@@ -36,7 +36,7 @@ export function AdminCommerceOrderDetailsModal(model: ReturnType<typeof useAdmin
               </span>
               <span
                 className={`nx-badge ${
-                  selectedOrder.status === 'COMPLETED'
+                  selectedOrder.status === 'COMPLETED' || (selectedOrder.status as string) === 'DELIVERED'
                     ? 'nx-badge-success'
                     : selectedOrder.status === 'SHIPPING'
                       ? 'nx-badge-primary'

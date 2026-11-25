@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { adminNotify } from '../../../roles/administrator/layouts/AdminLayout';
 import { adminUsersApi } from '../services/admin.service';
 import { loadAllAdminPages } from '../services/adminPagination';
 import type {
@@ -155,12 +156,15 @@ export function useAdminUsers() {
     setActionLoading(true);
     try {
       await adminUsersApi.updateStatus(selectedUser.id, targetStatus);
-      alert(`Đã cập nhật trạng thái người dùng ${selectedUser.fullName} thành ${targetStatus}!`);
+      adminNotify.success(
+        'Đã cập nhật trạng thái tài khoản',
+        `${selectedUser.fullName} → ${targetStatus}`,
+      );
       setShowStatusModal(false);
       fetchUsers();
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
-      alert(`Không thể cập nhật trạng thái người dùng:\n${errorMsg}`);
+      const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+      adminNotify.error('Không thể cập nhật trạng thái người dùng', errorMsg);
     } finally {
       setActionLoading(false);
     }

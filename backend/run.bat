@@ -1,6 +1,6 @@
 @echo off
 setlocal
-set "MAVEN_OPTS=-Dmaven.repo.local=%~dp0..\.m2repo"
+set "MAVEN_OPTS=-Dmaven.repo.local="%~dp0..\.m2repo""
 cd /d "%~dp0"
 echo =====================================================================
 echo  PROJECT NEXUS BACKEND — Spring Boot 4 + Swagger UI

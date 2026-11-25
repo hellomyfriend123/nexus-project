@@ -18,7 +18,7 @@ if (-not $MavenArgs -or $MavenArgs.Count -eq 0) {
 
 $backendDir = $PSScriptRoot
 $repoLocal = Join-Path (Split-Path $backendDir -Parent) '.m2repo'
-$env:MAVEN_OPTS = "-Dmaven.repo.local=$repoLocal"
+$env:MAVEN_OPTS = "-Dmaven.repo.local=`"$repoLocal`""
 
 Write-Host "[build.ps1] MAVEN_OPTS=$env:MAVEN_OPTS" -ForegroundColor Cyan
 Write-Host "[build.ps1] mvn -f $backendDir\pom.xml $($MavenArgs -join ' ')" -ForegroundColor Cyan

@@ -8,7 +8,7 @@ export function AdminCommerceCouponsPanel(model: ReturnType<typeof useAdminComme
             <div className="nx-admin-card">
               <div className="nx-admin-card-header">
                 <div>
-                  <h2 className="nx-admin-card-title">Quản lý Voucher & Mã giảm giá (Discount Codes)</h2>
+                  <h2 className="nx-admin-card-title">Quản lý Voucher &amp; Mã giảm giá</h2>
                   <p style={{ margin: '4px 0 0 0', fontSize: '12.5px', color: '#64748b' }}>
                     Mã giảm giá cụ thể người mua nhập khi đặt hàng. Có thể trực thuộc một Chiến dịch hoặc áp dụng độc lập toàn sàn.
                   </p>

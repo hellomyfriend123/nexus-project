@@ -8,9 +8,9 @@ export function AdminCommerceCampaignsPanel(model: ReturnType<typeof useAdminCom
             <div className="nx-admin-card">
               <div className="nx-admin-card-header">
                 <div>
-                  <h2 className="nx-admin-card-title">Chiến dịch khuyến mãi toàn sàn (Marketing Campaigns)</h2>
+                  <h2 className="nx-admin-card-title">Chiến dịch khuyến mãi toàn sàn</h2>
                   <p style={{ margin: '4px 0 0 0', fontSize: '12.5px', color: '#64748b' }}>
-                    Khung chương trình marketing tổng thể theo mùa/sự kiện. Mỗi chiến dịch có thể chứa nhiều Mã giảm giá (Vouchers) trực thuộc.
+                    Khung chương trình marketing tổng thể theo mùa/sự kiện. Mỗi chiến dịch có thể chứa nhiều Mã giảm giá trực thuộc.
                   </p>
                 </div>
                 <button

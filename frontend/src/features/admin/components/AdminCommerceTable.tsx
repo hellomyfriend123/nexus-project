@@ -78,7 +78,7 @@ export function AdminCommerceTable(model: ReturnType<typeof useAdminCommerce>) {
                           <td>
                             <span
                               className={`nx-badge ${
-                                ord.status === 'COMPLETED'
+                                ord.status === 'COMPLETED' || (ord.status as string) === 'DELIVERED'
                                   ? 'nx-badge-success'
                                   : ord.status === 'SHIPPING'
                                     ? 'nx-badge-primary'

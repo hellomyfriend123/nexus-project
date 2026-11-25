@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { adminNotify, adminConfirm } from '../../../roles/administrator/layouts/AdminLayout';
 import { adminCatalogApi } from '../services/admin.service';
 import { loadAllAdminPages } from '../services/adminPagination';
 import type {
@@ -135,36 +136,38 @@ export function useAdminCatalog() {
           sortOrder: selectedCategory.sortOrder,
           parentId: selectedCategory.parentId ?? null,
         });
-        alert('Đã cập nhật danh mục thành công!');
+        adminNotify.success('Đã cập nhật danh mục', categoryForm.name.trim());
       } else {
         await adminCatalogApi.createCategory({
           name: categoryForm.name.trim(),
           description: categoryForm.description.trim() || undefined,
           status: categoryForm.status,
         });
-        alert('Đã tạo danh mục mới thành công!');
+        adminNotify.success('Đã tạo danh mục mới', categoryForm.name.trim());
       }
       setShowCategoryModal(false);
       loadData();
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : 'Lỗi lưu danh mục từ máy chủ';
-      alert(`Không thể lưu danh mục:\n${errorMsg}`);
+      adminNotify.error('Không thể lưu danh mục', errorMsg);
     }
   };
 
   const handleDeleteCategory = async (cat: AdminCategory) => {
-    if (
-      confirm(
-        `Bạn có chắc chắn muốn xoá mềm danh mục "${cat.name}"?\nDanh mục sẽ ngừng hiển thị; dữ liệu đã có vẫn được giữ lại.`
-      )
-    ) {
+    const ok = await adminConfirm({
+      title: 'Xác nhận xoá mềm danh mục',
+      message: `Bạn có chắc chắn muốn xoá mềm danh mục "${cat.name}"?\nDanh mục sẽ được chuyển sang trạng thái INACTIVE để đảm bảo toàn vẹn dữ liệu.`,
+      confirmLabel: 'Xoá danh mục',
+      danger: true,
+    });
+    if (ok) {
       try {
         await adminCatalogApi.deleteCategory(cat.id);
-        alert(`Đã xoá mềm danh mục "${cat.name}" thành công! Trạng thái đã chuyển sang INACTIVE.`);
+        adminNotify.success('Đã xoá mềm danh mục', `"${cat.name}" đã chuyển sang INACTIVE`);
         loadData();
       } catch (err: unknown) {
-        const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
-        alert(`Không thể xoá danh mục:\n${errorMsg}`);
+        const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+        adminNotify.error('Không thể xoá danh mục', errorMsg);
       }
     }
   };
@@ -174,23 +177,29 @@ export function useAdminCatalog() {
     const nextStatus: ProductStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
     try {
       await adminCatalogApi.updateProductStatus(id, nextStatus);
-      alert(`Đã đổi trạng thái sản phẩm sang ${nextStatus}!`);
+      adminNotify.success('Đã đổi trạng thái sản phẩm', `Trạng thái mới: ${nextStatus}`);
       loadData();
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
-      alert(`Không thể đổi trạng thái sản phẩm:\n${errorMsg}`);
+      const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+      adminNotify.error('Không thể đổi trạng thái sản phẩm', errorMsg);
     }
   };
 
   const handleDeleteProduct = async (id: string) => {
-    if (confirm('Bạn có chắc chắn muốn xoá mềm sản phẩm này?')) {
+    const ok = await adminConfirm({
+      title: 'Xác nhận xoá mềm sản phẩm',
+      message: 'Bạn có chắc chắn muốn xoá mềm sản phẩm này?',
+      confirmLabel: 'Xoá sản phẩm',
+      danger: true,
+    });
+    if (ok) {
       try {
         await adminCatalogApi.deleteProduct(id);
-        alert('Đã xoá mềm sản phẩm!');
+        adminNotify.success('Đã xoá mềm sản phẩm thành công');
         loadData();
       } catch (err: unknown) {
-        const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
-        alert(`Không thể xoá sản phẩm:\n${errorMsg}`);
+        const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+        adminNotify.error('Không thể xoá sản phẩm', errorMsg);
       }
     }
   };
@@ -199,22 +208,22 @@ export function useAdminCatalog() {
   const handleApproveReview = async (id: string) => {
     try {
       await adminCatalogApi.updateReviewStatus(id, 'VISIBLE');
-      alert('Đã hiển thị lại đánh giá sản phẩm!');
+      adminNotify.success('Đã hiển thị lại đánh giá sản phẩm');
       loadData();
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
-      alert(`Không thể hiển thị lại đánh giá:\n${errorMsg}`);
+      const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+      adminNotify.error('Không thể hiển thị lại đánh giá', errorMsg);
     }
   };
 
   const handleRejectReview = async (id: string) => {
     try {
       await adminCatalogApi.updateReviewStatus(id, 'HIDDEN');
-      alert('Đã ẩn đánh giá sản phẩm!');
+      adminNotify.success('Đã ẩn đánh giá sản phẩm');
       loadData();
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Không thể hoàn tất yêu cầu';
-      alert(`Không thể ẩn đánh giá:\n${errorMsg}`);
+      const errorMsg = err instanceof Error ? err.message : 'Lỗi từ Backend';
+      adminNotify.error('Không thể ẩn đánh giá', errorMsg);
     }
   };
 

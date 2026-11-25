@@ -3,4 +3,5 @@ export interface AdminMenuItem {
   end?: boolean;
   label: string;
   icon: string;
+  badge?: string;
 }

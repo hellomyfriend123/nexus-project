@@ -1,10 +1,10 @@
 import type { AdminMenuItem } from '../types/adminLayout.types';
 
 export const adminMenuItems: AdminMenuItem[] = [
-  { to: '/admin', end: true, label: 'Tổng quan', icon: 'bi-grid-1x2' },
-  { to: '/admin/users', label: 'Người dùng', icon: 'bi-people' },
-  { to: '/admin/catalog', label: 'Danh mục & sản phẩm', icon: 'bi-box-seam' },
-  { to: '/admin/commerce', label: 'Đơn hàng & khuyến mãi', icon: 'bi-receipt' },
-  { to: '/admin/fulfillment', label: 'Kho hàng & tồn kho', icon: 'bi-building' },
-  { to: '/admin/auctions', label: 'Đấu giá', icon: 'bi-hammer' },
+  { to: '/admin', end: true, label: 'Tổng quan', icon: 'bi-grid-1x2-fill' },
+  { to: '/admin/users', label: 'Quản lý người dùng', icon: 'bi-people-fill' },
+  { to: '/admin/catalog', label: 'Danh mục & Sản phẩm', icon: 'bi-box-seam-fill', badge: 'Catalog' },
+  { to: '/admin/commerce', label: 'Đơn hàng & Khuyến mãi', icon: 'bi-receipt-cutoff', badge: 'Commerce' },
+  { to: '/admin/fulfillment', label: 'Tồn kho & Kho hàng', icon: 'bi-building-fill-gear', badge: 'Fulfillment' },
+  { to: '/admin/auctions', label: 'Quản lý đấu giá', icon: 'bi-hammer', badge: 'Auction' },
 ];
