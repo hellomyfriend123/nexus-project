@@ -77,6 +77,18 @@ nexus:
     token:
       secret: ${JWT_SECRET:nexus-dev-secret-doi-truoc-khi-nop}
       ttl-minutes: ${TOKEN_TTL_MINUTES:480}
+    # ---------------------------------------------------------------------------------
+    # Quên mật khẩu (POST /api/v1/auth/forgot-password, /api/v1/auth/reset-password)
+    #
+    # ttl-minutes  : hạn dùng của mã đặt lại.
+    # expose-token : CHỈ dùng cho dev/demo. Khi true, response của forgot-password chứa
+    #                luôn mã thô để dán vào Swagger — KHÔNG cần cấu hình SMTP.
+    #                Ở production BẮT BUỘC để false (mặc định), nếu không bất kỳ ai gọi
+    #                được forgot-password cũng chiếm được tài khoản của người khác.
+    # ---------------------------------------------------------------------------------
+    password-reset:
+      ttl-minutes: ${PASSWORD_RESET_TTL_MINUTES:15}
+      expose-token: ${PASSWORD_RESET_EXPOSE_TOKEN:true}
     cors:
       allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
     # ---------------------------------------------------------------------------------

@@ -8,7 +8,8 @@ export interface Product { id: string; sellerId: string; name: string; descripti
 export interface ProductInput { name: string; description: string; basePrice: number; images: { imageUrl: string; primary: boolean }[] }
 export interface Inventory { id: string; skuId: string; productId: string; skuCode: string; skuName: string | null; warehouseId: string; totalQuantity: number; availableQuantity: number; status: string }
 export interface Sku { id: string; productId: string; sellerId: string; skuCode: string; name: string | null; costPrice?: number | null; price: number | null }
-export interface SkuInput { productId: string; skuCode: string; name?: string; costPrice?: number | null; price?: number; initialTotalQuantity?: number; initialAvailableQuantity?: number }
+/** Không có skuCode: mã SKU do BE tự sinh (SKU-001, SKU-002, …) và trả lại trong Sku.skuCode. */
+export interface SkuInput { productId: string; name?: string; costPrice?: number | null; price?: number; initialTotalQuantity?: number; initialAvailableQuantity?: number }
 export interface OrderItem { id: string; productId: string; skuId?: string | null; productNameSnapshot: string; skuCodeSnapshot?: string | null; quantity: number; unitPrice: number; subtotal: number }
 export interface Order { id: string; orderNumber: string; status: string; totalAmount: number; itemCount?: number; createdAt: string; receiverName?: string; receiverPhone?: string; shippingAddress?: string; items?: OrderItem[] }
 const productPath = '/seller/catalog/products';
@@ -115,7 +116,8 @@ export const mutateAuction=(id:string|null,data?:unknown)=>rawRequest<Auction>('
 export const cancelAuction=(id:string)=>rawRequest<Auction>('/seller/auction/auctions/'+encodeURIComponent(id)+'/cancel',json('POST'));
 
 export interface Shipment {id:string;orderId:string;trackingNumber?:string;status:string}
-export const createShipment=(orderId:string,trackingNumber:string)=>rawRequest<Shipment>('/seller/fulfillment/shipments',json('POST',{orderId,trackingNumber}));
+/** Mã vận đơn do BE tự sinh (TRK-001, TRK-002, …) nên client KHÔNG gửi trackingNumber lên. */
+export const createShipment=(orderId:string)=>rawRequest<Shipment>('/seller/fulfillment/shipments',json('POST',{orderId}));
 export const updateShipment=(id:string,status:string)=>rawRequest<Shipment>('/seller/fulfillment/shipments/'+encodeURIComponent(id)+'/status',json('PATCH',{status}));
 
 /** Product PUT replaces its image list, so preserve the independent primary URL. */

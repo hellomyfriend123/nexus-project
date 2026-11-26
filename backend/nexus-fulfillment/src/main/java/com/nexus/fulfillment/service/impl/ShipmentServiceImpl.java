@@ -25,6 +25,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ShipmentServiceImpl implements ShipmentService {
 
+    /** Tiền tố mã vận đơn do hệ thống sinh: TRK-001, TRK-002, … */
+    private static final String TRACKING_NUMBER_PREFIX = "TRK";
+
     private final ShipmentRepository shipmentRepository;
     private final BuyerOrderOwnershipVerifier buyerOrderOwnershipVerifier;
 
@@ -46,11 +49,27 @@ public class ShipmentServiceImpl implements ShipmentService {
                 .orderId(request.orderId())
                 .sellerId(sellerId)
                 .warehouseId(request.warehouseId())
-                .trackingNumber(request.trackingNumber())
+                .trackingNumber(generateTrackingNumber())
                 .status(ShipmentStatus.PENDING)
                 .build();
 
         return ShipmentMapper.toResponse(shipmentRepository.save(shipment));
+    }
+
+    /**
+     * Sinh mã vận đơn kế tiếp dạng {@code TRK-001}, {@code TRK-002}, …
+     * <p>
+     * Seller <b>không nhập tay</b> mã này nữa — hệ thống cấp mã, FE chỉ hiển thị lại
+     * {@code ShipmentResponse.trackingNumber}. Số kế tiếp lấy từ mã lớn nhất đang có trong DB nên
+     * đúng cả sau khi khởi động lại và sau khi có bản ghi bị xoá.
+     */
+    private String generateTrackingNumber() {
+        int maxNumber = shipmentRepository.findTrackingNumbersStartingWith(TRACKING_NUMBER_PREFIX + "-").stream()
+                .mapToInt(code -> SequentialCodeGenerator.numberOf(TRACKING_NUMBER_PREFIX, code))
+                .max()
+                .orElse(0);
+        return SequentialCodeGenerator.next(TRACKING_NUMBER_PREFIX, maxNumber,
+                shipmentRepository::existsByTrackingNumber);
     }
 
     @Override

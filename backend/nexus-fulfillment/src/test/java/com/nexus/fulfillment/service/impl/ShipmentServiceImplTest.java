@@ -136,16 +136,19 @@ class ShipmentServiceImplTest {
     @Test
     @DisplayName("FR-38: tạo vận đơn luôn ở trạng thái PENDING và gắn sellerId từ token")
     void createShouldStartAsPending() {
+        when(shipmentRepository.findTrackingNumbersStartingWith("TRK-")).thenReturn(List.of());
+        when(shipmentRepository.existsByTrackingNumber("TRK-001")).thenReturn(false);
         when(shipmentRepository.save(any(Shipment.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         ShipmentResponse response = shipmentService.create(SELLER_ID,
-                new CreateShipmentRequest(ORDER_ID, WAREHOUSE_ID, "GHN-123456"));
+                new CreateShipmentRequest(ORDER_ID, WAREHOUSE_ID));
 
         assertThat(response.status()).isEqualTo(ShipmentStatus.PENDING);
         assertThat(response.sellerId()).isEqualTo(SELLER_ID);
         assertThat(response.orderId()).isEqualTo(ORDER_ID);
         assertThat(response.warehouseId()).isEqualTo(WAREHOUSE_ID);
-        assertThat(response.trackingNumber()).isEqualTo("GHN-123456");
+        // Mã vận đơn do hệ thống sinh, KHÔNG nhận từ client.
+        assertThat(response.trackingNumber()).isEqualTo("TRK-001");
 
         ArgumentCaptor<Shipment> captor = ArgumentCaptor.forClass(Shipment.class);
         verify(shipmentRepository).save(captor.capture());
@@ -153,10 +156,24 @@ class ShipmentServiceImplTest {
     }
 
     @Test
+    @DisplayName("FR-38: mã vận đơn nối tiếp mã lớn nhất đang có trong DB (TRK-007 → TRK-008)")
+    void createShouldContinueTrackingNumberSequence() {
+        when(shipmentRepository.findTrackingNumbersStartingWith("TRK-"))
+                .thenReturn(List.of("TRK-003", "TRK-007", "TRK-005"));
+        when(shipmentRepository.existsByTrackingNumber("TRK-008")).thenReturn(false);
+        when(shipmentRepository.save(any(Shipment.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        ShipmentResponse response = shipmentService.create(SELLER_ID,
+                new CreateShipmentRequest(ORDER_ID, null));
+
+        assertThat(response.trackingNumber()).isEqualTo("TRK-008");
+    }
+
+    @Test
     @DisplayName("FR-38: thiếu orderId → BusinessException")
     void createWithoutOrderIdShouldFail() {
         assertThatThrownBy(() -> shipmentService.create(SELLER_ID,
-                new CreateShipmentRequest(null, null, "GHN-1")))
+                new CreateShipmentRequest(null, null)))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("orderId");
 

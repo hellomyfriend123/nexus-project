@@ -375,8 +375,6 @@ export default function CreateListingPage() {
     setSubmitting(true);
     try {
       const imagesPayload = imageUrls.map((imageUrl, idx) => ({ imageUrl, primary: idx === 0 }));
-      const basePrefix = toFolderSlug(name, 'SP').toUpperCase().slice(0, 10);
-      const suffix = Date.now().toString().slice(-4);
 
       if (isEditMode && productId) {
         await sellerApi.updateProduct(productId, {
@@ -416,15 +414,12 @@ export default function CreateListingPage() {
         if (newDraftSkus.length > 0) {
           await Promise.all(
             newDraftSkus.map((row, idx) => {
-              const variantSlug = toFolderSlug(row.name, `V${idx + 1}`).toUpperCase().slice(0, 10);
-              const code = row.skuCode.trim() || `${basePrefix}-${variantSlug}-${suffix}-${idx + 1}`;
               const skuCost = row.costPrice.trim() ? Number(row.costPrice) : 0;
               const skuPrice = row.price.trim() ? Number(row.price) : numericPrice;
               const qty = Math.max(0, Math.floor(Number(row.initialQuantity) || 0));
               return sellerApi
                 .createSku({
                   productId,
-                  skuCode: code,
                   name: row.name.trim() || `Phân loại ${idx + 1}`,
                   costPrice: Number.isFinite(skuCost) && skuCost >= 0 ? skuCost : 0,
                   price: Number.isFinite(skuPrice) && skuPrice > 0 ? skuPrice : numericPrice,
@@ -452,15 +447,12 @@ export default function CreateListingPage() {
 
       await Promise.all(
         draftSkus.map((row, idx) => {
-          const variantSlug = toFolderSlug(row.name, `V${idx + 1}`).toUpperCase().slice(0, 10);
-          const code = row.skuCode.trim() || `${basePrefix}-${variantSlug}-${suffix}-${idx + 1}`;
           const skuCost = row.costPrice.trim() ? Number(row.costPrice) : 0;
           const skuPrice = row.price.trim() ? Number(row.price) : numericPrice;
           const qty = Math.max(0, Math.floor(Number(row.initialQuantity) || 0));
           return sellerApi
             .createSku({
               productId: created.id,
-              skuCode: code,
               name: row.name.trim() || `Phân loại ${idx + 1}`,
               costPrice: Number.isFinite(skuCost) && skuCost >= 0 ? skuCost : 0,
               price: Number.isFinite(skuPrice) && skuPrice > 0 ? skuPrice : numericPrice,

@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS nexus_fulfillment.shipments (
     order_id        UUID         NOT NULL,           -- tham chiếu logic tới nexus_commerce.orders
     warehouse_id    UUID         REFERENCES nexus_fulfillment.warehouses (id),
     seller_id       UUID,
-    tracking_number VARCHAR(100),                    -- FR-40: nhập tay, KHÔNG tích hợp carrier thật
+    tracking_number VARCHAR(100),                    -- FR-40: hệ thống tự sinh TRK-001, TRK-002, … (KHÔNG nhập tay)
     status          VARCHAR(20)  NOT NULL DEFAULT 'PENDING',
     created_at      TIMESTAMPTZ  NOT NULL DEFAULT now(),
     updated_at      TIMESTAMPTZ
@@ -79,5 +79,11 @@ CREATE TABLE IF NOT EXISTS nexus_fulfillment.shipments (
 CREATE INDEX IF NOT EXISTS ix_shipments_order_id  ON nexus_fulfillment.shipments (order_id);
 CREATE INDEX IF NOT EXISTS ix_shipments_seller_id ON nexus_fulfillment.shipments (seller_id);
 CREATE INDEX IF NOT EXISTS ix_shipments_status    ON nexus_fulfillment.shipments (status);
+
+-- Mã vận đơn do hệ thống sinh (TRK-001, TRK-002, …) nên phải duy nhất: đây là lớp bảo vệ cuối
+-- nếu hai request tạo vận đơn song song cùng tính ra một số thứ tự.
+CREATE UNIQUE INDEX IF NOT EXISTS ux_shipments_tracking_number
+    ON nexus_fulfillment.shipments (tracking_number) WHERE tracking_number IS NOT NULL;
+
 ALTER TABLE nexus_fulfillment.shipments
     ADD CONSTRAINT ck_shipments_status CHECK (status IN ('PENDING', 'SHIPPED', 'DELIVERED'));

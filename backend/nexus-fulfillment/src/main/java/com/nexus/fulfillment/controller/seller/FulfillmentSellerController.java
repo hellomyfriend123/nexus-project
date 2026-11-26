@@ -53,8 +53,9 @@ public class FulfillmentSellerController {
     @PreAuthorize("hasRole('SELLER')")
     @Operation(summary = "FR-05 — Seller tạo SKU kèm tồn kho ban đầu ở kho mặc định",
             description = "Tạo SKU của Product đã có và đồng thời tạo bản ghi tồn kho ở kho ACTIVE đầu tiên. "
+                    + "Mã SKU do hệ thống tự sinh dạng SKU-001, SKU-002, … — client KHÔNG gửi skuCode lên. "
                     + "Ghi chú: luồng tạo Product kèm SKU sẽ nối vào đây ở giai đoạn business logic.")
-    @ApiResponse(responseCode = "201", description = "Tạo SKU thành công")
+    @ApiResponse(responseCode = "201", description = "Tạo SKU thành công, trả về skuCode do hệ thống cấp")
     public ResponseEntity<SkuResponse> createSku(@Valid @RequestBody CreateSkuRequest request) {
         UUID sellerId = SecurityUtils.currentUserId();
         return ResponseEntity.status(HttpStatus.CREATED).body(skuService.create(sellerId, request));
@@ -129,9 +130,10 @@ public class FulfillmentSellerController {
     @PostMapping("/shipments")
     @PreAuthorize("hasRole('SELLER')")
     @Operation(summary = "FR-38 — Seller tạo vận đơn cho đơn hàng",
-            description = "Trạng thái khởi tạo là PENDING. Ghi chú: điều kiện \"Order đã thanh toán thành công\" "
+            description = "Trạng thái khởi tạo là PENDING. Mã vận đơn do hệ thống tự sinh dạng TRK-001, TRK-002, … "
+                    + "— client KHÔNG gửi trackingNumber lên. Ghi chú: điều kiện \"Order đã thanh toán thành công\" "
                     + "sẽ được kiểm tra khi nối với module commerce ở giai đoạn business logic.")
-    @ApiResponse(responseCode = "201", description = "Tạo vận đơn thành công")
+    @ApiResponse(responseCode = "201", description = "Tạo vận đơn thành công, trả về trackingNumber do hệ thống cấp")
     public ResponseEntity<ShipmentResponse> createShipment(@Valid @RequestBody CreateShipmentRequest request) {
         UUID sellerId = SecurityUtils.currentUserId();
         return ResponseEntity.status(HttpStatus.CREATED).body(shipmentService.create(sellerId, request));

@@ -53,14 +53,13 @@ export function useSellerHub() {
  const price=Number(draft.price),quantity=Number(draft.stock);
  if(!draft.name.trim()||!Number.isFinite(price)||price<=0||!draft.stock||!Number.isInteger(quantity)||quantity<0||!categories.some(c=>c.id===draft.category)){notify.warning('Nhập tên, danh mục, giá và tồn kho hợp lệ.');return;}
  if(draft.makeOffer||!draft.buyNow){notify.warning('Cấu hình trả giá chưa được hỗ trợ. Vui lòng chọn mua ngay.');return;}
- const skuCode=window.prompt('Nhập mã SKU cho sản phẩm (bắt buộc, tối đa 100 ký tự):')?.trim();if(!skuCode)return;if(skuCode.length>100){notify.warning('Mã SKU tối đa 100 ký tự.');return;}
  mutationLock.current=true;setBusy(true);
  try{
  const input={name:draft.name.trim(),description:'',basePrice:price,categoryId:draft.category,images:[]};
  assertProductRetryMatches(pendingProduct.current,input);
  const id=pendingProduct.current?.id??(await sellerApi.createProduct(input)).id;
  pendingProduct.current={id,fingerprint:productCreationFingerprint(input)};
- await sellerApi.createSku({productId:id,skuCode,name:input.name,price,initialTotalQuantity:quantity,initialAvailableQuantity:quantity});
+ await sellerApi.createSku({productId:id,name:input.name,price,initialTotalQuantity:quantity,initialAvailableQuantity:quantity});
  pendingProduct.current=null;
  // Creation is complete even if the subsequent inventory read fails. Clear the
  // form now so retrying a failed refresh cannot create the same listing again.

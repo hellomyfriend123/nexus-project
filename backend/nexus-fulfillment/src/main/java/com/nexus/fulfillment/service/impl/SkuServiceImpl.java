@@ -2,7 +2,6 @@ package com.nexus.fulfillment.service.impl;
 
 import com.nexus.common.api.PageResponse;
 import com.nexus.common.exception.BusinessException;
-import com.nexus.common.exception.DuplicateResourceException;
 import com.nexus.common.exception.ForbiddenOperationException;
 import com.nexus.common.exception.ResourceNotFoundException;
 import com.nexus.fulfillment.dto.common.SkuResponse;
@@ -35,6 +34,9 @@ public class SkuServiceImpl implements SkuService {
     /** Ngưỡng cảnh báo sắp hết hàng — dùng chung quy tắc với FR-14. */
     private static final int LOW_STOCK_THRESHOLD = 5;
 
+    /** Tiền tố mã SKU do hệ thống sinh: SKU-001, SKU-002, … */
+    private static final String SKU_CODE_PREFIX = "SKU";
+
     private final SkuRepository skuRepository;
     private final InventoryRepository inventoryRepository;
     private final WarehouseRepository warehouseRepository;
@@ -42,9 +44,6 @@ public class SkuServiceImpl implements SkuService {
     @Override
     @Transactional
     public SkuResponse create(UUID sellerId, CreateSkuRequest request) {
-        if (skuRepository.existsBySkuCode(request.skuCode())) {
-            throw new DuplicateResourceException("SKU", "skuCode", request.skuCode());
-        }
         if (request.costPrice() != null && request.price() != null
                 && request.costPrice().compareTo(request.price()) > 0) {
             throw new BusinessException("Không được phép bán lỗ: Giá bán SKU (" + request.price()
@@ -54,7 +53,7 @@ public class SkuServiceImpl implements SkuService {
         Sku sku = Sku.builder()
                 .productId(request.productId())
                 .sellerId(sellerId)
-                .skuCode(request.skuCode())
+                .skuCode(generateSkuCode())
                 .name(request.name())
                 .costPrice(request.costPrice())
                 .price(request.price())
@@ -65,6 +64,22 @@ public class SkuServiceImpl implements SkuService {
         createInitialInventory(saved, request);
 
         return SkuMapper.toResponse(saved);
+    }
+
+    /**
+     * Sinh mã SKU kế tiếp dạng {@code SKU-001}, {@code SKU-002}, …
+     * <p>
+     * Seller <b>không nhập</b> mã này nữa — hệ thống cấp mã, FE chỉ hiển thị lại
+     * {@code SkuResponse.skuCode}. Số kế tiếp lấy từ mã lớn nhất đang có trong DB nên đúng cả sau khi
+     * khởi động lại và sau khi có bản ghi bị xoá. Unique index {@code ux_skus_sku_code} là lớp bảo vệ
+     * cuối nếu hai request song song cùng ra một số.
+     */
+    private String generateSkuCode() {
+        int maxNumber = skuRepository.findSkuCodesStartingWith(SKU_CODE_PREFIX + "-").stream()
+                .mapToInt(code -> SequentialCodeGenerator.numberOf(SKU_CODE_PREFIX, code))
+                .max()
+                .orElse(0);
+        return SequentialCodeGenerator.next(SKU_CODE_PREFIX, maxNumber, skuRepository::existsBySkuCode);
     }
 
     @Override

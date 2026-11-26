@@ -62,7 +62,6 @@ export function useCreateListing(options: CreateListingOptions = {}) {
   async function submitListing(){
     if(mutationLock.current)return;
     const next=validateListing(draft,category,saleModes);
-    if(!draft.sku.trim()||draft.sku.trim().length>100)next.push('Nhập mã SKU tối đa 100 ký tự.');
     if(!categories.some(c=>c.id===category))next.push('Chọn danh mục từ hệ thống.');
     if(saleModes.some(m=>m!=='fixed'))next.push('Màn hình này chỉ hỗ trợ mua ngay; đấu giá/trả giá chưa được lưu.');
     setErrors(next);if(next.length){notify.warning(next[0]);return;}
@@ -76,7 +75,7 @@ export function useCreateListing(options: CreateListingOptions = {}) {
       // Finish media before SKU creation so upload retries cannot duplicate a SKU.
       await persistListingImages(id,mediaRef.current,uploadedImages.current,sellerApi.uploadProductImage,
         images => sellerApi.updateProduct(id,{name:input.name,description:input.description,basePrice:input.basePrice,images}));
-      await sellerApi.createSku({productId:id,skuCode:draft.sku.trim(),name:input.name,price:input.basePrice,initialTotalQuantity:draft.quantity,initialAvailableQuantity:draft.quantity});
+      await sellerApi.createSku({productId:id,name:input.name,price:input.basePrice,initialTotalQuantity:draft.quantity,initialAvailableQuantity:draft.quantity});
       pendingProduct.current=null;notify.success('Đã lưu sản phẩm, SKU và tồn kho.');
       if(onSuccess.current)onSuccess.current();
       else navigate('/seller/products',{state:{listingPublished:true}});

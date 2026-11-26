@@ -76,6 +76,11 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login").permitAll()
+                        // Quên mật khẩu: người dùng chưa/không thể đăng nhập nên phải công khai.
+                        // Chính mã đặt lại (dùng một lần, có hạn) là bằng chứng xác thực ở bước 2.
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/v1/auth/forgot-password",
+                                "/api/v1/auth/reset-password").permitAll()
                         // Luồng Google OAuth2: client chưa có token nên phải công khai.
                         // (Chain riêng của OAuth2 được ưu tiên hơn và đã khớp các URL này;
                         //  các dòng dưới là lớp phòng thủ thứ hai nếu chain đó không được bật.)

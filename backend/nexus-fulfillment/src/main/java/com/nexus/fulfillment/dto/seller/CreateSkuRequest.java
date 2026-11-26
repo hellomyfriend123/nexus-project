@@ -1,6 +1,5 @@
 package com.nexus.fulfillment.dto.seller;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
@@ -13,6 +12,10 @@ import java.util.UUID;
  * <p>
  * {@code sellerId} KHÔNG nhận từ client — lấy từ token (SecurityUtils.currentUserId()).
  * <p>
+ * <b>KHÔNG nhận {@code skuCode} từ client:</b> mã SKU do hệ thống tự sinh dạng
+ * {@code SKU-001}, {@code SKU-002}, … (xem {@code SkuServiceImpl}). Người dùng chỉ nhập thông tin
+ * nghiệp vụ; mã hiển thị lại trong {@code SkuResponse.skuCode} để FE đọc ra cho người dùng thấy.
+ * <p>
  * {@code initialTotalQuantity}/{@code initialAvailableQuantity}: tồn kho ban đầu, service sẽ tạo
  * luôn một bản ghi {@code Inventory} ở kho ACTIVE mặc định. Để trống = 0.
  * <p>
@@ -24,10 +27,6 @@ public record CreateSkuRequest(
 
         @NotNull(message = "productId không được để trống")
         UUID productId,
-
-        @NotBlank(message = "skuCode không được để trống")
-        @Size(max = 100, message = "skuCode tối đa 100 ký tự")
-        String skuCode,
 
         @Size(max = 200, message = "Tên SKU tối đa 200 ký tự")
         String name,
@@ -46,12 +45,11 @@ public record CreateSkuRequest(
 ) {
     public CreateSkuRequest(
             UUID productId,
-            String skuCode,
             String name,
             BigDecimal price,
             Integer initialTotalQuantity,
             Integer initialAvailableQuantity
     ) {
-        this(productId, skuCode, name, null, price, initialTotalQuantity, initialAvailableQuantity);
+        this(productId, name, null, price, initialTotalQuantity, initialAvailableQuantity);
     }
 }
